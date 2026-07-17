@@ -723,7 +723,7 @@ a { color: inherit; }
   --panel-bg: oklch(22% var(--panel-chroma) 195);
 }
 
-.theme-navigator {
+.theme-insights {
   --c-chroma: calc(0.17 * var(--p-color-amount, 1));
   --paper-chroma: calc(0.006 * var(--p-color-amount, 1));
   --panel-chroma: calc(0.08 * var(--p-color-amount, 1));
@@ -734,7 +734,7 @@ a { color: inherit; }
   --panel-bg: oklch(20% var(--panel-chroma) 260);
 }
 
-.theme-omnitopia {
+.theme-sim {
   --c-chroma: calc(0.19 * var(--p-color-amount, 1));
   --paper-chroma: calc(0.006 * var(--p-color-amount, 1));
   --panel-chroma: calc(0.08 * var(--p-color-amount, 1));
