@@ -1,0 +1,45 @@
+:root {
+  --paper: #fafaf8;
+  --ink: #111;
+  --muted: #888;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0f0f0e;
+    --ink: #f1f1ee;
+    --muted: #888;
+  }
+}
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: Helvetica, Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stub {
+  text-align: center;
+  padding: 32px;
+  max-width: 480px;
+}
+.stub__label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.stub__title {
+  font-size: 22px;
+  margin: 0 0 8px;
+  font-weight: 500;
+}
+.stub__body {
+  font-size: 15px;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.5;
+}
