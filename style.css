@@ -129,16 +129,10 @@ a { color: inherit; }
 /* Home panel */
 .panel--home .panel__type { font-size: clamp(3rem, 6.6vw, 7.5rem); }
 .panel--home .panel__type span:nth-child(2) { padding-left: 0.18em; }
+.panel--home .panel__meta { justify-content: flex-end; }
 
 /* Case panel */
 .panel--case .panel__type { font-size: clamp(2.2rem, 4.6vw, 5rem); }
-
-.panel__id {
-  font-family: var(--mono);
-  font-size: 0.75rem;
-  color: var(--accent);
-  margin-bottom: 12px;
-}
 
 .panel__facts {
   display: grid;
@@ -201,7 +195,7 @@ a { color: inherit; }
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-columns: 3.5rem 5rem 1fr 4rem;
+  grid-template-columns: 5rem 1fr 4rem;
   gap: 16px;
   align-items: center;
   padding: 20px 0;
@@ -228,7 +222,6 @@ a { color: inherit; }
   outline: none;
 }
 .index__row:focus-visible::before { opacity: 1; }
-.index__row:focus-visible .index__id { color: var(--row-accent-id, var(--accent)); }
 
 @media (hover: hover) and (pointer: fine) {
   .index__row {
@@ -243,10 +236,7 @@ a { color: inherit; }
     transform: translateX(12px);
   }
   .index__row:hover::before { opacity: 1; }
-  .index__row:hover .index__id { color: var(--row-accent-id, var(--accent)); }
 }
-
-.index__id { font-family: var(--mono); font-size: 0.75rem; font-weight: 700; align-self: baseline; padding-top: 4px; }
 
 .index__thumb {
   display: block;
@@ -643,7 +633,7 @@ a { color: inherit; }
 /* ---- Responsive ---- */
 
 @media (max-width: 1024px) {
-  .index__row { grid-template-columns: 2.5rem 4rem 1fr 3.5rem; gap: 12px; }
+  .index__row { grid-template-columns: 4rem 1fr 3.5rem; gap: 12px; }
   .index__thumb { width: 4rem; }
   .profile { grid-template-columns: 1fr; }
 }
@@ -749,17 +739,13 @@ a { color: inherit; }
 /* ---- Home index row custom hover accents ---- */
 .index li:nth-child(1) {
   --row-accent: oklch(55% calc(0.14 * var(--p-color-amount, 1)) 140);
-  --row-accent-id: var(--paper);
 }
 .index li:nth-child(2) {
   --row-accent: oklch(55% calc(0.13 * var(--p-color-amount, 1)) 195);
-  --row-accent-id: var(--paper);
 }
 .index li:nth-child(3) {
   --row-accent: oklch(52% calc(0.17 * var(--p-color-amount, 1)) 260);
-  --row-accent-id: var(--paper);
 }
 .index li:nth-child(4) {
   --row-accent: oklch(60% calc(0.19 * var(--p-color-amount, 1)) 50);
-  --row-accent-id: var(--paper);
 }
