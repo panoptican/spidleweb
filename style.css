@@ -677,8 +677,8 @@ a { color: inherit; }
   .contact { padding-top: 64px; }
 
   .index__row {
-    grid-template-columns: 2rem 1fr 3.5rem;
-    gap: 8px;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
   }
   .index__thumb {
     display: none;
