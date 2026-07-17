@@ -37,7 +37,9 @@ inversions, grayscale imagery that colorizes on hover.
 - Navigator365 / Omnitopia copy: written from the supplied screens in
   `assets/` — no write-ups existed. See assumptions.
 - Bio: jasonspidle.com + `application/resume-draft.md`.
-- Case imagery: `assets/*.png` (supplied). Site imagery:
+- Case imagery: `assets/*.png` (supplied). The Vidscrip case uses four revised
+  captures in scrollable frames, including the procedure survey and date editor.
+  Site imagery:
   `assets/sites/*.png`, captured 2026-07-17 from the four live sites at
   1440×1024 @2x with Playwright's headless Chromium shell. Ascensus is
   top-cropped to 1240px to remove a cookie banner.
