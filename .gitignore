@@ -1,2 +1,4 @@
 .DS_Store
 /qa/
+/.playwright-cli/
+/variant-rating/
