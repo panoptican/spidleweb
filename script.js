@@ -1,14 +1,25 @@
-// Fade in the fixed marker once the hero has scrolled past.
-const marker = document.getElementById('marker');
-const hero = document.querySelector('.hero');
+// Reveal sections as they enter the viewport. Progressive enhancement:
+// without JS (or with reduced motion) everything is visible by default.
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const targets = document.querySelectorAll('.reveal');
 
-const observer = new IntersectionObserver(
-  (entries) => {
-    const heroVisible = entries[0].isIntersecting;
-    marker.classList.toggle('is-visible', !heroVisible);
-    marker.setAttribute('aria-hidden', heroVisible ? 'true' : 'false');
-  },
-  { threshold: 0, rootMargin: '-80px 0px 0px 0px' }
-);
+if (reduced || !('IntersectionObserver' in window)) {
+  targets.forEach((el) => el.classList.add('is-in'));
+} else {
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-in');
+          io.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.1 }
+  );
+  targets.forEach((el) => io.observe(el));
+}
 
-if (hero) observer.observe(hero);
+// Keep the footer year current.
+const year = document.getElementById('year');
+if (year) year.textContent = new Date().getFullYear();
