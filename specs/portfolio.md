@@ -25,6 +25,8 @@ inversions, grayscale imagery that colorizes on hover.
 - `style.css` — single shared stylesheet, all pages.
 - `script.js` — reveal-on-scroll only (IntersectionObserver), fully
   progressive: reduced motion or no JS shows everything immediately.
+- `assets/favicon.svg` — three-color abstract mark derived from the site's
+  paper, ink, and red registration-mark visual language.
 
 ## Content sources
 
