@@ -662,7 +662,10 @@ a { color: inherit; }
   .panel__meta { display: none; }
 
   .panel--home .panel__type { font-size: 11vw; margin: 16px 0; }
-  .panel--case .panel__type { font-size: 10vw; margin: 16px 0 0; }
+
+  .panel--case { padding: 48px var(--gap) 72px; gap: 32px; }
+  .panel--case .panel__type { font-size: 10vw; margin: 0; }
+  .panel--case .panel__facts { margin-top: 32px; }
 
   .panel__blurb { max-width: none; }
 
@@ -677,8 +680,8 @@ a { color: inherit; }
   .contact { padding-top: 64px; }
 
   .index__row {
-    grid-template-columns: 2rem 1fr 3.5rem;
-    gap: 8px;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
   }
   .index__thumb {
     display: none;
@@ -723,7 +726,7 @@ a { color: inherit; }
   --panel-bg: oklch(22% var(--panel-chroma) 195);
 }
 
-.theme-navigator {
+.theme-insights {
   --c-chroma: calc(0.17 * var(--p-color-amount, 1));
   --paper-chroma: calc(0.006 * var(--p-color-amount, 1));
   --panel-chroma: calc(0.08 * var(--p-color-amount, 1));
@@ -734,7 +737,7 @@ a { color: inherit; }
   --panel-bg: oklch(20% var(--panel-chroma) 260);
 }
 
-.theme-omnitopia {
+.theme-sim {
   --c-chroma: calc(0.19 * var(--p-color-amount, 1));
   --paper-chroma: calc(0.006 * var(--p-color-amount, 1));
   --panel-chroma: calc(0.08 * var(--p-color-amount, 1));
