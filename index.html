@@ -1,96 +1,176 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Jason Spidle</title>
-    <meta name="description" content="Designer building products and experiments, increasingly with the help of AI agents.">
-    <link rel="stylesheet" href="style.css">
-  </head>
-  <body>
-    <header class="marker" id="marker" aria-hidden="true">
-      <span class="marker__name">Jason Spidle</span>
-      <nav class="marker__nav">
-        <a href="#work">Work</a>
-        <a href="#agents">Agents</a>
-      </nav>
-    </header>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jason Spidle — Product Designer</title>
+  <meta name="description" content="Jason Spidle is a product designer in Minneapolis. Ten years of enterprise software: dashboards, data-dense workflows, and the design systems that keep them coherent.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-    <main>
-      <section class="hero" id="top">
-        <h1 class="hero__name">Jason Spidle</h1>
-        <p class="hero__line">Designer. Lately I've been building a lot more than I used to, with AI agents doing the typing.</p>
-        <p class="hero__meta">Minneapolis · Open to contract work (remote, CT)</p>
-      </section>
+  <div class="viewport">
 
-      <section class="background">
-        <p>I've spent the last ten years designing enterprise software across financial services, agtech, and healthcare — dashboards, data-heavy workflows, and the design systems that keep them coherent. Before that, a decade programming and analyzing market research studies, which is where the comfort with dense data started. Most of what I make starts as a working prototype — agents have made that loop dramatically tighter, so the pile of things I can ship by myself keeps growing.</p>
-        <p>Below: a mix of traditional product design work, and a second pile of things I designed and built with the aid of coding agents. The agent-built pieces run right here in the page.</p>
-      </section>
+    <aside class="panel panel--home">
+      <span class="reg reg--tl" aria-hidden="true"></span>
+      <span class="reg reg--tr" aria-hidden="true"></span>
+      <span class="reg reg--bl" aria-hidden="true"></span>
+      <span class="reg reg--br" aria-hidden="true"></span>
 
-      <section class="work" id="work">
-        <h2 class="section-label">Selected work</h2>
-        <ul class="work-grid">
-          <li class="work-item">
-            <div class="work-item__media" style="background-image: url('work/assets/ascensus.png')" aria-hidden="true"></div>
-            <p class="work-item__caption">Ascensus — public web platform · design lead, [year]</p>
+      <div class="panel__meta micro">
+        <span>COORD // 44.9778° N, 93.2650° W</span>
+        <span>SPIDLEWEB // VOL. 01</span>
+      </div>
+
+      <h1 class="panel__type">
+        <span>Jason</span>
+        <span>Spidle</span>
+      </h1>
+
+      <div class="panel__footer">
+        <p class="panel__blurb">Product design for dense, data-heavy software. Dashboards, complex workflows, and the design systems that keep them coherent.</p>
+        <p class="micro"><a href="mailto:jason.spidle@gmail.com">jason.spidle@gmail.com</a> · Minneapolis, MN</p>
+      </div>
+    </aside>
+
+    <main class="archive">
+
+      <header class="archive__header micro">
+        <nav style="display:flex; gap:24px;">
+          <a href="#work">Index</a>
+          <a href="#sites">Sites</a>
+          <a href="#profile">Profile</a>
+          <a href="#contact">Contact</a>
+        </nav>
+        <span>Sort: Selected</span>
+      </header>
+
+      <section id="work" aria-label="Selected case studies">
+        <ul class="index">
+          <li class="reveal">
+            <a class="index__row" href="work/conservis.html">
+              <span class="index__id">01</span>
+              <span class="index__title">Conservis</span>
+              <span class="index__kind">Farm management</span>
+              <span class="index__year">2019</span>
+            </a>
           </li>
-          <li class="work-item">
-            <div class="work-item__media" style="background-image: url('work/assets/us-bank.png')" aria-hidden="true"></div>
-            <p class="work-item__caption">U.S. Bank — [product/descriptor] · [role], [year]</p>
+          <li class="reveal">
+            <a class="index__row" href="work/vidscrip.html">
+              <span class="index__id">02</span>
+              <span class="index__title">Vidscrip</span>
+              <span class="index__kind">Patient journeys</span>
+              <span class="index__year">2021</span>
+            </a>
           </li>
-          <li class="work-item">
-            <div class="work-item__media" style="background-image: url('work/assets/precision.png')" aria-hidden="true"></div>
-            <p class="work-item__caption">Precision Medicine Group — [product/descriptor] · [role], [year]</p>
+          <li class="reveal">
+            <a class="index__row" href="work/navigator.html">
+              <span class="index__id">03</span>
+              <span class="index__title">Navigator365</span>
+              <span class="index__kind">Expert insights</span>
+              <span class="index__year">2025</span>
+            </a>
           </li>
-          <li class="work-item">
-            <div class="work-item__media" style="background-image: url('work/assets/conservis.png')" aria-hidden="true"></div>
-            <p class="work-item__caption">Conservis — farm management platform · [role], [year]</p>
-          </li>
-          <li class="work-item">
-            <div class="work-item__media" style="background-image: url('work/assets/ever-ag.png')" aria-hidden="true"></div>
-            <p class="work-item__caption">Ever.ag — [product/descriptor] · [role], [year]</p>
-          </li>
-          <li class="work-item">
-            <div class="work-item__media" style="background-image: url('work/assets/vault.png')" aria-hidden="true"></div>
-            <p class="work-item__caption">Vault AI Systems — private on-prem AI platform · fractional CDO, 2025–</p>
-          </li>
-          <li class="work-item">
-            <div class="work-item__media" style="background-image: url('work/assets/vidscrip.png')" aria-hidden="true"></div>
-            <p class="work-item__caption">Vidscrip — [product/descriptor] · [role], [year]</p>
-          </li>
-          <li class="work-item">
-            <div class="work-item__media" style="background-image: url('work/assets/surge.png')" aria-hidden="true"></div>
-            <p class="work-item__caption">Blueshift Surge — one-week design sprint product · creator, 2025</p>
+          <li class="reveal">
+            <a class="index__row" href="work/omnitopia.html">
+              <span class="index__id">04</span>
+              <span class="index__title">Omnitopia</span>
+              <span class="index__kind">Campaign planning</span>
+              <span class="index__year">2025</span>
+            </a>
           </li>
         </ul>
       </section>
 
-      <p class="divider">Below: things that respond when you touch them.</p>
+      <section id="sites" aria-label="Shipped websites">
+        <header class="section-head micro">
+          <span>Sites // Shipped</span>
+          <span>Live // External</span>
+        </header>
 
-      <section class="agents" id="agents">
-        <h2 class="section-label">Built with agents</h2>
+        <ul class="sites">
+          <li class="site-card reveal">
+            <a href="https://www.ascensus.com" target="_blank" rel="noopener">
+              <span class="site-card__frame">
+                <img src="assets/sites/ascensus.png" alt="Ascensus.com homepage" loading="lazy" style="object-position: left top;">
+              </span>
+              <span class="site-card__caption micro">
+                <span class="site-card__name">Ascensus <span class="accent">↗</span></span>
+                <span>Design lead · Financial services</span>
+              </span>
+            </a>
+          </li>
+          <li class="site-card reveal">
+            <a href="https://www.kardion.com" target="_blank" rel="noopener">
+              <span class="site-card__frame">
+                <img src="assets/sites/kardion.png" alt="Kardion.com homepage" loading="lazy">
+              </span>
+              <span class="site-card__caption micro">
+                <span class="site-card__name">Kardion <span class="accent">↗</span></span>
+                <span>Site design</span>
+              </span>
+            </a>
+          </li>
+          <li class="site-card reveal">
+            <a href="https://www.blueshift-consulting.com" target="_blank" rel="noopener">
+              <span class="site-card__frame">
+                <img src="assets/sites/blueshift.png" alt="Blueshift-consulting.com homepage" loading="lazy">
+              </span>
+              <span class="site-card__caption micro">
+                <span class="site-card__name">Blueshift <span class="accent">↗</span></span>
+                <span>Partner / Design lead</span>
+              </span>
+            </a>
+          </li>
+          <li class="site-card reveal">
+            <a href="https://www.vaultaisystems.com" target="_blank" rel="noopener">
+              <span class="site-card__frame">
+                <img src="assets/sites/vaultai.png" alt="Vaultaisystems.com homepage" loading="lazy">
+              </span>
+              <span class="site-card__caption micro">
+                <span class="site-card__name">Vault AI Systems <span class="accent">↗</span></span>
+                <span>Fractional CDO</span>
+              </span>
+            </a>
+          </li>
+        </ul>
+      </section>
 
-        <figure class="agent">
-          <div class="agent__body">
-            <h3 class="agent__title">Sheets to Layers</h3>
-            <p>An open-source Figma plugin that syncs Google Sheets data into designs — text layers, image fills, component swaps, colors, visibility. Built in a weekend with coding agents; MIT licensed, no accounts, no API keys.</p>
-            <p><a href="https://www.figma.com/community/plugin/1583237911043000951/sheets-to-layers">Plugin on Figma Community →</a></p>
+      <section id="profile" aria-label="Profile">
+        <header class="section-head micro">
+          <span>Profile // Background</span>
+          <span>Status: Open to contract work</span>
+        </header>
+
+        <div class="profile">
+          <div class="profile__body reveal">
+            <h2 class="profile__title">Comfortable in dense data.</h2>
+            <p>I'm a product designer in Minneapolis. I've spent ten years shipping enterprise software across financial services, agtech, and healthcare: dashboards, data-heavy workflows, and the design systems behind them. I'm in Figma daily, from discovery and user flows through high-fidelity UI and developer handoff, and I build working prototypes with coding agents as part of the process.</p>
+            <p>Before design, I spent a decade programming and analyzing market research studies. That's where the comfort with dense data started. Almost everything I know I've learned from experience, and I've experienced a lot: fifty-some homes, ten states, two countries, and about every collar they've fitted for the working class.</p>
           </div>
-          <figcaption class="agent__caption">Sheets to Layers — Figma plugin, 2026</figcaption>
-        </figure>
 
-        <figure class="agent">
-          <iframe class="agent__frame" src="https://www.youtube-nocookie.com/embed/-hG8qxgbIw4" loading="lazy" title="AI Design Challenge, Episode 2: Figma Make vs Vercel v0" allowfullscreen></iframe>
-          <figcaption class="agent__caption">AI Design Challenge — webinar series benchmarking AI design tools, 2025–</figcaption>
-        </figure>
+          <ul class="roster micro reveal" aria-label="Roles">
+            <li><span class="roster__org">Blueshift</span><span>Partner / Design lead · 2024–</span></li>
+            <li><span class="roster__org">Vault AI Systems</span><span>Fractional CDO · 2025–</span></li>
+            <li><span class="roster__org">Foundry</span><span>Product design → Director · 2015–2024</span></li>
+            <li><span class="roster__org">Research &amp; data</span><span>Survey programming &amp; analysis · 2002–2012</span></li>
+          </ul>
+        </div>
       </section>
 
-      <section class="contact">
-        <p><a href="mailto:jason.spidle@gmail.com">jason.spidle@gmail.com</a></p>
+      <section id="contact" class="contact" aria-label="Contact">
+        <p class="micro" style="margin-bottom: 16px;">Contact // Direct</p>
+        <a class="contact__mail" href="mailto:jason.spidle@gmail.com">jason.spidle@gmail.com</a>
       </section>
+
+      <footer class="footer micro">
+        <span>© <span id="year">2026</span> Jason Spidle · <a href="https://www.linkedin.com/in/jspidle" target="_blank" rel="noopener">LinkedIn ↗</a></span>
+        <span>Minneapolis, MN // CT</span>
+      </footer>
+
     </main>
+  </div>
 
-    <script src="script.js"></script>
-  </body>
+  <script src="script.js"></script>
+</body>
 </html>

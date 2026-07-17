@@ -1,10 +1,12 @@
 # Fonts
 
-Drop GT America web files here. `style.css` expects:
+GT America web files, referenced from `style.css`:
 
-- `GT-America-Medium.woff2`
-- `GT-America-Expanded-Regular.woff2`
+- `Medium.ttf` — GT America Medium (body, weight 500)
+- `Expanded.ttf` — GT America Expanded Regular (display, weight 400)
 
-Until they're present the site falls back to Helvetica.
+Until present the site falls back to Helvetica. Mono micro-labels use the
+system mono stack (SF Mono / Menlo), no file needed.
 
-If additional weights/widths are needed (e.g. an Italic, a heavier display weight, or GT America Expanded Medium), let me know — you'd need to license them.
+Licensing note: these are licensed font files. Keep the repo private, or move
+them out of version control before making it public.
