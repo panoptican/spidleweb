@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Jason Spidle — Product Designer</title>
+  <title>Jason Spidle | Product Designer</title>
   <meta name="description" content="Jason Spidle is a product designer in Minneapolis. Ten years of enterprise software: dashboards, data-dense workflows, and the design systems that keep them coherent.">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
@@ -15,8 +15,8 @@
     <aside class="panel panel--home">
 
       <div class="panel__meta micro">
-        <span>COORD // 44.9778° N, 93.2650° W</span>
-        <span>SPIDLEWEB // VOL. 01</span>
+        <span>Minneapolis</span>
+        <span>Vol. 01</span>
       </div>
 
       <h1 class="panel__type">
@@ -33,63 +33,83 @@
     <main class="archive">
 
       <header class="archive__header micro">
-        <nav style="display:flex; gap:24px;">
+        <nav class="archive__nav" aria-label="Page sections">
           <a href="#work">Index</a>
           <a href="#sites">Sites</a>
           <a href="#profile">Profile</a>
           <a href="#contact">Contact</a>
         </nav>
-        <span>Sort: Selected</span>
       </header>
 
-      <section id="work" aria-label="Selected case studies">
+      <section id="work" aria-labelledby="work-title">
+        <h2 id="work-title" class="visually-hidden">Selected Case Studies</h2>
         <ul class="index">
           <li class="reveal">
             <a class="index__row" href="work/conservis.html">
               <span class="index__id">01</span>
-              <span class="index__title">Conservis</span>
-              <span class="index__kind">Farm management</span>
+              <span class="index__thumb">
+                <img src="assets/conservis-03.png" alt="" width="80" height="50" loading="lazy">
+              </span>
+              <span class="index__main">
+                <span class="index__title">Conservis</span>
+                <span class="index__kind">Farm management</span>
+              </span>
               <span class="index__year">2019</span>
             </a>
           </li>
           <li class="reveal">
             <a class="index__row" href="work/vidscrip.html">
               <span class="index__id">02</span>
-              <span class="index__title">Vidscrip</span>
-              <span class="index__kind">Patient journeys</span>
+              <span class="index__thumb">
+                <img src="assets/vidscrip-01.png" alt="" width="80" height="50" loading="lazy">
+              </span>
+              <span class="index__main">
+                <span class="index__title">Vidscrip</span>
+                <span class="index__kind">Patient journeys</span>
+              </span>
               <span class="index__year">2021</span>
             </a>
           </li>
           <li class="reveal">
             <a class="index__row" href="work/navigator.html">
               <span class="index__id">03</span>
-              <span class="index__title">Navigator365</span>
-              <span class="index__kind">Expert insights</span>
+              <span class="index__thumb">
+                <img src="assets/navigator-01.png" alt="" width="80" height="50" loading="lazy">
+              </span>
+              <span class="index__main">
+                <span class="index__title">Navigator365</span>
+                <span class="index__kind">Expert insights</span>
+              </span>
               <span class="index__year">2025</span>
             </a>
           </li>
           <li class="reveal">
             <a class="index__row" href="work/omnitopia.html">
               <span class="index__id">04</span>
-              <span class="index__title">Omnitopia</span>
-              <span class="index__kind">Campaign planning</span>
+              <span class="index__thumb">
+                <img src="assets/omnitopia-01.png" alt="" width="80" height="50" loading="lazy">
+              </span>
+              <span class="index__main">
+                <span class="index__title">Omnitopia</span>
+                <span class="index__kind">Campaign planning</span>
+              </span>
               <span class="index__year">2025</span>
             </a>
           </li>
         </ul>
       </section>
 
-      <section id="sites" aria-label="Shipped websites">
-        <header class="section-head micro">
-          <span>Sites // Shipped</span>
-          <span>Live // External</span>
-        </header>
+      <section id="sites" aria-labelledby="sites-title">
+        <h2 id="sites-title" class="section-head micro">
+          <span>Shipped sites</span>
+          <span>External</span>
+        </h2>
 
         <ul class="sites">
           <li class="site-card reveal">
             <a href="https://www.ascensus.com" target="_blank" rel="noopener">
-              <span class="site-card__frame">
-                <img src="assets/sites/ascensus.png" alt="Ascensus.com homepage" loading="lazy" style="object-position: left top;">
+              <span class="site-card__frame site-card__frame--crop-top">
+                <img src="assets/sites/ascensus.png" alt="Ascensus.com homepage" loading="lazy">
               </span>
               <span class="site-card__caption micro">
                 <span class="site-card__name">Ascensus <span class="accent">↗</span></span>
@@ -133,15 +153,15 @@
         </ul>
       </section>
 
-      <section id="profile" aria-label="Profile">
-        <header class="section-head micro">
-          <span>Profile // Background</span>
-          <span>Status: Open to contract work</span>
-        </header>
+      <section id="profile" aria-labelledby="profile-title">
+        <h2 id="profile-title" class="section-head micro">
+          <span>Profile</span>
+          <span>Open to contract work</span>
+        </h2>
 
         <div class="profile">
           <div class="profile__body reveal">
-            <h2 class="profile__title">Comfortable in dense data.</h2>
+            <h3 class="profile__title">Comfortable in dense data.</h3>
             <p>I'm a product designer in Minneapolis. I've spent ten years shipping enterprise software across financial services, agtech, and healthcare: dashboards, data-heavy workflows, and the design systems behind them. I work in Figma every day, from discovery and user flows through high-fidelity UI and developer handoff. I also build working prototypes with coding agents.</p>
             <p>Before design, I spent a decade programming and analyzing market research studies. That's where the comfort with dense data started. Most of what I know came from experience: fifty-some homes, ten states, two countries, and about every collar they've fitted for the working class.</p>
           </div>
@@ -154,8 +174,8 @@
         </div>
       </section>
 
-      <section id="contact" class="contact" aria-label="Contact">
-        <p class="micro" style="margin-bottom: 16px;">Contact // Direct</p>
+      <section id="contact" class="contact" aria-labelledby="contact-title">
+        <h2 id="contact-title" class="contact__label micro">Contact</h2>
         <a class="contact__mail" href="mailto:jason@spidleweb.net">jason@spidleweb.net</a>
       </section>
 
