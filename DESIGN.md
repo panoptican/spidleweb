@@ -74,6 +74,16 @@ A strictly limited, high-contrast palette. Neutrals carry subtle tinting to avoi
 - **Hairline Rule** (`rgba(10, 10, 10, 0.18)`): Structural boundary lines that separate entries, sections, and items.
 - **Strong Line** (`#0a0a0a`): Prominent separators and structural borders.
 
+### Case-Specific Brutalist Themes (Committed Strategy)
+To give each ledger entry a distinct visual identity, case study pages use specialized color palettes. The neutrals are dynamically tinted toward each case's signature hue:
+
+- **Conservis (AgTech)**: Earth Crop Green accent (`oklch(55% 0.16 140)`), warm sage-tinted paper background (`oklch(96.5% 0.006 140)`), dark pine panel background (`oklch(22% 0.06 140)`), and dark forest-ink text (`oklch(13% 0.008 140)`).
+- **Vidscrip (Health)**: Clinical Teal accent (`oklch(55% 0.15 195)`), pale teal-tinted paper background (`oklch(96.5% 0.006 195)`), spruce panel background (`oklch(22% 0.06 195)`), and deep-ocean-ink text (`oklch(13% 0.008 195)`).
+- **Navigator365 (Enterprise)**: Cobalt Blue accent (`oklch(52% 0.17 260)`), slate-blue tinted paper background (`oklch(96.5% 0.006 260)`), deep indigo panel background (`oklch(20% 0.08 260)`), and midnight-blue ink text (`oklch(13% 0.008 260)`).
+- **Omnitopia (Campaign Simulation)**: Terracotta/Orange accent (`oklch(60% 0.19 50)`), sand-tinted paper background (`oklch(96.5% 0.006 50)`), rust panel background (`oklch(25% 0.08 50)`), and warm-clay ink text (`oklch(13% 0.008 50)`).
+
+All case themes support a responsive `var(--p-color-amount, 1)` range scaling parameter that allows adjustment of the chroma from completely monochrome (0) to fully saturated (1).
+
 ### Named Rules
 **The One Voice Rule.** The primary accent is used on ≤10% of any given screen. Its rarity is the point.
 **The Tinted Neutral Rule.** Never use pure black (`#000`) or pure white (`#fff`). All neutrals must be slightly tinted towards warm paper/ink hues.
