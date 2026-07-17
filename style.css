@@ -426,13 +426,13 @@ a { color: inherit; }
 
 .stats {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   border-top: 1px solid var(--line-strong);
   border-bottom: 1px solid var(--line-strong);
   margin-top: 48px;
 }
 
-.stats > div { padding: 24px 0; }
+.stats > div { min-width: 0; padding: 24px 0; }
 .stats > div + div { border-left: 1px solid var(--line-strong); padding-left: var(--gap); }
 .stats > div + div { margin-left: 0; }
 
