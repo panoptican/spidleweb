@@ -662,7 +662,10 @@ a { color: inherit; }
   .panel__meta { display: none; }
 
   .panel--home .panel__type { font-size: 11vw; margin: 16px 0; }
-  .panel--case .panel__type { font-size: 10vw; margin: 16px 0 0; }
+
+  .panel--case { padding: 48px var(--gap) 72px; gap: 32px; }
+  .panel--case .panel__type { font-size: 10vw; margin: 0; }
+  .panel--case .panel__facts { margin-top: 32px; }
 
   .panel__blurb { max-width: none; }
 
