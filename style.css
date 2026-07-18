@@ -138,8 +138,7 @@ a { color: inherit; }
 /* Home panel */
 .panel--home .panel__type { font-size: var(--text-hero); }
 .panel--home .panel__type span:nth-child(2) { padding-left: 0.18em; }
-/* Padding-top clears the 4% top-edge dip of the clip-path at the right side */
-.panel--home .panel__meta { justify-content: flex-end; padding-top: 3vh; }
+.panel--home .panel__meta { justify-content: flex-start; }
 
 /* Case panel */
 .panel--case .panel__type { font-size: var(--text-display); }
