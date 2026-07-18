@@ -2,3 +2,4 @@
 /qa/
 /.playwright-cli/
 /variant-rating/
+/.wrangler/
