@@ -91,12 +91,13 @@ a { color: inherit; }
   height: 100dvh;
   background: var(--panel-bg, var(--ink));
   color: var(--panel-fg, var(--paper));
-  clip-path: polygon(0 0, 100% 1.25%, 96.5% 100%, 0 100%);
+  clip-path: polygon(0 0, 100% 4%, 93.5% 100%, 0 100%);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: var(--gap);
-  padding-right: calc(var(--gap) + 3.5vw);
+  /* Clears the 6.5%-of-panel-width slant at the bottom of the clip-path */
+  padding-right: calc(var(--gap) + 4.75vw);
   z-index: 10;
 }
 
@@ -137,7 +138,8 @@ a { color: inherit; }
 /* Home panel */
 .panel--home .panel__type { font-size: var(--text-hero); }
 .panel--home .panel__type span:nth-child(2) { padding-left: 0.18em; }
-.panel--home .panel__meta { justify-content: flex-end; }
+/* Padding-top clears the 4% top-edge dip of the clip-path at the right side */
+.panel--home .panel__meta { justify-content: flex-end; padding-top: 3vh; }
 
 /* Case panel */
 .panel--case .panel__type { font-size: var(--text-display); }
@@ -654,8 +656,8 @@ a { color: inherit; }
     position: static;
     height: auto;
     min-height: 0;
-    clip-path: polygon(0 0, 100% 0, 100% 96%, 0 100%);
-    padding: 20px var(--gap);
+    clip-path: polygon(0 0, 100% 0, 100% 93%, 0 100%);
+    padding: 20px var(--gap) 36px;
     gap: 20px;
   }
 
