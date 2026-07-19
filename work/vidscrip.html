@@ -19,112 +19,133 @@
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="../fonts/Medium.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="../fonts/Expanded.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="stylesheet" href="../style.css">
-  <script>document.documentElement.classList.add('js-active');</script>
+  <link rel="stylesheet" href="../jp.css">
   <script defer src="https://analytics.spidleweb.net/script.js" data-website-id="49720a36-6280-4d69-9531-c1d0c36b8f11"></script>
 </head>
 <body class="theme-vidscrip">
 
-  <div class="viewport">
+  <div class="frame">
 
-    <aside class="panel panel--case">
-
-      <div class="panel__meta micro">
-        <a href="../index.html">← Index</a>
+    <header class="bar nano">
+      <div class="bar__cluster">
+        <span class="bar__site"><a href="../index.html">SPIDLEWEB.NET</a></span>
+        <span class="bar__dot" aria-hidden="true">●</span>
+        <span>CASE STUDY</span>
       </div>
+      <div class="bar__cluster">
+        <span>MINNEAPOLIS, USA</span>
+        <span class="bar__dot" aria-hidden="true">●</span>
+        <time id="today" datetime="2026-07-18">2026.07.18</time>
+        <span class="bar__dot" aria-hidden="true">●</span>
+        <span id="clock" class="bar__clock">00:00:00</span>
+      </div>
+    </header>
 
-      <div>
-        <h1 class="panel__type"><span>Vidscrip</span></h1>
-        <dl class="panel__facts micro">
+    <div class="grid">
+
+      <aside class="rail" aria-hidden="true">
+        <div class="rail__top">
+          <p class="rail__name vertical">Jason Spidle</p>
+        </div>
+        <p class="rail__role vertical">Vidscrip</p>
+        <div class="seal">JS</div>
+      </aside>
+
+      <div class="content">
+
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../index.html#work">← Index</a>
+          <span class="crumbs__trail">Works / Vidscrip — Patient journeys</span>
+          <span class="crumbs__trail">2021</span>
+        </nav>
+
+        <section class="hero" aria-label="Introduction">
+          <p class="hero__eyebrow nano">Case study — Patient journeys</p>
+          <h1 class="hero__name">Vidscrip</h1>
+          <div class="hero__deck">
+            <p class="hero__blurb">Videos from your own doctor, delivered at the right moments of a surgical journey.</p>
+          </div>
+        </section>
+
+        <dl class="specs">
           <div><dt>Client</dt><dd>Vidscrip</dd></div>
           <div><dt>Studio</dt><dd>Foundry</dd></div>
           <div><dt>Role</dt><dd>Product design lead</dd></div>
           <div><dt>Scope</dt><dd>Patient journey page · Enrollment</dd></div>
           <div><dt>Year</dt><dd>2021</dd></div>
         </dl>
+
+        <article>
+
+          <section class="case-sec">
+            <h2 class="case-head">A patient journey scattered across text messages.</h2>
+            <p>Surgical patients need different information at specific moments: one week before surgery, the day after discharge, and throughout recovery. Vidscrips are short videos recorded by healthcare providers and scheduled from the patient's surgery date. Each one arrives from the patient's own doctor at the relevant moment.</p>
+            <p>The delivery mechanism was the problem. Everything arrived as scheduled text messages, so a patient's entire journey lived as a pile of links in their SMS inbox. There was no way to see the whole path, no sense of where you were on it, and nothing to return to when the date changed.</p>
+          </section>
+
+          <section class="case-sec">
+            <h2 class="case-head">One timeline, start to finish.</h2>
+            <p>We designed the patient journey page: a single landing page for each enrolled patient, built around a line that maps every key moment from preparation through recovery. A "today" marker keeps the patient oriented against their procedure date, and moments along the line open videos, ask questions, link resources, or offer downloads.</p>
+            <p>The answers do real work. Confirming your procedure happened can auto-enroll you in a recovery program. Entering a new surgery date reshuffles every moment on the timeline. The same mechanics let providers collect satisfaction scores without a separate survey tool.</p>
+
+            <div class="phones">
+              <figure class="figure">
+                <div class="phone-frame" tabindex="0" aria-label="Scrollable capture of a full patient journey page">
+                  <img src="../assets/vidscrip-01.png" alt="Full patient journey page: dated moments from meet-your-physician through post-surgery instructions, with videos, forms, surveys, and links along a timeline" loading="lazy">
+                </div>
+                <figcaption>Full journey · scroll the frame</figcaption>
+              </figure>
+              <figure class="figure">
+                <div class="phone-frame" tabindex="0" aria-label="Scrollable capture of the journey page hub and prior-to-procedure section">
+                  <img src="../assets/vidscrip-02.png" alt="Journey hub with procedure date, days-until countdown, share action, and the prior-to-procedure moments" loading="lazy">
+                </div>
+                <figcaption>Date, countdown, and share up top</figcaption>
+              </figure>
+              <figure class="figure">
+                <div class="phone-frame" tabindex="0" aria-label="Scrollable capture of the procedure experience survey">
+                  <img src="../assets/vidscrip-03.png" alt="Procedure experience survey with a zero-to-nine rating scale and a submit rating button" loading="lazy">
+                </div>
+                <figcaption>Satisfaction scores inside the journey</figcaption>
+              </figure>
+              <figure class="figure">
+                <div class="phone-frame" tabindex="0" aria-label="Scrollable capture of the procedure date form">
+                  <img src="../assets/vidscrip-04.png" alt="Edit procedure date form with date input, set procedure date action, and return without saving action" loading="lazy">
+                </div>
+                <figcaption>One date reflows the timeline</figcaption>
+              </figure>
+            </div>
+          </section>
+
+          <section class="case-sec">
+            <h2 class="case-head">Built to be shared.</h2>
+            <p>Recovery is a family project, so every journey page has a short link a patient can hand to friends and caregivers by text, email, or social. Reminders still go out through whatever channel the patient prefers, but now they all point back to one place. Enrollment got the same treatment: pick your doctor, pick your program, enter your date, and land directly on your journey.</p>
+          </section>
+
+          <section class="case-sec">
+            <h2 class="case-head">Results</h2>
+            <ul class="results">
+              <li>One page replaced a scheduled stream of disconnected text messages as the patient's hub.</li>
+              <li>Patients reschedule their own date and the whole timeline reflows around it.</li>
+            </ul>
+          </section>
+
+        </article>
+
+        <a class="next" href="expert-insights.html">
+          <span class="next__label">Next case</span>
+          <span class="next__title">Expert Insights</span>
+          <span class="next__arrow" aria-hidden="true">→</span>
+        </a>
+
+        <footer class="footer">
+          <span class="footer__legal nano">© 2026 JASON SPIDLE</span>
+          <span class="nano"><a href="../index.html">BACK TO INDEX</a></span>
+        </footer>
+
       </div>
-
-      <div class="panel__footer">
-        <p class="panel__blurb">Videos from your own doctor, delivered at the right moments of a surgical journey.</p>
-      </div>
-    </aside>
-
-    <main class="archive">
-
-      <header class="archive__header micro">
-        <span>Vidscrip · Patient journeys</span>
-        <span>2021</span>
-      </header>
-
-      <article class="article">
-
-        <section class="article__section reveal">
-          <h2 class="article__head">A patient journey scattered across text messages.</h2>
-          <p>Surgical patients need different information at specific moments: one week before surgery, the day after discharge, and throughout recovery. Vidscrips are short videos recorded by healthcare providers and scheduled from the patient's surgery date. Each one arrives from the patient's own doctor at the relevant moment.</p>
-          <p>The delivery mechanism was the problem. Everything arrived as scheduled text messages, so a patient's entire journey lived as a pile of links in their SMS inbox. There was no way to see the whole path, no sense of where you were on it, and nothing to return to when the date changed.</p>
-        </section>
-
-        <section class="article__section reveal">
-          <h2 class="article__head">One timeline, start to finish.</h2>
-          <p>We designed the patient journey page: a single landing page for each enrolled patient, built around a line that maps every key moment from preparation through recovery. A "today" marker keeps the patient oriented against their procedure date, and moments along the line open videos, ask questions, link resources, or offer downloads.</p>
-          <p>The answers do real work. Confirming your procedure happened can auto-enroll you in a recovery program. Entering a new surgery date reshuffles every moment on the timeline. The same mechanics let providers collect satisfaction scores without a separate survey tool.</p>
-
-          <div class="phones">
-            <figure class="figure">
-              <div class="phone-frame" tabindex="0" aria-label="Scrollable capture of a full patient journey page">
-                <img src="../assets/vidscrip-01.png" alt="Full patient journey page: dated moments from meet-your-physician through post-surgery instructions, with videos, forms, surveys, and links along a timeline" loading="lazy">
-              </div>
-              <figcaption class="micro">Full journey · scroll the frame</figcaption>
-            </figure>
-            <figure class="figure">
-              <div class="phone-frame" tabindex="0" aria-label="Scrollable capture of the journey page hub and prior-to-procedure section">
-                <img src="../assets/vidscrip-02.png" alt="Journey hub with procedure date, days-until countdown, share action, and the prior-to-procedure moments" loading="lazy">
-              </div>
-              <figcaption class="micro">Date, countdown, and share up top</figcaption>
-            </figure>
-            <figure class="figure">
-              <div class="phone-frame" tabindex="0" aria-label="Scrollable capture of the procedure experience survey">
-                <img src="../assets/vidscrip-03.png" alt="Procedure experience survey with a zero-to-nine rating scale and a submit rating button" loading="lazy">
-              </div>
-              <figcaption class="micro">Satisfaction scores inside the journey</figcaption>
-            </figure>
-            <figure class="figure">
-              <div class="phone-frame" tabindex="0" aria-label="Scrollable capture of the procedure date form">
-                <img src="../assets/vidscrip-04.png" alt="Edit procedure date form with date input, set procedure date action, and return without saving action" loading="lazy">
-              </div>
-              <figcaption class="micro">One date reflows the timeline</figcaption>
-            </figure>
-          </div>
-        </section>
-
-        <section class="article__section reveal">
-          <h2 class="article__head">Built to be shared.</h2>
-          <p>Recovery is a family project, so every journey page has a short link a patient can hand to friends and caregivers by text, email, or social. Reminders still go out through whatever channel the patient prefers, but now they all point back to one place. Enrollment got the same treatment: pick your doctor, pick your program, enter your date, and land directly on your journey.</p>
-        </section>
-
-        <section class="article__section reveal">
-          <h2 class="article__head">Results</h2>
-          <ul class="results">
-            <li>One page replaced a scheduled stream of disconnected text messages as the patient's hub.</li>
-            <li>Patients reschedule their own date and the whole timeline reflows around it.</li>
-          </ul>
-        </section>
-
-      </article>
-
-      <a class="next" href="expert-insights.html">
-        <span class="next__title">Expert Insights</span>
-        <span class="next__arrow" aria-hidden="true">→</span>
-      </a>
-
-      <footer class="footer micro">
-        <span>© 2026 Jason Spidle</span>
-        <span><a href="../index.html">Back to index</a></span>
-      </footer>
-
-    </main>
+    </div>
   </div>
 
-  <script src="../script.js"></script>
+  <script src="../jp.js"></script>
 </body>
 </html>
