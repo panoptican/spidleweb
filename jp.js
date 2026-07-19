@@ -1,13 +1,13 @@
 // Homepage script for the Japanese-web layout. Case pages keep script.js.
 
-// Today's date in the classic Japanese homepage format: 2026.07.18（土）
+// Today's date in the dotted homepage format: 2026.07.18 (SAT)
 const today = document.getElementById('today');
 if (today) {
   const now = new Date();
   const pad = (n) => String(n).padStart(2, '0');
-  const youbi = ['日', '月', '火', '水', '木', '金', '土'][now.getDay()];
+  const day = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][now.getDay()];
   today.dateTime = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-  today.textContent = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())}（${youbi}）`;
+  today.textContent = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())} (${day})`;
 }
 
 // Keep the footer year current.

@@ -1,8 +1,8 @@
-/* spidleweb.net — Japanese-web homepage experiment
-   Visual language: Tokyo design-studio tategaki (vertical type, kanji numerals,
-   hanko seal, bilingual labels) fused with dense Japanese-homepage vernacular
-   (dated news list, notice ticker, borders on everything, tiny type,
-   visitor counter, リンクフリー). Paper + ink + vermillion kept from the
+/* spidleweb.net — Japanese-web homepage experiment, English-only edition.
+   The structure borrows the Japanese homepage vernacular — vertical name
+   rail, seal mark, dated update log, notice ticker, numbered sections,
+   borders on everything, tiny chrome type, visitor counter, "link-free" —
+   while every glyph stays Latin. Paper + ink + vermillion kept from the
    Documentarian Ledger system; work/*.html still use style.css. */
 
 @font-face {
@@ -24,17 +24,14 @@
 :root {
   --paper: #f2f2ef;
   --ink: #0a0a0a;
-  /* Vermillion (朱色) — the ledger's archive red reads as shuiro here */
+  /* Vermillion — the ledger's archive red, warmed toward a seal-ink hue */
   --accent: #e8380d;
   --line: color-mix(in srgb, var(--ink) 22%, transparent);
   --line-strong: var(--ink);
   --frame-bg: #d9d9d5;
 
-  /* Latin glyphs from GT America; kana/kanji fall through to Hiragino/Yu/Noto */
-  --jp: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic",
-        "Noto Sans JP", Meiryo, sans-serif;
-  --body: "GT America", Helvetica, Arial, var(--jp);
-  --display: "GT America Expanded", "Arial Black", Helvetica, var(--jp);
+  --body: "GT America", Helvetica, Arial, sans-serif;
+  --display: "GT America Expanded", "Arial Black", Helvetica, sans-serif;
   --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
 
   --gap: 20px;
@@ -59,7 +56,7 @@ body {
   font-family: var(--body);
   font-weight: 500;
   font-size: var(--text-small);
-  line-height: 1.7; /* JP-comfortable leading */
+  line-height: 1.7; /* generous leading keeps the density readable */
   -webkit-font-smoothing: antialiased;
 }
 
@@ -67,8 +64,6 @@ body {
 
 img { display: block; max-width: 100%; }
 a { color: inherit; }
-
-[lang="ja"] { font-family: var(--jp); }
 
 /* ---- Utility type ---- */
 
@@ -88,10 +83,12 @@ a { color: inherit; }
 }
 
 .gloss {
-  font-family: var(--jp);
+  font-family: var(--mono);
   font-size: var(--text-nano);
-  letter-spacing: 0.14em;
-  opacity: 0.72;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.6;
 }
 
 /* ---- Page frame: the whole site sits in a ruled box ---- */
@@ -153,9 +150,10 @@ a { color: inherit; }
 }
 
 .ticker__list li {
-  font-family: var(--jp);
+  font-family: var(--mono);
   font-size: var(--text-nano);
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   padding: 0 1.5em;
 }
 
@@ -180,7 +178,7 @@ a { color: inherit; }
   align-items: stretch;
 }
 
-/* ---- Left rail: tategaki name + hanko ---- */
+/* ---- Left rail: vertical name + seal ---- */
 
 .rail {
   border-right: var(--rule);
@@ -202,10 +200,10 @@ a { color: inherit; }
 }
 
 .rail__name {
-  font-family: var(--jp);
-  font-size: 1.05rem;
-  letter-spacing: 0.28em;
-  font-weight: 600;
+  font-family: var(--display);
+  font-size: 1rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
 }
 
 .rail__name-en {
@@ -220,23 +218,25 @@ a { color: inherit; }
 .rail__top { display: flex; }
 
 .rail__role {
-  font-family: var(--jp);
+  font-family: var(--mono);
   font-size: var(--text-nano);
-  letter-spacing: 0.24em;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
   opacity: 0.72;
 }
 
-/* Hanko seal — 蛛 (spider) for spidleweb / 蜘蛛の巣 */
-.hanko {
+/* Seal mark — a round vermillion stamp, hanko-style, bearing the initials */
+.seal {
   width: 52px;
   height: 52px;
   border: 2.5px solid var(--accent);
   border-radius: 50%;
   color: var(--accent);
-  font-family: var(--jp);
-  font-size: 1.7rem;
-  font-weight: 700;
+  font-family: var(--display);
+  font-size: 1.05rem;
+  font-weight: 400;
   line-height: 1;
+  letter-spacing: 0.02em;
   display: grid;
   place-items: center;
   transform: rotate(-6deg);
@@ -255,6 +255,12 @@ a { color: inherit; }
   border-bottom: var(--rule);
 }
 
+.hero__eyebrow {
+  letter-spacing: 0.55em;
+  opacity: 0.65;
+  margin-bottom: 10px;
+}
+
 .hero__name {
   font-family: var(--display);
   font-weight: 400;
@@ -262,16 +268,6 @@ a { color: inherit; }
   line-height: 1.05;
   letter-spacing: -0.02em;
   text-transform: uppercase;
-}
-
-.hero__name rt {
-  font-family: var(--jp);
-  font-size: 0.14em;
-  font-weight: 500;
-  letter-spacing: 0.9em;
-  text-transform: none;
-  opacity: 0.8;
-  ruby-align: space-between;
 }
 
 .hero__deck {
@@ -283,12 +279,6 @@ a { color: inherit; }
 }
 
 .hero__blurb { font-size: var(--text-body); }
-.hero__blurb [lang="ja"] {
-  display: block;
-  font-size: var(--text-micro);
-  opacity: 0.72;
-  margin-top: 6px;
-}
 
 .hero__facts {
   justify-self: end;
@@ -320,8 +310,6 @@ a { color: inherit; }
 
 .dirs a:last-child { border-right: none; }
 
-.dirs a .gloss { opacity: 0.65; }
-
 .dirs a.is-active,
 .dirs a:focus-visible { background: var(--ink); color: var(--paper); outline: none; }
 .dirs a.is-active .gloss,
@@ -332,7 +320,7 @@ a { color: inherit; }
   .dirs a:hover .gloss { opacity: 0.8; }
 }
 
-/* ---- Section chrome: kanji numeral + bilingual head ---- */
+/* ---- Section chrome: accent number + head ---- */
 
 section { border-bottom: var(--rule); }
 
@@ -345,17 +333,17 @@ section { border-bottom: var(--rule); }
 }
 
 .sec-head__no {
-  font-family: var(--jp);
-  font-size: var(--text-body);
+  font-family: var(--mono);
+  font-size: var(--text-micro);
   color: var(--accent);
-  font-weight: 600;
+  letter-spacing: 0.08em;
 }
 
-.sec-head__ja {
-  font-family: var(--jp);
+.sec-head__title {
   font-size: var(--text-body);
-  font-weight: 600;
-  letter-spacing: 0.3em;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
 }
 
 .sec-head__en {
@@ -368,7 +356,7 @@ section { border-bottom: var(--rule); }
 
 .sec-head__aside { margin-left: auto; }
 
-/* ---- News / 更新履歴 ---- */
+/* ---- Update log ---- */
 
 .news {
   list-style: none;
@@ -405,9 +393,6 @@ section { border-bottom: var(--rule); }
 }
 
 .news .tag--quiet { background: var(--ink); }
-
-.news__what [lang="ja"] { margin-right: 0.75em; }
-.news__what .en { opacity: 0.6; }
 
 /* ---- Work index ---- */
 
@@ -465,7 +450,6 @@ section { border-bottom: var(--rule); }
   font-size: var(--text-nano);
 }
 
-.works__kind [lang="ja"] { letter-spacing: 0.14em; margin-right: 0.75em; }
 .works__kind .en {
   font-family: var(--mono);
   text-transform: uppercase;
@@ -474,7 +458,6 @@ section { border-bottom: var(--rule); }
 }
 
 .works__arrow {
-  font-family: var(--jp);
   color: var(--accent);
   font-size: var(--text-body);
   opacity: 0;
@@ -573,22 +556,11 @@ section { border-bottom: var(--rule); }
 }
 
 .profile__lede {
-  font-family: var(--jp);
   font-size: var(--text-body);
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  margin-bottom: 4px;
-}
-
-.profile__lede .en {
-  display: block;
-  font-family: var(--mono);
-  font-size: var(--text-nano);
-  font-weight: 400;
-  letter-spacing: 0.14em;
+  font-weight: 500;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  opacity: 0.6;
-  margin-top: 2px;
+  margin-bottom: 4px;
 }
 
 .profile__body p {
@@ -617,7 +589,7 @@ section { border-bottom: var(--rule); }
 
 /* ---- Contact ---- */
 
-.contact { padding: 28px 14px 40px; }
+.contact__inner { padding: 24px 14px 40px; }
 
 .contact__mail {
   display: inline-block;
@@ -642,9 +614,8 @@ section { border-bottom: var(--rule); }
 .contact__note {
   margin-top: 12px;
   font-size: var(--text-micro);
+  opacity: 0.75;
 }
-.contact__note [lang="ja"] { letter-spacing: 0.1em; margin-right: 0.75em; }
-.contact__note .en { opacity: 0.6; }
 
 /* ---- Footer ---- */
 
@@ -665,8 +636,9 @@ section { border-bottom: var(--rule); }
 }
 
 .counter {
-  font-family: var(--jp);
-  letter-spacing: 0.1em;
+  font-family: var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .counter__digits {
@@ -675,11 +647,16 @@ section { border-bottom: var(--rule); }
   color: #7CFC00; /* the LCD-green of a 2001 visitor counter */
   padding: 1px 5px;
   letter-spacing: 0.18em;
-  margin: 0 0.4em;
+  margin: 0 0.5em;
 }
 
 .footer__legal { opacity: 0.7; }
-.footer__linkfree { font-family: var(--jp); letter-spacing: 0.1em; opacity: 0.7; }
+
+.footer__linkfree {
+  font-family: var(--mono);
+  letter-spacing: 0.14em;
+  opacity: 0.7;
+}
 
 /* ---- Motion ---- */
 
@@ -710,6 +687,7 @@ section { border-bottom: var(--rule); }
     height: auto;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
     padding: 10px 14px;
     border-right: none;
     border-bottom: var(--rule);
@@ -717,13 +695,13 @@ section { border-bottom: var(--rule); }
 
   .vertical { writing-mode: horizontal-tb; }
   .rail__top { align-items: baseline; gap: 12px; }
-  .rail__name { letter-spacing: 0.1em; font-size: 0.85rem; white-space: nowrap; }
-  .rail__name-en { margin-top: 0; margin-left: 0; }
+  .rail__name { letter-spacing: 0.14em; font-size: 0.8rem; white-space: nowrap; }
+  .rail__name-en { display: none; }
   .rail__role { display: none; }
-  .hanko { width: 40px; height: 40px; font-size: 1.3rem; border-width: 2px; }
+  .seal { width: 40px; height: 40px; font-size: 0.85rem; border-width: 2px; }
 
   .hero { padding: 28px 14px 22px; }
-  .hero__name rt { letter-spacing: 0.4em; }
+  .hero__eyebrow { letter-spacing: 0.3em; }
   .hero__deck { grid-template-columns: 1fr; }
   .hero__facts { justify-self: start; text-align: left; }
 
