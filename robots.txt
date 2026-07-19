@@ -1,5 +1,4 @@
 User-agent: *
-Disallow: /agents/
 Allow: /
 
 Sitemap: https://spidleweb.net/sitemap.xml
