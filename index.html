@@ -19,187 +19,273 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="fonts/Medium.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="fonts/Expanded.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="stylesheet" href="style.css">
-  <script>document.documentElement.classList.add('js-active');</script>
+  <link rel="stylesheet" href="jp.css">
   <script defer src="https://analytics.spidleweb.net/script.js" data-website-id="49720a36-6280-4d69-9531-c1d0c36b8f11"></script>
 </head>
 <body>
 
-  <div class="viewport">
+  <div class="frame">
 
-    <aside class="panel panel--home">
-
-      <div class="panel__meta micro">
-        <span>Vol. 01</span>
+    <header class="bar nano">
+      <div class="bar__cluster">
+        <span class="bar__site">SPIDLEWEB.NET</span>
+        <span class="gloss" lang="ja">〜 蜘蛛の巣 〜</span>
+        <span class="bar__dot" aria-hidden="true">●</span>
+        <span>EST. 2015</span>
       </div>
-
-      <h1 class="panel__type">
-        <span>Jason</span>
-        <span>Spidle</span>
-      </h1>
-
-      <div class="panel__footer">
-        <p class="panel__blurb">Product design for dense, data-heavy software. Dashboards, complex workflows, and the design systems that keep them coherent.</p>
-        <p class="micro">Minneapolis</p>
-        <p class="micro"><a href="mailto:jason@spidleweb.net">jason@spidleweb.net</a></p>
+      <div class="bar__cluster">
+        <span>MINNEAPOLIS, USA</span>
+        <span class="gloss" lang="ja">ミネアポリス</span>
+        <span class="bar__dot" aria-hidden="true">●</span>
+        <time id="today" datetime="2026-07-18">2026.07.18</time>
       </div>
-    </aside>
+    </header>
 
-    <main class="archive">
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker__track">
+        <ul class="ticker__list" lang="ja">
+          <li>お知らせ｜NOW ACCEPTING CONTRACT WORK</li>
+          <li>業務委託のご相談を受付中です</li>
+          <li>このサイトはリンクフリーです — THIS SITE IS LINK-FREE</li>
+          <li>データの多いソフトウェアのためのプロダクトデザイン</li>
+          <li>PRODUCT DESIGN FOR DENSE, DATA-HEAVY SOFTWARE</li>
+        </ul>
+        <ul class="ticker__list" lang="ja">
+          <li>お知らせ｜NOW ACCEPTING CONTRACT WORK</li>
+          <li>業務委託のご相談を受付中です</li>
+          <li>このサイトはリンクフリーです — THIS SITE IS LINK-FREE</li>
+          <li>データの多いソフトウェアのためのプロダクトデザイン</li>
+          <li>PRODUCT DESIGN FOR DENSE, DATA-HEAVY SOFTWARE</li>
+        </ul>
+      </div>
+    </div>
 
-      <header class="archive__header micro">
-        <nav class="archive__nav" aria-label="Page sections">
-          <a href="#work">Index</a>
-          <a href="#sites">Sites</a>
-          <a href="#profile">Profile</a>
-          <a href="#contact">Contact</a>
+    <div class="grid">
+
+      <aside class="rail" aria-hidden="true">
+        <div class="rail__top">
+          <p class="rail__name vertical" lang="ja">ジェイソン・スパイドル</p>
+          <p class="rail__name-en vertical">Jason Spidle</p>
+        </div>
+        <p class="rail__role vertical" lang="ja">プロダクトデザイナー</p>
+        <div class="hanko" lang="ja">蛛</div>
+      </aside>
+
+      <div class="content">
+
+        <section class="hero" aria-label="Introduction">
+          <h1 class="hero__name"><ruby>Jason Spidle<rt lang="ja">ジェイソン・スパイドル</rt></ruby></h1>
+          <div class="hero__deck">
+            <p class="hero__blurb">
+              Product design for dense, data-heavy software. Dashboards, complex
+              workflows, and the design systems that keep them coherent.
+              <span lang="ja">データの多い業務ソフトウェアのためのプロダクトデザイン。ダッシュボード、複雑なワークフロー、そしてそれらを支えるデザインシステム。</span>
+            </p>
+            <div class="hero__facts nano">
+              <span>PRODUCT DESIGNER <span lang="ja" class="gloss">プロダクトデザイナー</span></span>
+              <span>10 YEARS ENTERPRISE <span lang="ja" class="gloss">業務ソフト十年</span></span>
+              <span>OPEN TO CONTRACT <span lang="ja" class="gloss">業務委託可</span></span>
+            </div>
+          </div>
+        </section>
+
+        <nav class="dirs" aria-label="Page sections">
+          <a href="#news"><span lang="ja">更新履歴</span><span class="gloss">Updates</span></a>
+          <a href="#work"><span lang="ja">作品</span><span class="gloss">Works</span></a>
+          <a href="#profile"><span lang="ja">経歴</span><span class="gloss">Profile</span></a>
+          <a href="#contact"><span lang="ja">連絡先</span><span class="gloss">Contact</span></a>
         </nav>
-      </header>
 
-      <section id="work" aria-labelledby="work-title">
-        <h2 id="work-title" class="section-head micro">
-          <span>Selected Work</span>
-          <span>Index</span>
-        </h2>
-        <ul class="index">
-          <li class="reveal">
-            <a class="index__row" href="work/conservis.html">
-              <span class="index__thumb">
-                <img src="assets/conservis-03.png" alt="" width="80" height="50" loading="lazy">
-              </span>
-              <span class="index__main">
-                <span class="index__title">Conservis</span>
-                <span class="index__kind">Farm management</span>
-              </span>
-              <span class="index__year">2019</span>
-            </a>
-          </li>
-          <li class="reveal">
-            <a class="index__row" href="work/vidscrip.html">
-              <span class="index__thumb">
-                <img src="assets/vidscrip-01.png" alt="" width="80" height="50" loading="lazy">
-              </span>
-              <span class="index__main">
-                <span class="index__title">Vidscrip</span>
-                <span class="index__kind">Patient journeys</span>
-              </span>
-              <span class="index__year">2021</span>
-            </a>
-          </li>
-          <li class="reveal">
-            <a class="index__row" href="work/expert-insights.html">
-              <span class="index__thumb">
-                <img src="assets/expert-insights-01.png" alt="" width="80" height="50" loading="lazy">
-              </span>
-              <span class="index__main">
-                <span class="index__title">Expert Insights</span>
-                <span class="index__kind">Medical affairs</span>
-              </span>
-              <span class="index__year">2025</span>
-            </a>
-          </li>
-          <li class="reveal">
-            <a class="index__row" href="work/campaign-sim.html">
-              <span class="index__thumb">
-                <img src="assets/campaign-sim-01.png" alt="" width="80" height="50" loading="lazy">
-              </span>
-              <span class="index__main">
-                <span class="index__title">Campaign Sim</span>
-                <span class="index__kind">Campaign planning</span>
-              </span>
-              <span class="index__year">2025</span>
-            </a>
-          </li>
-        </ul>
-      </section>
+        <section id="news" aria-labelledby="news-title">
+          <header class="sec-head">
+            <span class="sec-head__no" lang="ja" aria-hidden="true">一</span>
+            <h2 id="news-title" class="sec-head__ja" lang="ja">更新履歴</h2>
+            <span class="sec-head__en">Updates</span>
+            <span class="sec-head__en sec-head__aside" lang="ja">最終更新 2026.07.18</span>
+          </header>
+          <ul class="news">
+            <li>
+              <time datetime="2026-07-18">2026.07.18</time>
+              <span class="tag">NEW</span>
+              <span class="news__what"><span lang="ja">サイトをリニューアルしました。</span><span class="en">Site redesigned.</span></span>
+            </li>
+            <li>
+              <time datetime="2025-11-01">2025.11.01</time>
+              <span class="tag tag--quiet">ADD</span>
+              <span class="news__what"><span lang="ja">「Campaign Sim」を作品に追加。</span><span class="en">Campaign Sim added to works.</span></span>
+            </li>
+            <li>
+              <time datetime="2025-06-01">2025.06.01</time>
+              <span class="tag tag--quiet">ADD</span>
+              <span class="news__what"><span lang="ja">「Expert Insights」を作品に追加。</span><span class="en">Expert Insights added to works.</span></span>
+            </li>
+            <li>
+              <time datetime="2025-01-01">2025.01.01</time>
+              <span class="tag tag--quiet">INFO</span>
+              <span class="news__what"><span lang="ja">Vault AI SystemsのフラクショナルCDOに就任。</span><span class="en">Joined Vault AI Systems as fractional CDO.</span></span>
+            </li>
+          </ul>
+        </section>
 
-      <section id="sites" aria-labelledby="sites-title">
-        <h2 id="sites-title" class="section-head micro">
-          <span>Shipped sites</span>
-          <span>External</span>
-        </h2>
+        <section id="work" aria-labelledby="work-title">
+          <header class="sec-head">
+            <span class="sec-head__no" lang="ja" aria-hidden="true">二</span>
+            <h2 id="work-title" class="sec-head__ja" lang="ja">作品</h2>
+            <span class="sec-head__en">Selected work</span>
+            <span class="sec-head__en sec-head__aside">Index · 4 items</span>
+          </header>
+          <ul class="works">
+            <li>
+              <a class="works__row" href="work/conservis.html">
+                <span class="works__no">№ 01</span>
+                <span class="works__thumb">
+                  <img src="assets/conservis-03.png" alt="" width="80" height="50" loading="lazy">
+                </span>
+                <span class="works__main">
+                  <span class="works__title">Conservis</span>
+                  <span class="works__kind"><span lang="ja">農場管理</span><span class="en">Farm management</span></span>
+                </span>
+                <span class="works__arrow" aria-hidden="true">→</span>
+                <span class="works__year">2019</span>
+              </a>
+            </li>
+            <li>
+              <a class="works__row" href="work/vidscrip.html">
+                <span class="works__no">№ 02</span>
+                <span class="works__thumb">
+                  <img src="assets/vidscrip-01.png" alt="" width="80" height="50" loading="lazy">
+                </span>
+                <span class="works__main">
+                  <span class="works__title">Vidscrip</span>
+                  <span class="works__kind"><span lang="ja">患者体験</span><span class="en">Patient journeys</span></span>
+                </span>
+                <span class="works__arrow" aria-hidden="true">→</span>
+                <span class="works__year">2021</span>
+              </a>
+            </li>
+            <li>
+              <a class="works__row" href="work/expert-insights.html">
+                <span class="works__no">№ 03</span>
+                <span class="works__thumb">
+                  <img src="assets/expert-insights-01.png" alt="" width="80" height="50" loading="lazy">
+                </span>
+                <span class="works__main">
+                  <span class="works__title">Expert Insights</span>
+                  <span class="works__kind"><span lang="ja">メディカルアフェアーズ</span><span class="en">Medical affairs</span></span>
+                </span>
+                <span class="works__arrow" aria-hidden="true">→</span>
+                <span class="works__year">2025</span>
+              </a>
+            </li>
+            <li>
+              <a class="works__row" href="work/campaign-sim.html">
+                <span class="works__no">№ 04</span>
+                <span class="works__thumb">
+                  <img src="assets/campaign-sim-01.png" alt="" width="80" height="50" loading="lazy">
+                </span>
+                <span class="works__main">
+                  <span class="works__title">Campaign Sim</span>
+                  <span class="works__kind"><span lang="ja">選挙シミュレーション</span><span class="en">Campaign planning</span></span>
+                </span>
+                <span class="works__arrow" aria-hidden="true">→</span>
+                <span class="works__year">2025</span>
+              </a>
+            </li>
+          </ul>
+        </section>
 
-        <ul class="sites">
-          <li class="site-card reveal">
-            <a href="https://www.ascensus.com" target="_blank" rel="noopener">
-              <span class="site-card__frame site-card__frame--crop-top">
-                <img src="assets/sites/ascensus.png" alt="Ascensus.com homepage" loading="lazy">
-              </span>
-              <span class="site-card__caption micro">
-                <span class="site-card__name">Ascensus <span class="accent">↗</span></span>
-                <span>Financial services</span>
-              </span>
-            </a>
-          </li>
-          <li class="site-card reveal">
-            <a href="https://www.kardion.com" target="_blank" rel="noopener">
-              <span class="site-card__frame">
-                <img src="assets/sites/kardion.png" alt="Kardion.com homepage" loading="lazy">
-              </span>
-              <span class="site-card__caption micro">
-                <span class="site-card__name">Kardion <span class="accent">↗</span></span>
-                <span>Medtech</span>
-              </span>
-            </a>
-          </li>
-          <li class="site-card reveal">
-            <a href="https://www.blueshift-consulting.com" target="_blank" rel="noopener">
-              <span class="site-card__frame">
-                <img src="assets/sites/blueshift.png" alt="Blueshift-consulting.com homepage" loading="lazy">
-              </span>
-              <span class="site-card__caption micro">
-                <span class="site-card__name">Blueshift <span class="accent">↗</span></span>
-                <span>Agency</span>
-              </span>
-            </a>
-          </li>
-          <li class="site-card reveal">
-            <a href="https://www.vaultaisystems.com" target="_blank" rel="noopener">
-              <span class="site-card__frame">
-                <img src="assets/sites/vaultai.png" alt="Vaultaisystems.com homepage" loading="lazy">
-              </span>
-              <span class="site-card__caption micro">
-                <span class="site-card__name">Vault AI Systems <span class="accent">↗</span></span>
-                <span>AI / Hardware</span>
-              </span>
-            </a>
-          </li>
-        </ul>
-      </section>
+        <section id="sites" aria-labelledby="sites-title">
+          <header class="sec-head">
+            <span class="sec-head__no" lang="ja" aria-hidden="true">三</span>
+            <h2 id="sites-title" class="sec-head__ja" lang="ja">制作サイト</h2>
+            <span class="sec-head__en">Shipped sites</span>
+            <span class="sec-head__en sec-head__aside">External ↗</span>
+          </header>
+          <ul class="sites">
+            <li>
+              <a href="https://www.ascensus.com" target="_blank" rel="noopener">
+                <span class="sites__figure sites__figure--crop-top">
+                  <img src="assets/sites/ascensus.png" alt="Ascensus.com homepage" loading="lazy">
+                </span>
+                <span class="sites__caption">
+                  <span class="sites__name">Ascensus <span class="ext">↗</span></span>
+                  <span class="gloss" lang="ja">金融サービス</span>
+                </span>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.kardion.com" target="_blank" rel="noopener">
+                <span class="sites__figure">
+                  <img src="assets/sites/kardion.png" alt="Kardion.com homepage" loading="lazy">
+                </span>
+                <span class="sites__caption">
+                  <span class="sites__name">Kardion <span class="ext">↗</span></span>
+                  <span class="gloss" lang="ja">医療機器</span>
+                </span>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.blueshift-consulting.com" target="_blank" rel="noopener">
+                <span class="sites__figure">
+                  <img src="assets/sites/blueshift.png" alt="Blueshift-consulting.com homepage" loading="lazy">
+                </span>
+                <span class="sites__caption">
+                  <span class="sites__name">Blueshift <span class="ext">↗</span></span>
+                  <span class="gloss" lang="ja">エージェンシー</span>
+                </span>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.vaultaisystems.com" target="_blank" rel="noopener">
+                <span class="sites__figure">
+                  <img src="assets/sites/vaultai.png" alt="Vaultaisystems.com homepage" loading="lazy">
+                </span>
+                <span class="sites__caption">
+                  <span class="sites__name">Vault AI Systems <span class="ext">↗</span></span>
+                  <span class="gloss" lang="ja">AI・ハードウェア</span>
+                </span>
+              </a>
+            </li>
+          </ul>
+        </section>
 
-      <section id="profile" aria-labelledby="profile-title">
-        <h2 id="profile-title" class="section-head micro">
-          <span>Profile</span>
-          <span>Open to contract work</span>
-        </h2>
-
-        <div class="profile">
-          <div class="profile__body reveal">
-            <h3 class="profile__title">Comfortable in dense data.</h3>
-            <p>I'm a product designer in Minneapolis. I've spent ten years shipping enterprise software across financial services, agtech, and healthcare: dashboards, data-heavy workflows, and the design systems behind them. I work in Figma every day, from discovery and user flows through high-fidelity UI and developer handoff. I also build working prototypes with coding agents.</p>
-            <p>Before design, I spent a decade programming and analyzing market research studies. That's where the comfort with dense data started. Most of what I know came from experience: fifty-some homes, ten states, two countries, and about every collar they've fitted for the working class.</p>
-
-            <ul class="roster micro" aria-label="Roles">
+        <section id="profile" aria-labelledby="profile-title">
+          <header class="sec-head">
+            <span class="sec-head__no" lang="ja" aria-hidden="true">四</span>
+            <h2 id="profile-title" class="sec-head__ja" lang="ja">経歴</h2>
+            <span class="sec-head__en">Profile</span>
+            <span class="sec-head__en sec-head__aside" lang="ja">業務委託受付中</span>
+          </header>
+          <div class="profile">
+            <div class="profile__body">
+              <h3 class="profile__lede" lang="ja">濃いデータの中でこそ。<span class="en" lang="en">Comfortable in dense data.</span></h3>
+              <p>I'm a product designer in Minneapolis. I've spent ten years shipping enterprise software across financial services, agtech, and healthcare: dashboards, data-heavy workflows, and the design systems behind them. I work in Figma every day, from discovery and user flows through high-fidelity UI and developer handoff. I also build working prototypes with coding agents.</p>
+              <p>Before design, I spent a decade programming and analyzing market research studies. That's where the comfort with dense data started. Most of what I know came from experience: fifty-some homes, ten states, two countries, and about every collar they've fitted for the working class.</p>
+            </div>
+            <ul class="roster" aria-label="Roles">
               <li><span class="roster__org">Blueshift</span><span>Partner / Design lead · 2024–</span></li>
               <li><span class="roster__org">Vault AI Systems</span><span>Fractional CDO · 2025–</span></li>
               <li><span class="roster__org">Foundry</span><span>Director · 2015–2024</span></li>
             </ul>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section id="contact" class="contact" aria-labelledby="contact-title">
-        <h2 id="contact-title" class="contact__label micro">Contact</h2>
-        <a class="contact__mail" href="mailto:jason@spidleweb.net">jason@spidleweb.net</a>
-      </section>
+        <section id="contact" class="contact" aria-labelledby="contact-title">
+          <header class="visually-hidden"><h2 id="contact-title">Contact</h2></header>
+          <a class="contact__mail" href="mailto:jason@spidleweb.net">jason@spidleweb.net</a>
+          <p class="contact__note"><span lang="ja">お気軽にご連絡ください。</span><span class="en">Feel free to get in touch.</span></p>
+        </section>
 
-      <footer class="footer micro">
-        <span>© <span id="year">2026</span> Jason Spidle · <a href="https://www.linkedin.com/in/jspidle" target="_blank" rel="noopener">LinkedIn ↗</a></span>
-      </footer>
+        <footer class="footer">
+          <span class="counter" lang="ja">あなたは<span class="counter__digits" id="counter">004721</span>人目の訪問者です</span>
+          <span class="footer__linkfree" lang="ja">リンクフリー｜LINK FREE</span>
+          <span class="footer__legal nano">© <span id="year">2026</span> JASON SPIDLE · <a href="https://www.linkedin.com/in/jspidle" target="_blank" rel="noopener">LINKEDIN ↗</a></span>
+        </footer>
 
-    </main>
+      </div>
+    </div>
   </div>
 
-  <script src="script.js"></script>
+  <script src="jp.js"></script>
 </body>
 </html>
