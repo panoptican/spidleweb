@@ -527,11 +527,10 @@ section { border-bottom: var(--rule); }
 /* ---- Profile ---- */
 
 .profile {
-  display: grid;
-  grid-template-columns: minmax(0, 58ch) 1fr;
-  gap: calc(var(--gap) * 2);
-  padding: 20px 14px 28px;
+  padding: 20px 14px 24px;
 }
+
+.profile__body { max-width: 58ch; }
 
 .profile__lede {
   font-size: var(--text-body);
@@ -546,24 +545,42 @@ section { border-bottom: var(--rule); }
   margin-top: 0.9em;
 }
 
-.roster {
-  list-style: none;
-  border-top: var(--rule);
-  align-self: start;
-}
+/* Employment record — a full-width ledger table, same anatomy as the
+   update log: mono date column, hairline-ruled rows. */
 
-.roster li {
+.record__head {
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
+  gap: 14px;
+  padding: 10px 14px 6px;
+  border-top: var(--hair);
+}
+
+.record__label { opacity: 0.6; }
+
+.record__list { list-style: none; }
+
+.record__list li {
+  display: grid;
+  grid-template-columns: 8.5em 16em 1fr;
   gap: 14px;
   align-items: baseline;
-  padding: 9px 0;
-  border-bottom: var(--hair);
+  padding: 8px 14px;
+  border-top: var(--hair);
   font-size: var(--text-micro);
 }
 
-.roster__org { font-weight: 500; text-transform: uppercase; letter-spacing: 0.03em; }
-.roster li > span:last-child { text-align: right; font-family: var(--mono); font-size: var(--text-nano); opacity: 0.75; }
+.record__years {
+  font-family: var(--mono);
+  font-size: var(--text-nano);
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+}
+
+.record__org { font-weight: 500; text-transform: uppercase; letter-spacing: 0.03em; }
+
+.record__role { opacity: 0.75; }
 
 /* ---- Contact ---- */
 
@@ -642,7 +659,6 @@ section { border-bottom: var(--rule); }
 @media (max-width: 900px) {
   .works__row { grid-template-columns: 1fr auto 4rem; }
   .works__thumb { display: none; }
-  .profile { grid-template-columns: 1fr; gap: var(--gap); }
 }
 
 @media (max-width: 700px) {
@@ -683,6 +699,10 @@ section { border-bottom: var(--rule); }
   .dirs a:last-child { grid-column: 1 / -1; }
 
   .news li { grid-template-columns: auto auto 1fr; gap: 10px; }
+
+  /* Record rows: years above, org + role share the second line */
+  .record__list li { grid-template-columns: auto 1fr; }
+  .record__years { grid-column: 1 / -1; }
 
   .works__row { grid-template-columns: 1fr 4rem; }
   .works__arrow { display: none; }
