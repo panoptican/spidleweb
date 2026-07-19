@@ -563,6 +563,9 @@ section { border-bottom: var(--rule); }
   list-style: none;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  /* Column-major: entries run down the left column, then down the right */
+  grid-template-rows: repeat(3, auto);
+  grid-auto-flow: column;
 }
 
 .record__list li {
@@ -575,7 +578,7 @@ section { border-bottom: var(--rule); }
   font-size: var(--text-micro);
 }
 
-.record__list li:nth-child(odd) { border-right: var(--hair); }
+.record__list li:nth-child(-n+3) { border-right: var(--hair); }
 
 .record__years {
   font-family: var(--mono);
@@ -712,9 +715,9 @@ section { border-bottom: var(--rule); }
 
   .news li { grid-template-columns: auto auto 1fr; gap: 10px; }
 
-  /* Record collapses to one column */
-  .record__list { grid-template-columns: 1fr; }
-  .record__list li:nth-child(odd) { border-right: none; }
+  /* Record collapses to one column, back to row flow */
+  .record__list { grid-template-columns: 1fr; grid-template-rows: none; grid-auto-flow: row; }
+  .record__list li:nth-child(-n+3) { border-right: none; }
 
   .works__row { grid-template-columns: 1fr 4rem; }
   .works__arrow { display: none; }
