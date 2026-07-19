@@ -10,6 +10,18 @@ if (today) {
   today.textContent = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())} (${day})`;
 }
 
+// Live clock with seconds in the top bar, 24-hour local time.
+const clock = document.getElementById('clock');
+if (clock) {
+  const pad = (n) => String(n).padStart(2, '0');
+  const tick = () => {
+    const now = new Date();
+    clock.textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  };
+  tick();
+  setInterval(tick, 1000);
+}
+
 // Keep the footer year current.
 const year = document.getElementById('year');
 if (year) year.textContent = new Date().getFullYear();
