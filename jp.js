@@ -9,18 +9,6 @@ if (today) {
   today.textContent = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())}`;
 }
 
-// Measure the chrome above the grid (bar + ticker + frame margin) so the
-// sticky rail can size itself to fit the viewport and keep the seal in view.
-const grid = document.querySelector('.grid');
-if (grid) {
-  const setRailOffset = () => {
-    const top = grid.getBoundingClientRect().top + window.scrollY;
-    document.documentElement.style.setProperty('--rail-offset', `${Math.round(top)}px`);
-  };
-  setRailOffset();
-  window.addEventListener('resize', setRailOffset);
-}
-
 // Live clock with seconds in the top bar, 24-hour local time.
 const clock = document.getElementById('clock');
 if (clock) {

@@ -182,20 +182,15 @@ a { color: inherit; }
 /* ---- Left rail: vertical name + seal ---- */
 
 .rail {
-  border-right: var(--rule);
   position: sticky;
   top: 0;
-  /* Fit within the viewport minus the bar + ticker above the grid, so the
-     name and seal are both in view without scrolling. --rail-offset is
-     measured and set by jp.js; the fallback covers the pre-script frame. */
-  height: calc(100vh - var(--rail-offset, 76px));
-  height: calc(100dvh - var(--rail-offset, 76px));
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
   padding: 24px 0;
-  overflow: hidden;
 }
 
 .vertical {
@@ -239,11 +234,23 @@ a { color: inherit; }
   opacity: 0.88;
   flex: none;
   text-decoration: none;
+  /* Pin the seal to the bottom-left corner of the viewport at every scroll
+     position, rather than letting it ride the bottom of the sticky rail box.
+     bottom matches the rail's 24px padding so its resting spot is unchanged. */
+  position: sticky;
+  bottom: 24px;
 }
 
 /* ---- Content column ---- */
 
-.content { min-width: 0; }
+/* The rail/content divider lives here, not on the sticky rail: the content
+   column runs the full page height, so the line is continuous even when the
+   shorter sticky rail has scrolled to the top. Removed on mobile, where the
+   rail becomes a horizontal strip. */
+.content {
+  min-width: 0;
+  border-left: var(--rule);
+}
 
 /* ---- Hero ---- */
 
@@ -706,15 +713,17 @@ section { border-bottom: var(--rule); }
     justify-content: space-between;
     align-items: center;
     padding: 10px 14px;
-    border-right: none;
     border-bottom: var(--rule);
   }
+
+  /* Divider is a top strip here, not a left rule */
+  .content { border-left: none; }
 
   .vertical { writing-mode: horizontal-tb; }
   .rail__top { align-items: baseline; gap: 12px; }
   .rail__name { letter-spacing: 0.14em; font-size: 0.8rem; white-space: nowrap; }
   .rail__role { display: none; }
-  .seal { width: 40px; height: 40px; font-size: 0.85rem; border-width: 2px; }
+  .seal { width: 40px; height: 40px; font-size: 0.85rem; border-width: 2px; position: static; }
 
   .hero { padding: 28px 14px 22px; }
   .hero__eyebrow { letter-spacing: 0.3em; }
