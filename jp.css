@@ -185,8 +185,11 @@ a { color: inherit; }
   border-right: var(--rule);
   position: sticky;
   top: 0;
-  height: 100vh;
-  height: 100dvh;
+  /* Fit within the viewport minus the bar + ticker above the grid, so the
+     name and seal are both in view without scrolling. --rail-offset is
+     measured and set by jp.js; the fallback covers the pre-script frame. */
+  height: calc(100vh - var(--rail-offset, 76px));
+  height: calc(100dvh - var(--rail-offset, 76px));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -205,6 +208,7 @@ a { color: inherit; }
   font-size: 1rem;
   letter-spacing: 0.3em;
   text-transform: uppercase;
+  text-decoration: none;
 }
 
 .rail__top { display: flex; }
@@ -234,6 +238,7 @@ a { color: inherit; }
   transform: rotate(-6deg);
   opacity: 0.88;
   flex: none;
+  text-decoration: none;
 }
 
 /* ---- Content column ---- */
