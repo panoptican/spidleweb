@@ -37,25 +37,34 @@ if (clock) {
 const year = document.getElementById('year');
 if (year) year.textContent = new Date().getFullYear();
 
-// Visitor counter: a loving fake. Increments once per browser, per day,
-// so returning visitors see the number tick up like it's 2001.
+// Visitor counter: a real shared tally, served by the /api/hits Pages Function
+// (Workers KV). To keep the count honest and the writes sane, each browser
+// bumps it at most once per day and otherwise just reads the current total.
 const counter = document.getElementById('counter');
 if (counter) {
-  const BASE = 4721;
-  let n = BASE;
+  const show = (n) => { counter.textContent = String(n).padStart(6, '0'); };
+
+  // Decide whether this load should increment the count.
+  let bump = true;
   try {
-    const stored = JSON.parse(localStorage.getItem('spidleweb-counter') || 'null');
     const stamp = new Date().toDateString();
-    if (stored && stored.stamp === stamp) {
-      n = stored.n;
+    if (localStorage.getItem('spidleweb-counter-stamp') === stamp) {
+      bump = false; // already counted today
     } else {
-      n = (stored ? stored.n : BASE) + 1;
-      localStorage.setItem('spidleweb-counter', JSON.stringify({ n, stamp }));
+      localStorage.setItem('spidleweb-counter-stamp', stamp);
     }
   } catch (e) {
-    // Private mode etc. — the counter just stays at base.
+    // Private mode etc. — treat every load as a fresh visit.
   }
-  counter.textContent = String(n).padStart(6, '0');
+
+  fetch(`/api/hits${bump ? '?bump=1' : ''}`, { cache: 'no-store' })
+    .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
+    .then((data) => {
+      if (typeof data.count === 'number') show(data.count);
+    })
+    .catch(() => {
+      // Offline, function not deployed yet, etc. — keep the static markup.
+    });
 }
 
 // Active section highlighting in the directory strip.
