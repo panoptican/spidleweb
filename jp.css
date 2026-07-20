@@ -442,6 +442,9 @@ section { border-bottom: var(--rule); }
 
 .works__arrow {
   color: var(--accent);
+  /* Mono renders the arrow glyph cleanly — GT America has no → and would fall
+     back to a slanted system arrow. Same reasoning as .sites__name .ext. */
+  font-family: var(--mono);
   font-size: var(--text-body);
   opacity: 0;
   transform: translateX(-6px);
@@ -516,7 +519,13 @@ section { border-bottom: var(--rule); }
 }
 
 .sites__name { font-weight: 500; }
-.sites__name .ext { color: var(--accent); }
+/* Render the arrow in the mono font — GT America has no ↗ glyph, so it would
+   otherwise fall back to an ugly slanted system arrow. Mono draws it cleanly,
+   matching the "External ↗" in the section head. */
+.sites__name .ext {
+  color: var(--accent);
+  font-family: var(--mono);
+}
 
 @media (hover: hover) and (pointer: fine) {
   .sites__figure img {
@@ -753,6 +762,9 @@ section { border-bottom: var(--rule); }
   font-size: var(--text-micro);
 }
 
+/* Mono renders the ← cleanly; GT America has no arrow glyph. */
+.crumbs__back { font-family: var(--mono); }
+
 .crumbs a { text-decoration: none; }
 .crumbs a:focus-visible { color: var(--accent); outline: 2px solid var(--accent); outline-offset: 2px; }
 @media (hover: hover) and (pointer: fine) {
@@ -891,7 +903,7 @@ section { border-bottom: var(--rule); }
   text-transform: uppercase;
 }
 
-.next__arrow { margin-left: auto; color: var(--accent); font-size: var(--text-body); }
+.next__arrow { margin-left: auto; color: var(--accent); font-family: var(--mono); font-size: var(--text-body); }
 
 .next:focus-visible { background: var(--ink); color: var(--paper); outline: none; }
 @media (hover: hover) and (pointer: fine) {
