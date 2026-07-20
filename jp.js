@@ -1,13 +1,12 @@
 // Homepage script for the Japanese-web layout. Case pages keep script.js.
 
-// Today's date in the dotted homepage format: 2026.07.18 (SAT)
+// Today's date in the dotted homepage format: 2026.07.18
 const today = document.getElementById('today');
 if (today) {
   const now = new Date();
   const pad = (n) => String(n).padStart(2, '0');
-  const day = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][now.getDay()];
   today.dateTime = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-  today.textContent = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())} (${day})`;
+  today.textContent = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())}`;
 }
 
 // Measure the chrome above the grid (bar + ticker + frame margin) so the
