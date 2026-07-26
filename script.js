@@ -1,23 +1,44 @@
 // Reveal sections as they enter the viewport. Progressive enhancement:
-// without JS, @media (scripting: none) shows content; reduced motion skips animation.
+// without JS, content stays visible (js-active never set); reduced motion skips animation.
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const targets = document.querySelectorAll('.reveal');
 
+function revealNow(el) {
+  el.classList.add('is-in');
+}
+
+function isInViewport(el) {
+  const rect = el.getBoundingClientRect();
+  return rect.top < window.innerHeight && rect.bottom > 0;
+}
+
 if (reduced || !('IntersectionObserver' in window)) {
-  targets.forEach((el) => el.classList.add('is-in'));
+  targets.forEach(revealNow);
 } else {
   const io = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('is-in');
+          revealNow(entry.target);
           io.unobserve(entry.target);
         }
       });
     },
-    { threshold: 0.1 }
+    { threshold: 0.05, rootMargin: '48px 0px' }
   );
-  targets.forEach((el) => io.observe(el));
+
+  // Hash deep-links and above-the-fold items must not stay invisible.
+  const hashTarget = location.hash ? document.querySelector(location.hash) : null;
+  targets.forEach((el) => {
+    if (
+      isInViewport(el) ||
+      (hashTarget && (el === hashTarget || hashTarget.contains(el)))
+    ) {
+      revealNow(el);
+      return;
+    }
+    io.observe(el);
+  });
 }
 
 // Keep the footer year current.
@@ -52,4 +73,3 @@ if (sections.length && navLinks.length && 'IntersectionObserver' in window) {
 
   sections.forEach((section) => observer.observe(section));
 }
-

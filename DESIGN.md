@@ -41,9 +41,16 @@ components:
     backgroundColor: "{colors.ink}"
     textColor: "{colors.paper}"
     padding: "28px 12px"
-  site-card-frame:
+  frame-bg:
     backgroundColor: "#d9d9d5"
     rounded: "{rounded.none}"
+  sites-row:
+    backgroundColor: "{colors.paper}"
+    textColor: "{colors.ink}"
+    padding: "14px 0px"
+  sites-row-hover:
+    backgroundColor: "{colors.ink}"
+    textColor: "{colors.paper}"
 ---
 
 # Design System: Spidleweb Portfolio
@@ -126,9 +133,9 @@ The design system is entirely flat and paper-like. Depth is conveyed strictly vi
 - **Layout:** 4-column baseline aligned grid (`3.5rem 1fr minmax(0, 11rem) 4rem`) with hairline separator border.
 - **States:** Hover triggers full row inversion (background turns to Ink Black, text turns to Warm Paper). Margin expands slightly (`-12px`) and padding shifts (`12px`) to pad the inverted block. Number turns to Accent Red.
 
-### Site Cards
-- **Structure:** Aspect ratio `16/10` bordered image frame (`border: 1px solid var(--line-strong)`) with caption underneath.
-- **Grayscale Transition:** Images are rendered in 100% grayscale with contrast enhanced. Hover transitions to full color and scales up (`scale(1.03)`).
+### Sites List
+- **Structure:** Compact ledger rows (name + domain label), demoted below Selected Work. No screenshot grid.
+- **States:** Hover/focus inverts to ink background and paper text, matching index-row tactile response at a quieter weight (hairline `--line` separators, not strong rules).
 
 ### Split Panel
 - **Layout:** Sticky column, full height (`100vh`). Ink background, paper text. Includes structural coordinate metrics at the top and bio/location metadata at the bottom.
@@ -143,6 +150,6 @@ The design system is entirely flat and paper-like. Depth is conveyed strictly vi
 ### Don't:
 - **Don't** use side-stripe borders (e.g. left borders on alerts or cards) to highlight elements.
 - **Don't** apply text gradients or background-clip text treatments.
-- **Don't** add drop shadows or box-shadows to panels, site cards, or rows.
+- **Don't** add drop shadows or box-shadows to panels, sites rows, or index rows.
 - **Don't** use rounded card corners or rounded borders (always use sharp `0px` corners).
 - **Don't** implement bouncy or elastic transition curves (use clean, linear, or expo transitions).
