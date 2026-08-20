@@ -539,6 +539,65 @@ a { color: inherit; }
 
 .phone-frame img { width: 100%; }
 
+/* ---- Cover grid: captioned frames that link out to the live pages ----
+   Two up. `.cover--wide` spans the full measure, used to close the seven-issue
+   run on a wide frame instead of an orphan. The grayscale-to-color reveal on
+   hover doubles as the "each issue looked different" proof. */
+
+.covers {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap);
+  margin-top: 40px;
+}
+
+.cover--wide { grid-column: 1 / -1; }
+
+.cover__link {
+  display: block;
+  text-decoration: none;
+}
+
+.cover__frame {
+  display: block;
+  border: 1px solid var(--line-strong);
+  background: var(--frame-bg);
+  overflow: hidden;
+}
+
+/* Height auto because the tags carry intrinsic width/height to reserve space */
+.cover__frame img { width: 100%; height: auto; }
+
+@media (hover: hover) and (pointer: fine) {
+  .cover__frame img {
+    filter: grayscale(100%) contrast(1.05);
+    transition: filter 0.2s linear;
+  }
+  .cover__link:hover .cover__frame img { filter: none; }
+  .cover__link:hover .cover__id { color: var(--accent); }
+}
+
+.cover__link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.cover__link:focus-visible .cover__frame img { filter: none; }
+.cover__link:focus-visible .cover__id { color: var(--accent); }
+
+.cover__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+.cover__note {
+  text-align: right;
+  opacity: 0.75;
+}
+
 /* ---- Case study results ---- */
 
 .results {
@@ -636,6 +695,8 @@ a { color: inherit; }
 .index li:nth-child(2).reveal { transition-delay: 60ms; }
 .index li:nth-child(3).reveal { transition-delay: 120ms; }
 .index li:nth-child(4).reveal { transition-delay: 180ms; }
+.index li:nth-child(5).reveal { transition-delay: 240ms; }
+.index li:nth-child(6).reveal { transition-delay: 300ms; }
 
 .sites li:nth-child(1).reveal { transition-delay: 0ms; }
 .sites li:nth-child(2).reveal { transition-delay: 60ms; }
@@ -648,6 +709,7 @@ a { color: inherit; }
   .index__row, .sites__row, .next {
     transition: color 0.05s ease-out;
   }
+  .cover__frame img { transition: none; }
   .index__row::before, .sites__row::before, .next::before {
     transition: opacity 0.05s ease-out;
   }
@@ -690,6 +752,10 @@ a { color: inherit; }
   .archive__header { position: static; }
 
   .phones { grid-template-columns: 1fr; }
+  .covers { grid-template-columns: 1fr; }
+  /* Two mono labels can't share one phone-width line without ragged wrapping */
+  .cover__meta { flex-direction: column; gap: 2px; }
+  .cover__note { text-align: left; }
   .phone-frame { height: 480px; }
   .section-head, .contact { margin-top: 0; }
   .section-head { margin-top: 64px; }
@@ -801,6 +867,17 @@ a { color: inherit; }
   --panel-bg: oklch(22% var(--panel-chroma) 165);
 }
 
+.theme-plinth {
+  --c-chroma: calc(0.16 * var(--p-color-amount, 1));
+  --paper-chroma: calc(0.006 * var(--p-color-amount, 1));
+  --panel-chroma: calc(0.08 * var(--p-color-amount, 1));
+
+  --paper: oklch(96.5% var(--paper-chroma) 305);
+  --ink: oklch(13% var(--paper-chroma) 305);
+  --accent: oklch(55% var(--c-chroma) 305);
+  --panel-bg: oklch(20% var(--panel-chroma) 305);
+}
+
 /* ---- Home index row custom hover accents (each matches its case theme) ---- */
 .index li:nth-child(1) {
   --row-accent: oklch(52% calc(0.17 * var(--p-color-amount, 1)) 260);
@@ -816,4 +893,7 @@ a { color: inherit; }
 }
 .index li:nth-child(5) {
   --row-accent: oklch(55% calc(0.14 * var(--p-color-amount, 1)) 140);
+}
+.index li:nth-child(6) {
+  --row-accent: oklch(55% calc(0.16 * var(--p-color-amount, 1)) 305);
 }
