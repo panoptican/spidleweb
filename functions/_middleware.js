@@ -7,11 +7,17 @@
 
    The password lives in the PREVIEW_PASSWORD Pages environment variable:
      wrangler pages secret put PREVIEW_PASSWORD --project-name spidleweb
+   Pages binds variables at deploy time, so setting it does not affect the live
+   site until a new deployment exists — retry the deployment afterwards.
    Use an ASCII password: Basic credentials are latin1-decoded below, so a
    password with non-ASCII characters will not compare equal.
 
+   If the variable is unset, gated paths return 500 rather than the content:
+   the gate fails closed, so a missing secret breaks the page instead of
+   leaking it.
+
    To lift the gate, delete this file and restore the two <url> entries in
-   sitemap.xml. */
+   sitemap.xml. See docs/deployment.md. */
 
 const GATED = new Set([
   "/work/expert-insights",
