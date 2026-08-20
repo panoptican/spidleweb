@@ -790,16 +790,30 @@ a { color: inherit; }
   --panel-bg: oklch(25% var(--panel-chroma) 50);
 }
 
-/* ---- Home index row custom hover accents ---- */
+.theme-everag {
+  --c-chroma: calc(0.14 * var(--p-color-amount, 1));
+  --paper-chroma: calc(0.006 * var(--p-color-amount, 1));
+  --panel-chroma: calc(0.06 * var(--p-color-amount, 1));
+
+  --paper: oklch(96.5% var(--paper-chroma) 165);
+  --ink: oklch(13% var(--paper-chroma) 165);
+  --accent: oklch(55% var(--c-chroma) 165);
+  --panel-bg: oklch(22% var(--panel-chroma) 165);
+}
+
+/* ---- Home index row custom hover accents (each matches its case theme) ---- */
 .index li:nth-child(1) {
-  --row-accent: oklch(55% calc(0.14 * var(--p-color-amount, 1)) 140);
-}
-.index li:nth-child(2) {
-  --row-accent: oklch(55% calc(0.13 * var(--p-color-amount, 1)) 195);
-}
-.index li:nth-child(3) {
   --row-accent: oklch(52% calc(0.17 * var(--p-color-amount, 1)) 260);
 }
-.index li:nth-child(4) {
+.index li:nth-child(2) {
   --row-accent: oklch(60% calc(0.19 * var(--p-color-amount, 1)) 50);
+}
+.index li:nth-child(3) {
+  --row-accent: oklch(55% calc(0.14 * var(--p-color-amount, 1)) 165);
+}
+.index li:nth-child(4) {
+  --row-accent: oklch(55% calc(0.13 * var(--p-color-amount, 1)) 195);
+}
+.index li:nth-child(5) {
+  --row-accent: oklch(55% calc(0.14 * var(--p-color-amount, 1)) 140);
 }

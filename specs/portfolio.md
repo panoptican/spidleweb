@@ -36,6 +36,20 @@ inversions, grayscale imagery that colorizes on hover.
   is the original product requirements doc, not case-study copy).
 - Navigator365 / Omnitopia copy: written from the supplied screens in
   `assets/` — no write-ups existed. See assumptions.
+- Ever.Ag copy (added 2026-08-19): written from `qa/everag-background/`
+  (SOWs, the Foundry design collaboration guide, the design-system gaps doc,
+  the 2023-05-05 retro transcript, and the Ever.Ag/supply-chain decks).
+  Confidential material excluded: budgets/rates/FTE counts, competitor and
+  PE-ownership details, named enterprise customers, internal retro
+  criticism, individual names, and internal product codenames (Phoenix,
+  Vault, CMS, MDD) — apps are described by domain instead. Links to the
+  public style guide at design.ever.ag (verified live 2026-08-19).
+- Ever.Ag imagery: `assets/everag-01..05.png` from `qa/260819-screens/`;
+  02/03/05 are crops of two deck slides (Use of Color, Product Examples)
+  trimmed to product imagery. A Mobile Manifest phone crop was tried and
+  cut on review (Jason: looked wrong in the layout); the field app stays
+  in the copy only. OG captured from the live page at 1200×630 with
+  Playwright's headless Chromium shell.
 - Bio: jasonspidle.com + `application/resume-draft.md`.
 - Case imagery: `assets/*.png` (supplied). The Vidscrip case uses four revised
   captures in scrollable frames, including the procedure survey and date editor.
@@ -58,6 +72,13 @@ inversions, grayscale imagery that colorizes on hover.
    (Blueshift-era cases) inferred from the resume draft.
 5. The `agents/` demos and `variant-rating/` were left untouched and are not
    linked from the new site (out of the supplied scope for this build).
+6. **Ever.Ag years listed as 2022–24**: the engagement started March 2022
+   (collaboration guide); the sustainability-platform SOW ran from late
+   October 2023 with a four-month initial term, which implies work into
+   early 2024. Correct if the actual end date differs.
+7. **Ever.Ag index-row hover accents**: the home-page `nth-child` accent
+   hues were remapped so each row matches its case theme again (they had
+   drifted when rows were reordered), with a new hue 165 for Ever.Ag.
 
 ## Conventions
 
