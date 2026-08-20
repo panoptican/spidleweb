@@ -53,3 +53,58 @@ in `qa/screens/` (gitignored).
   temporary local Python static server on port 8001 and Playwright's bundled
   headless Chromium. The server was stopped after verification.
 - Release screenshots are in `qa/screens/release-*.png` (gitignored).
+
+## PLINTH case study (2026-08-20)
+
+Same method as the rebuild: headless-shell renders from `file://`, no
+automated checks exist.
+
+### Checked
+
+- `work/plinth.html` at 1440x900, 1440x4600 (full page), 1280, 1024, 900,
+  800, and 390x6000. Cover grid is two-up with issue 07 spanning the full
+  measure; collapses to one column under 768px. Panel facts fit on one line
+  down to 1024 and wrap cleanly right-aligned at 900 and below — the
+  "Unwin-Dunraven Literary Ecclesia" value is the widest thing in the panel
+  and was the reason for checking those widths.
+- Hover branch verified by rendering a scratch page that forces
+  `filter: none` and the accent label, since headless shell cannot hover:
+  covers reveal full colour and the issue label turns accent. The touch
+  branch (no `hover: hover`) shows full colour by construction, as with the
+  existing `.figure__frame` pattern.
+- `index.html` at 1440x2000 with reduced motion forced: the sixth index row
+  renders with the issue 06 thumbnail, which is the only cover legible at
+  80x50. Note that reveal-on-scroll makes normal-motion captures of the
+  lower rows unreliable — force reduced motion when capturing the index.
+- Next-project chain re-verified as a complete cycle in index order:
+  expert-insights → campaign-sim → everag → vidscrip → conservis → plinth →
+  expert-insights.
+- Every local reference in `work/plinth.html` resolves; all eight external
+  links point at plinth.us and returned 200 during research.
+- `assets/og/plinth.png` is 1200x630 and matches the framing of the other
+  case OG captures.
+
+### Fixed during verification
+
+- Cover images rendered squashed to 1000px tall: the tags carry intrinsic
+  `width`/`height` to reserve layout space, and `.cover__frame img` set
+  `width: 100%` without `height: auto`. The older `.figure__frame img` rule
+  has the same gap but no case hits it, because those tags omit dimensions.
+- Index reveal stagger only defined delays for rows 1–4; rows 5 and 6 now
+  continue the 60ms step, so Conservis picks up a 240ms delay it did not
+  have before.
+
+### Reading-page grid (added same day)
+
+- `.covers` now carries two lists on the page, so `.cover__no`/`.cover__type`
+  were renamed to `.cover__id`/`.cover__note`, and the full-measure span moved
+  off `li:last-child` onto an explicit `.cover--wide` — otherwise the fourth
+  reading page would have stretched across the grid. Re-checked that the
+  seven-cover run still closes on the wide issue 07 frame.
+- Reading grid rendered as a clean 2x2 at 1440 and stacked at 390. All four
+  reading-page URLs returned 200.
+- Caption lines wrapped raggedly at phone width, where two mono labels cannot
+  share one line: `.cover__meta` now stacks and `.cover__note` left-aligns
+  under 768px.
+- Conn frame re-cropped after review; re-checked that it and Kreiden still
+  render at equal height with their captions on a shared baseline.

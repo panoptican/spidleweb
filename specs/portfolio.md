@@ -51,6 +51,51 @@ inversions, grayscale imagery that colorizes on hover.
   in the copy only. OG captured from the live page at 1200×630 with
   Playwright's headless Chromium shell.
 - Bio: jasonspidle.com + `application/resume-draft.md`.
+- PLINTH copy (added 2026-08-20): written from the live journal at
+  plinth.us, not from any existing write-up. Facts verified against the
+  running site: the manifesto and "attains each equinox" cadence from
+  `issue02/about` and `issue06/about`; the contributor roster from
+  `issue07/archive.html` (nine pieces an issue, sixty-three across seven
+  issues); the per-issue type stacks read out of each issue's own CSS
+  (`issue01/css/grid.css`, `issue02/css/grid.css`, `issue03/css/grid.css`,
+  `issue04..07/css/styles.css`); issue 03's image-map contents page and
+  issue 06's single-page structure from their markup. Collaborator credits
+  (Garett Strickland editing, Tyann Prentice graphics) supplied by Jason.
+  Copy passed through the `jason-voice` skill on 2026-08-20: em dashes and
+  semicolons removed, "not X, it's Y" reversals unwound, and the writerly
+  lines cut ("the differences are the argument", "a masthead built out of
+  nothing but hairlines", "simple and unreasonable"). Agency moved to first
+  person where Jason did the work ("I built the page to hold words where the
+  poem put them"). Every specific was kept: that lint fails generic summary
+  without backing detail, so the names, faces, and counts all stay.
+- PLINTH imagery: `assets/plinth-01..07.jpg`, captured 2026-08-20 from the
+  seven live issue indexes at 1440x1000 @2x with Playwright's headless
+  Chromium shell, downsampled to 1440px wide and saved as JPEG q88 (~1.1 MB
+  for all seven; PNG would have been ~3.3 MB, and these are photographic
+  screen captures). Issue 03 is top-cropped by 50 CSS px to remove its
+  unstyled "Skip to content" link, which is visible on that page because it
+  has no external stylesheet. The home-page index thumbnail uses
+  `plinth-06.jpg` because issue 06's black cover is the only one that reads
+  at 80x50. OG captured from the local page at 1200x630 the same way.
+- PLINTH reading pages (added 2026-08-20, Jason's picks):
+  `assets/plinth-evenson.jpg`, `-attar.jpg`, `-kreiden.jpg`, `-conn.jpg`,
+  captured the same way from `issue07/evenson`, `issue05/attar`,
+  `issue04/kreiden`, and `issue03/conn`. They were chosen to each show a
+  different thing the reading layout had to do: a justified prose measure,
+  a poem scored across the full page width rather than reflowed into a
+  column, a narrow ragged column on issue 04's mint grid, and issue 03's
+  custom scrollbar. That last one is verifiable in the source rather than
+  inferred from the render: `conn.html` calls `.scroll-pane').jScrollPane()`
+  and `issue03/css/jquery.jscrollpane.css` sets `.jspTrack` to `#000000`
+  with a white `.jspDrag`, so the black vertical rule beside the text
+  really is the scrollbar with its usual colours inverted.
+  The Conn capture is cropped to `2304x1600+192+0` of the raw 2880x2000
+  before downscaling — Jason marked it up as too loose, and its content
+  filled only 51% of the frame against 75% for Evenson and 100% for
+  Kreiden. The crop is centred on the measured content bounds with even
+  ~100px margins, and holds the 36:25 ratio the other frames use: an
+  arbitrary aspect would leave that cell short of its neighbour and pull
+  the row's caption baselines apart.
 - Case imagery: `assets/*.png` (supplied). The Vidscrip case uses four revised
   captures in scrollable frames, including the procedure survey and date editor.
   Site imagery:
@@ -76,6 +121,23 @@ inversions, grayscale imagery that colorizes on hover.
    (collaboration guide); the sustainability-platform SOW ran from late
    October 2023 with a four-month initial term, which implies work into
    early 2024. Correct if the actual end date differs.
+8. **PLINTH years listed as 2014–19, against Jason's recollection of
+   2011–14.** Jason's initial brief said the journal ran 2011–2014; the site
+   itself disagrees, and he chose to follow the site. Evidence: issue 04's
+   masthead reads "Fall Equinox / MMXV" (2015) in `issue04/index.html`;
+   Internet Archive first captures are issue 03 on 2015-03-25 (days after
+   the March 2015 equinox), issue 04 on 2015-09-30, issue 05 mid-2016,
+   issue 06 in 2018, issue 07 in 2019; and plinth.us was still a splash page
+   linking only to unwin-dunraven.com as late as 2014-01-06, showing issue
+   02's artwork by autumn 2014. Wayback first-capture is an upper bound on
+   publication, so issue 01 and 07's exact dates remain approximate — hence
+   the rounded "2014–19". 2011 is plausibly when the Ecclesia and the
+   project began, which is not the same as when issue 01 shipped.
+9. **PLINTH theme hue is 305 (violet)**, the first case hue outside the
+   260–50 spread already in use, at chroma 0.16. No brand colour exists to
+   match: the journal itself is mostly black and white, and its two colour
+   issues (04 mint, 05 rust) disagree with each other.
+
 7. **Ever.Ag index-row hover accents**: the home-page `nth-child` accent
    hues were remapped so each row matches its case theme again (they had
    drifted when rows were reordered), with a new hue 165 for Ever.Ag.
