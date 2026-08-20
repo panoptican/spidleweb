@@ -5,16 +5,23 @@
    including the two `-01` screenshots the homepage index uses as row thumbnails
    (gating those would break the public index).
 
-   The password lives in the PREVIEW_PASSWORD Pages environment variable:
-     wrangler pages secret put PREVIEW_PASSWORD --project-name spidleweb
-   Pages binds variables at deploy time, so setting it does not affect the live
-   site until a new deployment exists — retry the deployment afterwards.
-   Use an ASCII password: Basic credentials are latin1-decoded below, so a
-   password with non-ASCII characters will not compare equal.
+   Unlocking is a form on a styled page rather than HTTP Basic Auth, so the
+   client sees one password field instead of a browser dialog with a username
+   box they would have to be told to ignore. A correct password sets a signed,
+   HttpOnly cookie good for COOKIE_DAYS days.
 
-   If the variable is unset, gated paths return 500 rather than the content:
+   Two Pages environment variables are required:
+     wrangler pages secret put PREVIEW_PASSWORD   --project-name spidleweb
+     wrangler pages secret put PREVIEW_COOKIE_KEY --project-name spidleweb
+   PREVIEW_PASSWORD is what the client types. PREVIEW_COOKIE_KEY signs the
+   cookie and should be a long random string, not a memorable one:
+     openssl rand -hex 32
+   Pages binds variables at deploy time, so setting them does not affect the
+   live site until a new deployment exists — retry the deployment afterwards.
+
+   If either variable is unset, gated paths return 500 rather than the content:
    the gate fails closed, so a missing secret breaks the page instead of
-   leaking it.
+   leaking it. Rotating either one signs everyone out.
 
    To lift the gate, delete this file and restore the two <url> entries in
    sitemap.xml. See docs/deployment.md. */
@@ -30,6 +37,9 @@ const GATED = new Set([
   "/assets/og/campaign-sim.png",
 ]);
 
+const COOKIE = "sw_preview";
+const COOKIE_DAYS = 30;
+
 /* Pages serves a page at both `/work/foo` and `/work/foo.html`, and asset
    matching is not reliably case-sensitive, so compare on one canonical form. */
 function canonical(pathname) {
@@ -37,18 +47,61 @@ function canonical(pathname) {
   return trimmed.endsWith(".html") ? trimmed.slice(0, -5) : trimmed;
 }
 
-function supplied(request) {
-  const [scheme, encoded] = (request.headers.get("Authorization") || "").split(" ");
-  if (scheme !== "Basic" || !encoded) return null;
-  try {
-    const decoded = atob(encoded);
-    return decoded.slice(decoded.indexOf(":") + 1);
-  } catch {
-    return null;
-  }
+const bytes = (s) => new TextEncoder().encode(s);
+
+function signingKey(secret) {
+  return crypto.subtle.importKey(
+    "raw",
+    bytes(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign", "verify"],
+  );
 }
 
-const CHALLENGE = `<!doctype html>
+/* Cookie value is `<expiry-ms>.<hex hmac of expiry>`. The expiry is carried in
+   the clear and signed, so it cannot be extended without the key, and the
+   cookie stays valid only until the timestamp it commits to. */
+async function issue(env) {
+  const expiry = Date.now() + COOKIE_DAYS * 86400_000;
+  const signature = await crypto.subtle.sign(
+    "HMAC",
+    await signingKey(env.PREVIEW_COOKIE_KEY),
+    bytes(String(expiry)),
+  );
+  const hex = [...new Uint8Array(signature)]
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return `${COOKIE}=${expiry}.${hex}; Path=/; Max-Age=${COOKIE_DAYS * 86400}; HttpOnly; Secure; SameSite=Lax`;
+}
+
+async function unlocked(request, env) {
+  const match = (request.headers.get("Cookie") || "").match(
+    new RegExp(`(?:^|;\\s*)${COOKIE}=([^;]+)`),
+  );
+  if (!match) return false;
+
+  const [expiry, hex] = decodeURIComponent(match[1]).split(".");
+  if (!/^\d+$/.test(expiry || "") || !/^[0-9a-f]+$/.test(hex || "")) return false;
+  if (Number(expiry) < Date.now()) return false;
+
+  const signature = Uint8Array.from(
+    hex.match(/../g).map((pair) => parseInt(pair, 16)),
+  );
+  /* subtle.verify compares in constant time. */
+  return crypto.subtle.verify(
+    "HMAC",
+    await signingKey(env.PREVIEW_COOKIE_KEY),
+    signature,
+    bytes(String(Number(expiry))),
+  );
+}
+
+const escapeAttr = (s) => s.replace(/[&<>"]/g, (c) =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+
+function gatePage(action, error) {
+  return `<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
@@ -72,8 +125,8 @@ const CHALLENGE = `<!doctype html>
     min-height: 100dvh; display: grid; place-items: center; padding: 24px;
     -webkit-font-smoothing: antialiased;
   }
-  main { max-width: 34rem; }
-  p.label {
+  main { width: 100%; max-width: 34rem; }
+  .label {
     font: 0.65rem/1 ui-monospace, "SF Mono", Menlo, monospace;
     letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent);
     padding-bottom: 12px; border-bottom: 1px solid var(--ink); margin-bottom: 24px;
@@ -83,42 +136,97 @@ const CHALLENGE = `<!doctype html>
     font-size: clamp(1.35rem, 2.8vw, 2.5rem); font-weight: 400;
     line-height: 1.15; margin-bottom: 12px;
   }
+  p.lede { margin-bottom: 32px; }
+  label {
+    display: block; margin-bottom: 8px;
+    font: 0.65rem/1 ui-monospace, "SF Mono", Menlo, monospace;
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; }
+  input {
+    flex: 1 1 16rem; min-width: 0;
+    font-family: inherit; font-size: 1rem; font-weight: 500;
+    padding: 12px; color: var(--ink);
+    background: transparent; border: 1px solid var(--ink); border-radius: 0;
+  }
+  input:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button {
+    font: 500 1rem/1 "GT America", Helvetica, Arial, sans-serif;
+    padding: 12px 24px; cursor: pointer; border: 1px solid var(--ink);
+    background: var(--ink); color: var(--paper); border-radius: 0;
+    transition: background 120ms steps(2), color 120ms steps(2);
+  }
+  button:hover { background: var(--paper); color: var(--ink); }
+  .error {
+    margin-top: 16px; color: var(--accent);
+    font: 0.8rem/1.4 ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  .back { margin-top: 32px; font-size: 0.8rem; }
   a { color: inherit; }
+  @media (prefers-reduced-motion: reduce) { button { transition: none; } }
 </style>
 <main>
-  <p class="label">401 &mdash; Client preview</p>
+  <p class="label">Client preview</p>
   <h1>This case study is under client review.</h1>
-  <p>Reload and enter the shared password to continue, or head back to the
-  <a href="/">index</a>.</p>
+  <p class="lede">Enter the shared password to read it.</p>
+  <form method="POST" action="${escapeAttr(action)}">
+    <label for="password">Password</label>
+    <div class="row">
+      <input id="password" name="password" type="password" autocomplete="current-password"
+             autofocus required spellcheck="false" aria-describedby="${error ? "error" : ""}">
+      <button type="submit">Unlock</button>
+    </div>
+    ${error ? `<p class="error" id="error" role="alert">${escapeAttr(error)}</p>` : ""}
+  </form>
+  <p class="back">Or head back to the <a href="/">index</a>.</p>
 </main>`;
+}
 
-export async function onRequest({ request, next, env }) {
-  if (!GATED.has(canonical(new URL(request.url).pathname))) return next();
-
-  if (!env.PREVIEW_PASSWORD) {
-    return new Response("PREVIEW_PASSWORD is not set on this deployment.", {
-      status: 500,
-      headers: { "Cache-Control": "no-store" },
-    });
-  }
-
-  if (supplied(request) === env.PREVIEW_PASSWORD) {
-    /* Copy the upstream response so the gated pages are never cached at the
-       edge or in a shared proxy while they are still under review. */
-    const upstream = await next();
-    const response = new Response(upstream.body, upstream);
-    response.headers.set("Cache-Control", "no-store");
-    response.headers.set("X-Robots-Tag", "noindex");
-    return response;
-  }
-
-  return new Response(CHALLENGE, {
+const gateResponse = (action, error) =>
+  new Response(gatePage(action, error), {
     status: 401,
     headers: {
-      "WWW-Authenticate": 'Basic realm="Spidleweb client preview", charset="UTF-8"',
       "Content-Type": "text/html; charset=utf-8",
       "Cache-Control": "no-store",
       "X-Robots-Tag": "noindex",
     },
   });
+
+export async function onRequest({ request, next, env }) {
+  const url = new URL(request.url);
+  if (!GATED.has(canonical(url.pathname))) return next();
+
+  if (!env.PREVIEW_PASSWORD || !env.PREVIEW_COOKIE_KEY) {
+    return new Response(
+      "PREVIEW_PASSWORD and PREVIEW_COOKIE_KEY must both be set on this deployment.",
+      { status: 500, headers: { "Cache-Control": "no-store" } },
+    );
+  }
+
+  if (request.method === "POST") {
+    const submitted = (await request.formData()).get("password");
+    if (submitted !== env.PREVIEW_PASSWORD) {
+      return gateResponse(url.pathname, "That password is not right. Try again.");
+    }
+    /* 303 so the browser re-requests the page as a GET and a refresh does not
+       resubmit the form. */
+    return new Response(null, {
+      status: 303,
+      headers: {
+        Location: url.pathname,
+        "Set-Cookie": await issue(env),
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  if (!(await unlocked(request, env))) return gateResponse(url.pathname);
+
+  /* Copy the upstream response so the gated pages are never cached at the
+     edge or in a shared proxy while they are still under review. */
+  const upstream = await next();
+  const response = new Response(upstream.body, upstream);
+  response.headers.set("Cache-Control", "no-store");
+  response.headers.set("X-Robots-Tag", "noindex");
+  return response;
 }
