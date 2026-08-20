@@ -11,3 +11,7 @@ Default vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-
 ### Domain docs
 
 Single-context repo. See `docs/agents/domain.md` for documentation layout and consumption rules.
+
+## Deployment
+
+Cloudflare Pages, auto-deployed from GitHub on push to `main` — pushing to `main` is deploying. Do not run `wrangler pages deploy`. See `docs/deployment.md`.
