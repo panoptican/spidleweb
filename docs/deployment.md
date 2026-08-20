@@ -27,8 +27,36 @@ wrangler pages secret put NAME --project-name spidleweb
 ```
 
 Pages binds variables **at deploy time**, so adding or changing one does not
-affect the running site until a new deployment exists. After changing a
-variable, retry the latest deployment from the dashboard or push again.
+affect the running site until a new deployment exists.
+
+### Redeploying to pick up a changed variable
+
+**Retrying a deployment re-promotes that deployment's commit**, so retrying an
+older row in the dashboard silently rolls production back to older code. The
+deployment list is newest-first and the top row is whatever deployed most
+recently, which is not necessarily your newest commit — especially right after
+someone has retried something.
+
+The safe move is to push, which always builds the newest commit and puts it on
+top. An empty commit is enough when the code has not changed:
+
+```
+git commit --allow-empty -m "site: redeploy" && git push
+```
+
+Retrying from the dashboard is fine too, as long as you retry the row whose
+**Source** column matches the commit you actually want live, rather than
+reaching for the top row.
+
+Check what is deployed with:
+
+```
+wrangler pages deployment list --project-name spidleweb
+```
+
+Every deployment also keeps its own permanent `<id>.spidleweb.pages.dev` URL,
+which is the quickest way to test whether a specific build works before
+promoting it.
 
 Variables are scoped per environment. A value set only on Production is absent
 from preview branch deployments, and vice versa.
