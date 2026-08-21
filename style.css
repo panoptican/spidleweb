@@ -697,6 +697,7 @@ a { color: inherit; }
 .index li:nth-child(4).reveal { transition-delay: 180ms; }
 .index li:nth-child(5).reveal { transition-delay: 240ms; }
 .index li:nth-child(6).reveal { transition-delay: 300ms; }
+.index li:nth-child(7).reveal { transition-delay: 360ms; }
 
 .sites li:nth-child(1).reveal { transition-delay: 0ms; }
 .sites li:nth-child(2).reveal { transition-delay: 60ms; }
@@ -878,22 +879,39 @@ a { color: inherit; }
   --panel-bg: oklch(20% var(--panel-chroma) 305);
 }
 
-/* ---- Home index row custom hover accents (each matches its case theme) ---- */
-.index li:nth-child(1) {
+/* Blueshift's palette is ultramarine plus one magenta, so the panel carries a
+   real deep ultramarine rather than the usual near-black tint. */
+.theme-blueshift {
+  --c-chroma: calc(0.21 * var(--p-color-amount, 1));
+  --paper-chroma: calc(0.006 * var(--p-color-amount, 1));
+  --panel-chroma: calc(0.14 * var(--p-color-amount, 1));
+
+  --paper: oklch(96.5% var(--paper-chroma) 265);
+  --ink: oklch(13% var(--paper-chroma) 265);
+  --accent: oklch(52% var(--c-chroma) 265);
+  --panel-bg: oklch(22% var(--panel-chroma) 265);
+}
+
+/* ---- Home index row custom hover accents (each matches its case theme) ----
+   Keyed by case, not by position: the index reorders whenever work is added. */
+.index li[data-case="insights"] {
   --row-accent: oklch(52% calc(0.17 * var(--p-color-amount, 1)) 260);
 }
-.index li:nth-child(2) {
+.index li[data-case="sim"] {
   --row-accent: oklch(60% calc(0.19 * var(--p-color-amount, 1)) 50);
 }
-.index li:nth-child(3) {
+.index li[data-case="blueshift"] {
+  --row-accent: oklch(52% calc(0.21 * var(--p-color-amount, 1)) 265);
+}
+.index li[data-case="everag"] {
   --row-accent: oklch(55% calc(0.14 * var(--p-color-amount, 1)) 165);
 }
-.index li:nth-child(4) {
+.index li[data-case="vidscrip"] {
   --row-accent: oklch(55% calc(0.13 * var(--p-color-amount, 1)) 195);
 }
-.index li:nth-child(5) {
+.index li[data-case="conservis"] {
   --row-accent: oklch(55% calc(0.14 * var(--p-color-amount, 1)) 140);
 }
-.index li:nth-child(6) {
+.index li[data-case="plinth"] {
   --row-accent: oklch(55% calc(0.16 * var(--p-color-amount, 1)) 305);
 }

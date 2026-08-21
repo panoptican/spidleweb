@@ -96,6 +96,45 @@ inversions, grayscale imagery that colorizes on hover.
   ~100px margins, and holds the 36:25 ratio the other frames use: an
   arbitrary aspect would leave that cell short of its neighbour and pull
   the row's caption baselines apart.
+- Blueshift copy (added 2026-08-21): written from the live site and from
+  `~/Projects/blueshift`, not from any existing write-up. Facts verified
+  against the running pages at `/`, `/surge`, `/spark`, `/pulse`: headlines,
+  subheads, stage names, deliverable names, package names, prices, and
+  delivery windows are quoted or paraphrased from the SSR HTML as of
+  2026-08-21. Founding year 2024 and the four founding partners (Nils
+  Hansen, Heather Sowden, Kurt Schmidt, Jason) come from the site-wide
+  schema in `archive/qa/seo/site-wide-schema.html` and `archive/qa/seo/
+  llms.txt`. Project and retainer ranges ($30–80k, $8–15k monthly) are the
+  homepage FAQ's own numbers. The Surge pricing story is verified against
+  the two PDFs in `~/Projects/blueshift/specs/`: `Surge one-pager.pdf`
+  ($2,500 / $5,000 / $10,000, hedged subhead) and `Blueshift_Surge.pdf`
+  ($4,950 / $9,500 / $19,500, live subhead), which are otherwise identical
+  stage for stage and deliverable for deliverable — `pdftotext -layout` on
+  both confirms the only differences are the subhead and the three prices.
+  The five-approach argument for the instrument panel is
+  `archive/specs/design-approaches.md`, which names the direction and gives
+  the reason quoted in the case ("showing what the AI does rather than
+  describing it"). Client logos, the Precision AQ engagement document, and
+  the internal SEO audit were deliberately left out; see assumptions.
+  Copy passed through the `jason-voice` skill on 2026-08-21:
+  pronoun-plus-copula openings rewritten to name their subject ("It is the
+  cheapest door into the studio" to "Pulse is the cheapest way into the
+  studio"), formal negations contracted, and two flourishes cut ("neither of
+  which anyone will spend on a first date"; "The color rule does the arguing",
+  which the sentence after it already said). An unsourced recommendation went
+  too ("the one most people should walk through first"). Every price, name,
+  and count was kept: the lint fails generic summary without backing detail.
+- Blueshift imagery: `assets/blueshift-*.jpg`, captured 2026-08-21 from the
+  live site at 1440×1000 @2x with Playwright driving the installed Chrome,
+  downsampled to 1440px wide and saved as JPEG q88 (~2.0 MB for ten frames).
+  Every capture scrolls the page to the bottom and back first, because the
+  site reveals sections on scroll and a cold viewport screenshot catches
+  them mid-transition. Full-page captures were tried and abandoned: the
+  Surge teaser is scroll-pinned and repeats itself in a `fullPage` shot.
+  Frames are viewport captures at fixed scroll offsets instead. The home
+  index thumbnail uses `blueshift-01.jpg`, the homepage hero, because the
+  magenta wordmark on the blue starfield is the only frame that reads at
+  80×50. OG captured from the local page at 1200×630 the same way.
 - Case imagery: `assets/*.png` (supplied). The Vidscrip case uses four revised
   captures in scrollable frames, including the procedure survey and date editor.
   Site imagery:
@@ -137,6 +176,46 @@ inversions, grayscale imagery that colorizes on hover.
    260–50 spread already in use, at chroma 0.16. No brand colour exists to
    match: the journal itself is mostly black and white, and its two colour
    issues (04 mint, 05 rust) disagree with each other.
+
+10. **Jason's Blueshift title reads "Founding partner · Design lead".**
+    Every source says "Founding Partner" and only that: the site-wide schema
+    and `llms.txt` both list four Founding Partners. "Design lead" is
+    Jason's own wording on the home-page roster and is carried through for
+    consistency. Drop half of it if only one is right.
+11. **The instrument panels are attributed to Jason.** What is documented is
+    that `~/Projects/blueshift/archive/specs/design-approaches.md` argues
+    for the direction, and that the Spark and Pulse components plus their
+    handoff READMEs live in his repo. Who wrote the shipped React is not
+    recorded anywhere. The case says he argued for the direction and that
+    two of them shipped, which is what the files support. Correct the
+    attribution if someone else built them.
+12. **The shipped panels differ from the archived prototypes.** The Pulse
+    component in `archive/framer/pulse/` is a beige scanner sweeping a
+    wireframe with WCAG labels; what is live is a blue halftone field with
+    a magenta core and `PROCESSING_NODES [ 56 ]` telemetry. The copy
+    describes what is live, checked by capture on 2026-08-21.
+13. **Blueshift theme hue is 265 (ultramarine)** at chroma 0.21, five
+    degrees off the 260 already used by Expert Insights. Both rows go blue
+    on hover. The collision is real and was accepted: 265 is the brand's
+    dominant colour and its name, Expert Insights is Blueshift work anyway,
+    and the panel is a much deeper, much more saturated ultramarine
+    (`oklch(22% 0.14 265)`) than the insights panel. The alternative was
+    Blueshift's magenta `#F81A75`, which clips out of sRGB above chroma
+    0.20 at the lightness the accent needs and lands at 3.5:1 on paper,
+    under the 4.5:1 the mono captions want.
+14. **Blueshift appears both as a case study and in Shipped sites.** Left
+    that way on purpose: the index row is the engagement, the sites row is
+    the live site. Remove the sites row if the duplication reads badly.
+15. **Left out of the Blueshift case on purpose.** The thirteen client
+    logos on the homepage marquee are labelled "Clients and partners" and
+    several are plausibly partner-team credentials, so no client is named.
+    `~/Projects/blueshift/archive/qa/Precision_AQ_Kickoff_Agenda_styled.docx`
+    is a live client engagement document naming client staff, a recruiter,
+    and commercial terms; it is good evidence Jason leads engagements and
+    unpublishable in any recognisable form. The hand-built vanilla rebuild
+    of the homepage in `~/Projects/blueshift` was also cut: it is real craft
+    but it is not shipped, and describing it means describing the live
+    site's faults.
 
 7. **Ever.Ag index-row hover accents**: the home-page `nth-child` accent
    hues were remapped so each row matches its case theme again (they had
