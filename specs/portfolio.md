@@ -127,6 +127,41 @@ inversions, grayscale imagery that colorizes on hover.
   index thumbnail uses `blueshift-01.jpg`, the homepage hero, because the
   magenta wordmark on the blue starfield is the only frame that reads at
   80×50. OG captured from the local page at 1200×630 the same way.
+- Vault AI Systems copy (added 2026-08-21): written from the live site and
+  from `~/Projects/vault-ai`, not from any existing write-up. Public numbers
+  only: $45,900 / $69,900, the $5,000 deposit, the late-2026 ship window, the
+  published specs, the calculator's own stated assumptions ($7,200 per heavy
+  user per year, ten heavy users per Cube), and the 200-billion-parameter
+  claim all come off the running site. Vault's internal cost and margin
+  material is in that repo and is deliberately not used and must not be: it
+  is unit economics, not a case study. The design rules and
+  the anti-references passage are quoted from `landing-page/DESIGN.md` and
+  `landing-page/PRODUCT.md`; the palette from
+  `landing-page/assets/styles/vault-base.css` and `docs/color-palette.md`;
+  the display rules, the seven running states, and the abandoned cat concept
+  from `display/DISPLAY_SPEC.md` and `display/tool/src/data/state-config.ts`
+  (verified: seven running states, eleven fault and warning states, 960×544).
+  "197 tests" is `landing-page/specs/verification.md`; "thirty-one states" is
+  the row count of `stills/manifest.csv`. No customer, pilot, founder,
+  funding, or benchmark is named anywhere in the case, because none is
+  documented; `landing-page/specs/content-gaps-plan.md` says so in writing.
+- Vault imagery: `assets/vault-01.jpg`, `-system`, `-security`, `-pricing`,
+  `-calculator`, captured 2026-08-21 from the live site at 1440×1000 @2x with
+  Playwright driving the installed Chrome, downsampled to 1440 wide, JPEG q90.
+  The site's fixed top nav overlaps whatever is under it, so the section
+  frames were captured with `#topnav` and the skip link hidden and the scroll
+  offset set from each section's measured `offsetTop`; the hero keeps its nav
+  because the nav is part of that composition. `assets/vault-os-chat.jpg` and
+  `-insights.jpg` are `stills/chat_conversation__16x9_1920x1080.png` and
+  `stills/insights__16x9_1920x1080.png` downsampled to 1440 wide, so they
+  keep 16:9 and sit in `.figure` blocks rather than the cover grid, which is
+  also the honest signal that they are prototype captures with nothing to
+  link to. `assets/vault-display-ready.png` and `-standby.png` are
+  `display/tool/qa/*` at their native 818×468 and stay PNG: they are flat
+  renders where PNG is only ~14 KB more than JPEG and has no ringing on the
+  pixel type. The home index thumbnail uses the Lantern ready state, the only
+  Vault frame with a shape that survives 80×50. OG captured from the local
+  page at 1200×630 the same way.
 - Case imagery: `assets/*.png` (supplied). The Vidscrip case uses four revised
   captures in scrollable frames, including the procedure survey and date editor.
   Site imagery:
@@ -208,6 +243,28 @@ inversions, grayscale imagery that colorizes on hover.
     of the homepage in `~/Projects/blueshift` was also cut: it is real craft
     but it is not shipped, and describing it means describing the live
     site's faults.
+
+16. **Jason's Vault title reads "Fractional CDO"**, matching the home-page
+    roster. The résumé draft says "Chief Design Officer (fractional) · Dec
+    2025–Present", so the case says "the end of 2025" and the index says
+    "2025–".
+17. **Enclosure and render attribution.** The case does not claim the
+    industrial design of the cube. It describes the site, VaultOS, the
+    display, and the design system, which are the things the repo shows him
+    authoring (`landing-page/DESIGN.md`, 287 of 316 landing-page commits, 67
+    VaultOS commits, 28 display-tool commits, all sole-author). The Blender
+    sources and the 225-frame turntable live in the repo too but nothing
+    records who modelled the cube. Add a line if the enclosure is his.
+18. **GEM and the backend are not claimed.** Those plans are addressed to a
+    CTO and have no local git history under Jason, so the case mentions GEM
+    only where the site does.
+19. **Vault theme hue is 16 (ruby)** at chroma 0.20, matching the brand's
+    `#E72A52`. The panel deliberately breaks the one-hue-per-case pattern and
+    runs on hue 290 at chroma 0.025, because Vault's own rule is that the
+    neutrals are cool and the ruby is the only warm thing in the system. It
+    is the darkest panel in the set, which is the point.
+20. **Vault appears both as a case study and in Shipped sites**, same as
+    Blueshift. See assumption 14.
 
 7. **Ever.Ag index-row hover accents**: the home-page `nth-child` accent
    hues were remapped so each row matches its case theme again (they had

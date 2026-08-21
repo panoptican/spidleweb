@@ -151,3 +151,46 @@ npx caches no longer match the installed Playwright.
   cannot hover. The grayscale-to-colour branch is the same `.cover__link`
   rule PLINTH already exercises.
 - Real-device Safari/iOS rendering.
+
+## Vault AI Systems case study (2026-08-21)
+
+Same method as the Blueshift case: local `python3 -m http.server` on 8011,
+Playwright driving the installed Chrome.
+
+### Checked
+
+- `work/vault.html` at 1440x900, 1440x6575 (full page), and 390 wide.
+  Cover grids are two-up with the hero spanning the full measure; the two
+  VaultOS stills are `.figure` blocks at the full measure; the two Lantern
+  display states are a two-up cover grid whose frames use a non-linking
+  `span.cover__link`, since those renders have nowhere to link to. All
+  collapse to one column under 768px.
+- Scripted audit at 1440x900 and 390x844 over `index.html` and the case
+  studies in the chain: HTTP 200, no broken or alt-less images, no duplicate
+  ids, no horizontal overflow, no page errors, no 4xx sub-requests, and zero
+  unrevealed `.reveal` sections after a full scroll.
+- The Lantern frames are used at their native 818x468 inside a 900px measure,
+  so they upscale by about 10% at 1440. Checked at 1440 and 1920: the pixel
+  type stays legible and does not fringe.
+- Next-project chain re-verified as a complete cycle in the new index order:
+  vault → expert-insights → campaign-sim → blueshift → everag → vidscrip →
+  conservis → plinth → vault.
+- Facts re-checked against their sources rather than the research notes:
+  seven running states and eleven fault/warning states in
+  `display/tool/src/data/state-config.ts`; 960x544 in `display/DISPLAY_SPEC.md`;
+  31 rows in `stills/manifest.csv`; 197/197 in
+  `landing-page/specs/verification.md`. An earlier draft said the display had
+  seven states "from boot to offline", which conflated the abandoned cat
+  spec's state list with Lantern's; corrected before commit.
+- `assets/og/vault.png` is 1200x630 and matches the framing of the other
+  case OG captures.
+
+### Changed while adding it
+
+- Index reveal stagger gained an eighth step. Row accents needed no change,
+  since they key off `data-case` rather than position.
+
+### Not verified
+
+- Hover states were reviewed in CSS, not interactively.
+- Real-device Safari/iOS rendering.
