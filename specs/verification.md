@@ -108,3 +108,46 @@ automated checks exist.
   under 768px.
 - Conn frame re-cropped after review; re-checked that it and Kreiden still
   render at equal height with their captions on a shared baseline.
+
+## Blueshift case study (2026-08-21)
+
+Rendered from a local `python3 -m http.server` on 8011 with Playwright
+driving the installed Chrome, since the bundled Chromium revisions in the
+npx caches no longer match the installed Playwright.
+
+### Checked
+
+- `work/blueshift.html` at 1440x900, 1440x7073 (full page), and 390x8702.
+  Cover grids are two-up with Surge, the Surge panel, and the packages frame
+  spanning the full measure; all collapse to one column under 768px with
+  captions stacked and left-aligned.
+- Scripted audit at 1440x900 and 390x844 over `index.html` and the five
+  case studies in the chain: HTTP 200, no broken or alt-less images, no
+  duplicate ids, no horizontal overflow, no page errors, no 4xx sub-requests,
+  and zero unrevealed `.reveal` sections after a full scroll.
+- Panel facts fit the 320px column; the Partners value wraps to two lines
+  right-aligned, which is the same behaviour as PLINTH's publisher value.
+- Cover captions were shortened after the first render: several `.cover__note`
+  values ran past their half-width cell and wrapped under the id. Anything
+  over roughly 25 characters wraps in a two-up cell at 1440.
+- Next-project chain re-verified as a complete cycle in the new index order:
+  expert-insights → campaign-sim → blueshift → everag → vidscrip →
+  conservis → plinth → expert-insights.
+- All ten external links point at blueshift-consulting.com and returned 200
+  during capture.
+- `assets/og/blueshift.png` is 1200x630 and matches the framing of the other
+  case OG captures.
+
+### Changed while adding it
+
+- Index row hover accents were keyed by `nth-child`, so inserting a row in
+  the middle silently reassigned every colour below it. They now key off a
+  `data-case` attribute on the `li` instead. The reveal stagger still keys
+  off position, which is correct, and gained a seventh step.
+
+### Not verified
+
+- Hover states were reviewed in CSS, not interactively; headless capture
+  cannot hover. The grayscale-to-colour branch is the same `.cover__link`
+  rule PLINTH already exercises.
+- Real-device Safari/iOS rendering.
