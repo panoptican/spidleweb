@@ -145,6 +145,15 @@ inversions, grayscale imagery that colorizes on hover.
   the row count of `stills/manifest.csv`. No customer, pilot, founder,
   funding, or benchmark is named anywhere in the case, because none is
   documented; `landing-page/specs/content-gaps-plan.md` says so in writing.
+  Copy passed through the `jason-voice` skill on 2026-08-21: the copula-heavy
+  constructions the skill's lint flags were rewritten to name their subject
+  ("It is a prototype" to "It's a prototype built to be argued with, so I
+  captured thirty-one states"), formal negations contracted, and two
+  flourishes cut ("which is the correct ratio for a site whose main job is
+  saying true things about money"; "the failure case was the good part").
+  "It opens on a conversation, not a dashboard" was unwound to "The first
+  screen is a conversation", since the lint bans assertion by negation. Every
+  specific was kept.
 - Vault imagery: `assets/vault-01.jpg`, `-system`, `-security`, `-pricing`,
   `-calculator`, captured 2026-08-21 from the live site at 1440×1000 @2x with
   Playwright driving the installed Chrome, downsampled to 1440 wide, JPEG q90.
