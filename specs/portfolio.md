@@ -116,6 +116,14 @@ inversions, grayscale imagery that colorizes on hover.
   the reason quoted in the case ("showing what the AI does rather than
   describing it"). Client logos, the Precision AQ engagement document, and
   the internal SEO audit were deliberately left out; see assumptions.
+  Copy passed through the `jason-voice` skill on 2026-08-21:
+  pronoun-plus-copula openings rewritten to name their subject ("It is the
+  cheapest door into the studio" to "Pulse is the cheapest way into the
+  studio"), formal negations contracted, and two flourishes cut ("neither of
+  which anyone will spend on a first date"; "The color rule does the arguing",
+  which the sentence after it already said). An unsourced recommendation went
+  too ("the one most people should walk through first"). Every price, name,
+  and count was kept: the lint fails generic summary without backing detail.
 - Blueshift imagery: `assets/blueshift-*.jpg`, captured 2026-08-21 from the
   live site at 1440×1000 @2x with Playwright driving the installed Chrome,
   downsampled to 1440px wide and saved as JPEG q88 (~2.0 MB for ten frames).
