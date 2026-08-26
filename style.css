@@ -118,6 +118,7 @@ a { color: inherit; }
   text-transform: uppercase;
   line-height: 0.92;
   letter-spacing: -0.02em;
+  text-wrap: balance;
   margin: auto 0;
 }
 
@@ -133,6 +134,7 @@ a { color: inherit; }
   max-width: 240px;
   font-size: var(--text-small);
   line-height: 1.45;
+  text-wrap: pretty;
 }
 
 /* Home panel */
@@ -287,10 +289,12 @@ a { color: inherit; }
   line-height: 1;
   letter-spacing: -0.01em;
   text-transform: uppercase;
+  text-wrap: balance;
 }
 
 .index__kind { font-size: var(--text-small); opacity: 0.75; }
-.index__year { font-family: var(--mono); font-size: var(--text-small); text-align: right; align-self: baseline; padding-top: 4px; }
+/* nowrap: a range like 2022-24 is one token, never split at the en dash */
+.index__year { font-family: var(--mono); font-size: var(--text-small); text-align: right; align-self: baseline; padding-top: 4px; white-space: nowrap; }
 
 /* ---- Section headers within the archive ---- */
 
@@ -389,12 +393,13 @@ a { color: inherit; }
   line-height: 1;
   text-transform: uppercase;
   letter-spacing: -0.01em;
+  text-wrap: balance;
   margin-bottom: 24px;
 }
 
 /* 58ch at body size caps the copy and the roster at the same width */
 .profile__body { max-width: 58ch; }
-.profile__body p { margin-bottom: 1em; }
+.profile__body p { margin-bottom: 1em; text-wrap: pretty; }
 
 .roster {
   list-style: none;
@@ -485,11 +490,12 @@ a { color: inherit; }
   line-height: 1.05;
   text-transform: uppercase;
   letter-spacing: -0.01em;
+  text-wrap: balance;
   max-width: 22ch;
   margin-bottom: 20px;
 }
 
-.article__section > p { max-width: 62ch; margin-bottom: 1em; }
+.article__section > p { max-width: 58ch; margin-bottom: 1em; text-wrap: pretty; }
 
 .figure { margin-top: 40px; }
 
@@ -516,6 +522,7 @@ a { color: inherit; }
   gap: var(--gap);
   padding-top: 8px;
   opacity: 0.75;
+  text-wrap: pretty;
 }
 
 /* Tall mobile captures: fixed-height frames the visitor can scroll */
@@ -596,6 +603,7 @@ a { color: inherit; }
 .cover__note {
   text-align: right;
   opacity: 0.75;
+  text-wrap: pretty;
 }
 
 /* ---- Case study results ---- */
@@ -603,13 +611,14 @@ a { color: inherit; }
 .results {
   list-style: disc;
   padding-left: 1.25em;
-  max-width: 62ch;
+  max-width: 58ch;
 }
 
 .results li {
   margin-bottom: 0.65em;
   font-size: var(--text-body);
   line-height: 1.5;
+  text-wrap: pretty;
 }
 
 .results li:last-child { margin-bottom: 0; }
@@ -672,6 +681,7 @@ a { color: inherit; }
   font-size: var(--text-title);
   line-height: 1;
   text-transform: uppercase;
+  text-wrap: balance;
 }
 
 .next__arrow {
@@ -722,7 +732,7 @@ a { color: inherit; }
 /* ---- Responsive ---- */
 
 @media (max-width: 1024px) {
-  .index__row { grid-template-columns: 4rem 1fr 3.5rem; gap: 12px; }
+  .index__row { grid-template-columns: 4rem 1fr 4rem; gap: 12px; }
   .index__thumb { width: 4rem; }
 }
 
@@ -761,8 +771,10 @@ a { color: inherit; }
   .section-head { margin-top: 64px; }
   .contact { padding-top: 64px; }
 
+  /* Content-sized year column: wide enough for a full range (2022-24),
+     never wider, so the title keeps every pixel it can get */
   .index__row {
-    grid-template-columns: 3.25rem 1fr 3rem;
+    grid-template-columns: 3.25rem 1fr auto;
     gap: 10px;
   }
   .index__thumb {
@@ -795,6 +807,11 @@ a { color: inherit; }
     text-align: left;
   }
 }
+
+/* ---- Typographic utility ---- */
+
+/* Years and date ranges are single tokens: never break at the en dash */
+.nobreak { white-space: nowrap; }
 
 /* ---- Accessibility Utility ---- */
 
