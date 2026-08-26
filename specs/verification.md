@@ -108,3 +108,39 @@ automated checks exist.
   under 768px.
 - Conn frame re-cropped after review; re-checked that it and Kreiden still
   render at equal height with their captions on a shared baseline.
+
+## Text-balancing pass (2026-08-26)
+
+Playwright/Chromium against a local `http-server`, all seven pages
+(`index.html` plus the six case studies) at 1440×900, 769, 768, 390×844,
+and 320 wide. Line boxes were read back per element with a `Range`, so the
+numbers below are measured wrapping, not eyeballed.
+
+### Checked
+
+- Display headings (`.article__head`, `.panel__type`, `.index__title`,
+  `.profile__title`, `.next__title`) now set `text-wrap: balance`. Mean
+  raggedness across the 84 multi-line headings in the sweep fell from 41.2%
+  to 21.8%. The Ever.Ag opener, the worst case, went from 492/690/272px to
+  492/406/556px at 1440.
+- No heading anywhere gained a line, at any of the five widths.
+- Years and ranges no longer break at the en dash: seven wrapped instances
+  in the index, panel facts, and sticky header (`2022–24`, `2014–19`) went
+  to zero. `.index__year` carries `white-space: nowrap`; the values inside
+  the panel `Year` row, the case header, and the profile roster are wrapped
+  in `.nobreak`.
+- Case prose and results tightened from 62ch to 58ch, matching the profile
+  measure that was already 58ch. Computed max-width resolves to 580px on
+  every case study.
+- `text-wrap: pretty` verified as the computed value on body paragraphs,
+  panel blurbs, figure captions, cover notes, profile copy, and result
+  items — 158 elements asserted across the seven pages, zero misses.
+- No horizontal overflow at any page/width combination.
+
+### Fixed during verification
+
+- Widening the mobile year column to a fixed `4rem` bought room for
+  `2022–24` but pushed "Campaign Sim" onto two lines at 390. The column is
+  `auto` under 768px instead, so it sizes to the range and leaves the title
+  everything else. Years still right-align on a shared edge, because each
+  row's grid ends at the same x.
