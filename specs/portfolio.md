@@ -20,8 +20,9 @@ inversions, grayscale imagery that colorizes on hover.
 - `work/conservis.html`, `work/vidscrip.html`, `work/navigator.html`,
   `work/omnitopia.html` — case studies in the same split layout. Left panel
   carries number, title, and a facts table (client/studio/role/scope/year);
-  right column carries rewritten copy, figures with mono captions, a stats
-  block, and a next-project handoff row.
+  right column carries rewritten copy, figures with mono captions, and a
+  next-project handoff row. (The per-case Results blocks were removed on
+  2026-09-03; see the copy-pass note under Content sources.)
 - `style.css` — single shared stylesheet, all pages.
 - `script.js` — reveal-on-scroll only (IntersectionObserver), fully
   progressive: reduced motion or no JS shows everything immediately.
@@ -51,6 +52,41 @@ inversions, grayscale imagery that colorizes on hover.
   in the copy only. OG captured from the live page at 1200×630 with
   Playwright's headless Chromium shell.
 - Bio: jasonspidle.com + `application/resume-draft.md`.
+- Site-wide copy pass (2026-09-03), reviewed against the `jason-voice` skill,
+  the job-search project's writing-style guide, and the Evolve cover letter
+  Jason holds up as the gold standard for his application prose. What that
+  letter established as the target register: pairs rather than triplets, no
+  colon-then-list sentences, complete sentences of even length, reasoning
+  before evidence, judgment stated as practice. Changes made on that basis:
+  - One positioning line reused verbatim in the panel, og:description, and
+    (with a location prefix) the meta description. Bio rewritten to lead
+    with how Jason works, borrowing the letter's logic on task-organized
+    screens, depth for experienced users, and coded prototypes with realistic
+    data. The "fifty-some homes" line stays at Jason's request.
+  - Profile heading now reads "Open to contract and full-time roles" (was
+    contract only; Jason is open to both). Roster: "Product designer, then
+    director" for Foundry, and "Fractional chief design officer" spelled out.
+  - Every Results block was cut. Jason's rule: cut it if it only restates
+    the case. The one measurable claim, Conservis "100% adoption", has no
+    source Jason can produce, so it is gone; every other bullet restated the
+    body. The plinth.us and design.ever.ag links moved into the body copy.
+  - Ever.Ag: "public style guide" dropped. The client asked for the
+    zeroheight to be password-protected in January 2023, and today's fetch
+    shows mixed page-level gating flags, so the copy says only that the guide
+    is published at design.ever.ag. Added the verifiably-Jason parts of the
+    engagement (pitched it, owned the system hands-on from September 2022,
+    set up and administered the domain, proved out the cross-org Figma
+    handoff and wrote the gaps handoff) and kept "we" for the audit and
+    foundations, which colleagues built.
+  - Conservis: "world leader" superlative cut (unverified, not ours to make).
+  - Shipped sites: Ascensus stays. Jason built the design system for
+    ascensus.com and Ascensus engineers shipped it.
+  - Meta descriptions changed from the "Case study: ..." label to a plain
+    sentence, "A case study on ...".
+  - Untouched on purpose: the editorial section headings, figure captions,
+    and alt text; the title tag ("Product Designer" rather than the decided
+    LinkedIn headline "Principal Product Designer"), which Jason did not
+    rule on.
 - PLINTH copy (added 2026-08-20): written from the live journal at
   plinth.us, not from any existing write-up. Facts verified against the
   running site: the manifesto and "attains each equinox" cadence from
@@ -134,8 +170,10 @@ inversions, grayscale imagery that colorizes on hover.
    real drugs (Palbociclib, Ribociclib, Trastuzumab), a real competitor
    campaign ("Pfizer's #BCA campaign gained 23% share of voice"), and a real
    competitor brand (Verzenio).
-2. **Years**: Conservis 2019 (map data © 2019 in screens), Vidscrip 2021
-   (procedure dates in screens), Navigator/Omnitopia 2025. Correct if wrong.
+2. **Years**: Conservis 2016–21 (Jason, 2026-09-03; the screens are 2019
+   but the engagement ran from the first dashboard wireframes in January 2016
+   through 2021), Vidscrip 2021 (procedure dates in screens),
+   Navigator/Omnitopia 2025.
 3. **Kardion** had no role/context info supplied; captioned "Site design"
    only.
 4. **Roles**: "Product design lead" (Foundry-era cases) and "Design lead"
