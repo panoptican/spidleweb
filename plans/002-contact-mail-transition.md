@@ -8,7 +8,7 @@
 
 ## Problem
 
-In [style.css](file:///Users/jason/Projects/personal/spidleweb/style.css), `.contact__mail` (lines 334-348) snaps immediately to the accent red color and red bottom border on hover/focus:
+In [style.css](file:///Users/jason/Projects/websites/spidleweb/style.css), `.contact__mail` (lines 334-348) snaps immediately to the accent red color and red bottom border on hover/focus:
 
 ```css
 /* style.css:348 — current */
@@ -33,11 +33,11 @@ Introduce a quick `120ms` ease-out transition on `color` and `border-color` gate
 ## Repo conventions to follow
 
 - Hover transitions are placed on the base selector (not the `:hover` pseudo-class) to ensure smooth transitions in both directions.
-- All styles live in [style.css](file:///Users/jason/Projects/personal/spidleweb/style.css).
+- All styles live in [style.css](file:///Users/jason/Projects/websites/spidleweb/style.css).
 
 ## Steps
 
-1. Open [style.css](file:///Users/jason/Projects/personal/spidleweb/style.css).
+1. Open [style.css](file:///Users/jason/Projects/websites/spidleweb/style.css).
 2. Locate the `.contact__mail` class definition (around line 334).
 3. Wrap the transition property in a `@media (hover: hover) and (pointer: fine)` query block targeting `.contact__mail`.
 
