@@ -6,9 +6,9 @@ This directory contains self-contained plans for improving the micro-interaction
 
 | Plan | Title | Severity | Status | Dependencies |
 | --- | --- | --- | --- | --- |
-| [001-hover-inversion-transitions.md](file:///Users/jason/Projects/personal/spidleweb/plans/001-hover-inversion-transitions.md) | Smooth Case Index and Next Project Hover Inversions | MEDIUM | DONE | None |
-| [002-contact-mail-transition.md](file:///Users/jason/Projects/personal/spidleweb/plans/002-contact-mail-transition.md) | Add Transition to Contact Email Hover | LOW | DONE | None |
-| [003-staggered-scroll-entrance.md](file:///Users/jason/Projects/personal/spidleweb/plans/003-staggered-scroll-entrance.md) | Stagger Case Index and Shipped Sites Scroll Reveal | LOW | DONE | None |
+| [001-hover-inversion-transitions.md](file:///Users/jason/Projects/websites/spidleweb/plans/001-hover-inversion-transitions.md) | Smooth Case Index and Next Project Hover Inversions | MEDIUM | DONE | None |
+| [002-contact-mail-transition.md](file:///Users/jason/Projects/websites/spidleweb/plans/002-contact-mail-transition.md) | Add Transition to Contact Email Hover | LOW | DONE | None |
+| [003-staggered-scroll-entrance.md](file:///Users/jason/Projects/websites/spidleweb/plans/003-staggered-scroll-entrance.md) | Stagger Case Index and Shipped Sites Scroll Reveal | LOW | DONE | None |
 
 ## Recommended Execution Order
 

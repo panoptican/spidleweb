@@ -8,7 +8,7 @@
 
 ## Problem
 
-In [index.html](file:///Users/jason/Projects/personal/spidleweb/index.html), the case index rows and the shipped sites grid cards are revealed simultaneously using the `.reveal` and `.reveal.is-in` classes (driven by IntersectionObserver in [script.js](file:///Users/jason/Projects/personal/spidleweb/script.js) and styling in [style.css:L491-497](file:///Users/jason/Projects/personal/spidleweb/style.css#L491-L497)):
+In [index.html](file:///Users/jason/Projects/websites/spidleweb/index.html), the case index rows and the shipped sites grid cards are revealed simultaneously using the `.reveal` and `.reveal.is-in` classes (driven by IntersectionObserver in [script.js](file:///Users/jason/Projects/websites/spidleweb/script.js) and styling in [style.css:L491-497](file:///Users/jason/Projects/websites/spidleweb/style.css#L491-L497)):
 
 ```css
 /* style.css:491 — current */
@@ -42,19 +42,19 @@ Introduce a progressive `60ms` delay stagger per sibling item using CSS `:nth-ch
 
 ## Repo conventions to follow
 
-- Existing reveal rules are defined at the end of [style.css](file:///Users/jason/Projects/personal/spidleweb/style.css).
+- Existing reveal rules are defined at the end of [style.css](file:///Users/jason/Projects/websites/spidleweb/style.css).
 - Stagger delays are applied directly via CSS structure, keeping JS lightweight.
 
 ## Steps
 
-1. Open [style.css](file:///Users/jason/Projects/personal/spidleweb/style.css).
+1. Open [style.css](file:///Users/jason/Projects/websites/spidleweb/style.css).
 2. Locate the `.reveal.is-in` rules (around line 493).
 3. Append the staggered delay rules for `.index li:nth-child(n) .reveal` and `.sites li:nth-child(n).reveal` right below it.
 4. Verify that `@media (prefers-reduced-motion: reduce)` (around line 499) completely resets or removes the transitions (which it already does by setting `transition: none;`).
 
 ## Boundaries
 
-- Do NOT modify [script.js](file:///Users/jason/Projects/personal/spidleweb/script.js) or the HTML markup of case lists/grids.
+- Do NOT modify [script.js](file:///Users/jason/Projects/websites/spidleweb/script.js) or the HTML markup of case lists/grids.
 - Stagger must never block interaction or delay usability.
 
 ## Verification
