@@ -105,10 +105,35 @@ inversions, grayscale imagery that colorizes on hover.
 
 ## Assumptions (flagged for Jason)
 
-1. **Navigator365 and Omnitopia clients are listed as "Life sciences (NDA)"**
-   and attributed to Blueshift, 2025 (screens are dated Nov–Dec 2025; resume
-   flags client names as needing NDA confirmation). Swap in real names if
-   safe to list.
+1. **Navigator365 and Omnitopia are published with their domain changed.**
+   The engagement is real (Blueshift, 2025; screens dated Nov–Dec 2025) but the
+   client is NDA-sensitive, so both cases are rewritten out of pharma medical
+   affairs and into sports representation: key opinion leaders become scouts,
+   brands become the agency's players, therapeutic areas become leagues, and
+   congresses become showcases. The client line reads "Sports representation
+   (NDA)", and each facts table carries a `Note — Domain changed under NDA` row
+   so the substitution is disclosed rather than hidden. The design problem, the
+   IA, and Jason's role are described accurately; only the domain and the data
+   are substituted.
+
+   The substitution does not settle the confidentiality question. The IA and
+   the analytical model — three-way sentiment split, own-brand versus
+   competitor benchmarking, top-expert-per-row, three-way side-by-side compare
+   — survive the translation intact and stay recognizable to anyone in the
+   original market. Permission is still being sought, and both pages stay
+   behind the preview gate in `functions/_middleware.js` until it lands.
+
+   **Outstanding: the six screenshots still show the original domain.**
+   `assets/expert-insights-0{1,2,3}.png`, `assets/campaign-sim-0{1,2,3}.png`,
+   and both OG images must be redrawn in Figma before the gate lifts — the copy
+   now describes screens that do not exist yet. Screen-by-screen build spec:
+   `specs/case-studies/domain-shift.md`. Two things in the current
+   captures have to change regardless of what the client decides:
+   `expert-insights-02.png` attributes a fabricated social post to Maryam
+   Lustberg, a real practicing oncologist, and `expert-insights-01.png` names
+   real drugs (Palbociclib, Ribociclib, Trastuzumab), a real competitor
+   campaign ("Pfizer's #BCA campaign gained 23% share of voice"), and a real
+   competitor brand (Verzenio).
 2. **Years**: Conservis 2019 (map data © 2019 in screens), Vidscrip 2021
    (procedure dates in screens), Navigator/Omnitopia 2025. Correct if wrong.
 3. **Kardion** had no role/context info supplied; captioned "Site design"
