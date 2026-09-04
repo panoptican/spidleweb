@@ -31,8 +31,13 @@ const GATED = new Set([
   "/work/campaign-sim",
   "/assets/expert-insights-02.png",
   "/assets/expert-insights-03.png",
+  "/assets/expert-insights-04.png",
+  "/assets/expert-insights-05.png",
+  "/assets/expert-insights-06.png",
+  "/assets/expert-insights-07.png",
   "/assets/campaign-sim-02.png",
   "/assets/campaign-sim-03.png",
+  "/assets/campaign-sim-04.png",
   "/assets/og/expert-insights.png",
   "/assets/og/campaign-sim.png",
 ]);

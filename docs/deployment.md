@@ -77,7 +77,8 @@ the site is unaffected.
 Currently gated:
 
 - `/work/expert-insights` and `/work/campaign-sim` (clean and `.html` forms)
-- `assets/{expert-insights,campaign-sim}-02.png` and `-03.png`
+- `assets/expert-insights-02.png` through `-07.png` and
+  `assets/campaign-sim-02.png` through `-04.png`
 - `assets/og/expert-insights.png` and `assets/og/campaign-sim.png`
 
 Deliberately left public: `assets/expert-insights-01.png` and

@@ -159,17 +159,27 @@ inversions, grayscale imagery that colorizes on hover.
    original market. Permission is still being sought, and both pages stay
    behind the preview gate in `functions/_middleware.js` until it lands.
 
-   **Outstanding: the six screenshots still show the original domain.**
-   `assets/expert-insights-0{1,2,3}.png`, `assets/campaign-sim-0{1,2,3}.png`,
-   and both OG images must be redrawn in Figma before the gate lifts — the copy
-   now describes screens that do not exist yet. Screen-by-screen build spec:
-   `specs/case-studies/domain-shift.md`. Two things in the current
-   captures have to change regardless of what the client decides:
-   `expert-insights-02.png` attributes a fabricated social post to Maryam
-   Lustberg, a real practicing oncologist, and `expert-insights-01.png` names
-   real drugs (Palbociclib, Ribociclib, Trastuzumab), a real competitor
-   campaign ("Pfizer's #BCA campaign gained 23% share of voice"), and a real
-   competitor brand (Verzenio).
+   **Screens redrawn 2026-09-04.** All eleven frames were edited in Figma
+   from the prompts in `specs/case-studies/domain-shift.md` and exported to
+   `qa/precision-screens/`; `assets/expert-insights-01..07.png` and
+   `assets/campaign-sim-01..04.png` are those exports. The edit went past
+   the text-only brief in two ways: the client's magenta accent is recolored
+   on every frame, and the campaign currency reads as euros rather than the
+   original cent glyph. `expert-insights-05..07` are 1788x1788 crops of the
+   2880x2048 dashboard frames at offset x 1092, y 260 (the answer panel with
+   the roster table behind it), which holds the panel close to 1:1 in the
+   852px measure where the full frame showed it at 59%. Every frame is a 2x
+   export (2880x2048); the Campaign Sim set first came out at 1x and was
+   re-exported the same day. Both OG images were regenerated from the local
+   pages. The two `-01` files stay public as index thumbnails; everything
+   from `-02` up is in the gate.
+
+   One content slip was caught on review and fixed in the re-export: the
+   Review Campaign Resources card had been filled with youth-movement
+   Scouting costs (trail permits, campsite fees) where the source frame had
+   placeholder "Resource 1" rows. It now reads Match Travel, Showcase Fees,
+   and Video Analysis.
+
 2. **Years**: Conservis 2016–21 (Jason, 2026-09-03; the screens are 2019
    but the engagement ran from the first dashboard wireframes in January 2016
    through 2021), Vidscrip 2021 (procedure dates in screens),

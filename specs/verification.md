@@ -144,3 +144,35 @@ numbers below are measured wrapping, not eyeballed.
   `auto` under 768px instead, so it sizes to the range and leaves the title
   everything else. Years still right-align on a shared edge, because each
   row's grid ends at the same x.
+
+## Precision screens (2026-09-04)
+
+Python Playwright (Chromium, `reduced_motion='reduce'`) against the
+`spidleweb-static` preview server on port 8765, both pages at 1440×900 and
+390×844 with full-page captures in `qa/screens/precision-*.png` (gitignored).
+
+### Checked
+
+- `work/expert-insights.html`: seven figures, every image responds 200 and
+  decodes (`complete && naturalWidth > 0`); `-01` to `-04` at 2880×2048
+  render at 756×538, the three 1788×1788 answer-panel crops at 756×756. Four
+  sections, all revealed; no horizontal overflow at either width; no console
+  errors or failed requests other than the analytics script, which is
+  external.
+- `work/campaign-sim.html`: four figures in the new order (`-03`, `-01`,
+  `-02`, `-04`), same checks, same result. First run was against 1×
+  exports (1440×1024); re-run after the 2× re-export and the Resources-card
+  fix, all four at 2880×2048, same 756×538 render, still clean.
+- Captions and alt text read back from the DOM match the HTML.
+- OG images recaptured with the Playwright CLI at 1200×630 after a 2s
+  settle; both show the sports-domain panel facts and opening copy, with the
+  first figure's top edge in frame as before.
+- Preview gate: `GATED` gained `expert-insights-04..07` and
+  `campaign-sim-04`; the `-01` thumbnails stay public. Not exercised locally
+  (`wrangler pages dev` was not run); the set is a plain string list.
+
+### Not verified
+
+- Hover colorization on the new figures (CSS unchanged, same `.figure`
+  pattern as every other case).
+- The gate on a deployed preview.
