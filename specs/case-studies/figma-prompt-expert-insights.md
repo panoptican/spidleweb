@@ -1,193 +1,395 @@
-Build three desktop screens in Figma for **Expert Insights**, a scout-intelligence
-platform used by a sports representation agency. The agency tracks what talent
-scouts are saying about its own players, rival agencies' players, and whole
-leagues, across social platforms, showcases, and the press.
+# Figma edit prompts — Expert Insights screens
 
-Create each screen as its own frame at **1440 × 1024**, set up to export at 2x
-(2880 × 2048 PNG). Name the frames `expert-insights-01`, `-02`, `-03`.
+One prompt per screen in `qa/precision-screens/`. Each is self-contained: select
+the matching frame in Figma and paste the whole prompt. The shell edits
+(wordmark, nav, disclaimer) repeat in every prompt on purpose — the screens may
+be edited in any order, and if the shell is a shared component that has already
+been changed, the agent simply finds nothing left to do there.
 
-## Visual system
+Export names after editing: `navigator-01` → `expert-insights-01`, and so on
+through `-07`. The site currently uses `-01` to `-03`; `-04` to `-07` are new.
 
-Light enterprise SaaS. Build the shared pieces as components so the three
-screens stay identical where they repeat.
+Names introduced by these prompts, all invented: Toma Vasquez, Elias Braun,
+Ruben Achterberg, Dembe Osei, Rafael Eikeland, Dana Whitfield, Marcus Feld,
+Idris Falk, Mateus Oyelaran, Kestrel Sports Group. Names carried over from the
+current screens: Sophie Greenfield, Liam Hargrove, Emma Sinclair, Ethan Kim,
+Oliver Chen, Mia Turner, Emma Zhang, Sarah Chen, Michael Ross, Lisa Park.
 
-- Page background `#F5F6F8`; cards `#FFFFFF`, 1px border `#E4E7EC`, 8px radius,
-  very soft shadow.
-- Text `#101828` primary, `#667085` secondary, `#475467` body.
-- Primary action blue `#1D4ED8` for filled buttons and links.
-- Accent indigo `#4F46E5` for big metric numbers, the active nav item, and the
-  AI affordance. Do not use magenta or pink anywhere.
-- Sentiment triad: positive green `#12805C` on tint `#E7F6F0`; neutral gray
-  `#98A2B3` on tint `#F2F4F7`; negative red `#D92D20` on tint `#FEE4E2`. This
-  triad must read identically on all three screens — same colors, same order,
-  every time.
-- Type: Inter or a similar neutral grotesque. Page title 28/600, card title
-  18/600, body 14/400, table and label text 13/400, micro-labels 12/400.
-
-**Left nav rail**, 260px, white, full height, 1px right border. Icon + label
-rows, 15px: Dashboard · Scouts · Showcases · Analysis · Social Explorer ·
-Search · Leagues. The active row gets a 3px indigo left bar, an indigo icon and
-label, and a faint indigo row tint. Pinned to the bottom: a `Logout` row with an
-exit icon. Top-left above the nav sits a small square wordmark — invent a
-neutral one for the product, do not leave it blank or blurred.
-
-**Auto-generated badge** — a small indigo pill with a sparkle icon and the label
-`Auto-generated`, used wherever the product shows synthesized text.
-
-**Disclaimer** — 12px `#667085`, used verbatim under every auto-generated block:
-
-> This product leverages AI-powered capabilities to enhance your experience.
-> Outputs are for informational purposes only and do not constitute scouting,
-> contractual, or strategic advice. All outputs should be independently reviewed
-> and validated before use.
-
-**Date-range pill** — bordered white button with a calendar icon and the label
-`Nov 3, 2025 - Dec 3, 2025`. Appears top-right on all three screens.
-
-## Naming rule
-
-Every person, club, agency, and competition named in these screens is invented
-and must stay invented. Do not substitute a real athlete, scout, club, or
-tournament for any name below, and do not add real ones as filler.
+The sport is football (soccer) throughout — transfer fees, release clauses,
+academies, loan spells, first-team minutes — but no real club, league,
+competition, or person is ever named.
 
 ---
 
-## Frame 1 — `expert-insights-01`, Dashboard
+## navigator-01 — Dashboard
 
-Page title `Dashboard` top-left, date-range pill top-right.
+```
+This screen is the Dashboard of a scout-intelligence platform used by a sports
+representation agency. It tracks what talent scouts are saying about the
+agency's own players and rival agencies' players. Update the text so the screen
+reads as that product. Change only what is listed below. Keep the layout, type
+styles, colors, icons, figures, chips, and spacing exactly as they are. Text
+layers may reflow to fit new strings; do not change type sizes to compensate.
 
-**Stat cards** — a narrow left column (~30% width) holding two stacked cards:
+Shell:
+- Wordmark, top-left: replace "Navigator365™ Matrix" with "Expert Insights".
+  Replace the pink molecule icon beside it with a simple geometric mark in the
+  same pink — a filled circle with three short white horizontal bars of
+  increasing length is fine. Nothing that reads as a molecule, atom, or network.
+- Left nav: "Experts" → "Scouts"; "Conferences" → "Showcases";
+  "Therapeutic Areas" → "Leagues". Keep Dashboard, Analysis, Social Explorer,
+  Search, Logout, and every icon.
+- Disclaimer under What's Moving: change "regulatory, clinical, or strategic
+  advice" to "scouting, contractual, or strategic advice". Leave the rest of the
+  paragraph as is.
 
-- `10,045` in indigo at ~48px, a green `↑ 20%` beside it, label `total
-  discussions` beneath.
-- `847` in indigo, a red `↓ 7%` beside it, label `active scouts` beneath.
+Stat cards:
+- "active experts" → "active scouts". Keep "total discussions" and all four
+  figures and deltas.
 
-**What's Moving** — a wide card filling the remaining ~70%, title plus the
-Auto-generated badge. Three equal sub-cards in a row, each a bordered white box
-with a 15/600 title and 13px body:
-
-- **Competitive Shift** — "Meridian Athletic's #NextWave campaign gained 23%
-  share of voice, primarily through amplification of combine data."
-- **Sentiment Driver** — "Negative sentiment spike (-12%) linked to
+What's Moving (keep the title and the Auto-generated badge):
+- Competitive Shift body → "Kestrel Sports Group's #NextWave campaign gained 23%
+  share of voice, primarily through amplification of tracking data."
+- Sentiment Driver body → "Negative sentiment spike (-12%) linked to
   release-clause discussions around Toma Vasquez"
-- **Emerging Theme** — "Load-management discussions up 340% following league
+- Emerging Theme body → "Load-management discussions up 340% following league
   guidance update on under-21 minutes"
 
-The disclaimer runs full width beneath the three sub-cards.
-
-**Roster Sentiment** — a full-width card below. Header: title left; right, a
-segmented list/grid view toggle (list selected), a download icon, a settings
-icon.
-
-Table columns, left to right: player name, `Discussions`, `Positive`,
-`Neutral`, `Negative`, `Top Scout`, and a trailing chevron. Under the column
-headers, draw a 2px rule segmented in the sentiment triad — green beneath
-Positive, gray beneath Neutral, red beneath Negative.
-
-The three sentiment columns are tinted their full height: green tint, gray tint,
-red tint. Numbers right-aligned in their columns. Each player name carries a
-small leading dot — indigo for my players, gray for rivals. Each Top Scout cell
-is an empty avatar circle plus a name.
-
-Group header row `My Players`, 12px `#667085`:
-
-- Toma Vasquez · 3,120 · 58% · 7% · 35% · Sophie Greenfield
-- Elias Braun · 4,300 · 63% · 11% · 26% · Liam Hargrove
-
-Group header row `Rival Players`:
-
-- Nico Ferreira · 1,845 · 72% · 12% · 16% · Emma Sinclair
-- Dembe Osei · 2,560 · 67% · 10% · 23% · Ethan Kim
-- Rafael Lindqvist · 2,900 · 70% · 8% · 22% · Sophie Greenfield
-
-A circular indigo AI button floats over the bottom-right corner of the screen.
+Sentiment table:
+- Title "Brand Sentiment" → "Roster Sentiment".
+- Column header "Top Expert" → "Top Scout". Keep Discussions, Positive, Neutral,
+  Negative, and the colored rule under the headers.
+- Group label "My Brands" → "My Players"; "Competitor Brands" → "Rival Players".
+- Row names, top to bottom: "Palbociclib" → "Toma Vasquez";
+  "Ribociclib" → "Elias Braun"; "Abemaciclib" → "Ruben Achterberg";
+  "Talazoparib" → "Dembe Osei"; "Trastuzumab" → "Rafael Eikeland".
+- Every figure, percentage, leading dot, avatar, chevron, and scout name in the
+  Top Scout column stays.
+- The view toggle, download and settings icons, date-range button, and the
+  floating pink AI button stay.
+```
 
 ---
 
-## Frame 2 — `expert-insights-02`, Search
+## navigator-02 — Search
 
-Page title `Search`. Beneath it a row: a wide bordered search input with a
-magnifier icon, the value `#AcademyWatch`, and a filled blue `Search →` button
-sitting inside its right edge; then a bordered `Filters` button with a filter
-icon; then the date-range pill.
+```
+This screen is the Search view of a scout-intelligence platform used by a sports
+representation agency. It tracks what talent scouts are saying about the
+agency's players. Update the text so the screen reads as that product. Change
+only what is listed below. Keep the layout, type styles, colors, icons, figures,
+chips, and spacing exactly as they are. Text layers may reflow to fit new
+strings; do not change type sizes to compensate.
 
-**Insights card** — title `Insights` plus the Auto-generated badge, then this
-paragraph at 15px:
+Shell:
+- Wordmark, top-left: replace "Navigator365™ Matrix" with "Expert Insights".
+  Replace the pink molecule icon beside it with a simple geometric mark in the
+  same pink — a filled circle with three short white horizontal bars of
+  increasing length is fine. Nothing that reads as a molecule, atom, or network.
+- Left nav: "Experts" → "Scouts"; "Conferences" → "Showcases";
+  "Therapeutic Areas" → "Leagues". Keep Dashboard, Analysis, Social Explorer,
+  Search, Logout, and every icon. Search stays the active item.
+- Disclaimer inside the Insights card: change "regulatory, clinical, or
+  strategic advice" to "scouting, contractual, or strategic advice". Leave the
+  rest of the paragraph as is.
 
-> Recent discussions reveal a dual landscape of rapid analytical progress and
-> persistent access challenges in academy scouting. Tracking data is
-> accelerating individualized development plans. While there is a growing focus
-> on player welfare and long-term progression, the most critical hurdle is
-> persistent disparity in scout coverage, particularly in rural catchments.
+Search row:
+- Field value "#BreastCancerResearch" → "#AcademyWatch". Keep the Search button,
+  the Filters button, and the date-range button.
 
-Below it a `Sentiment` heading and one full-width rounded bar split
-58% green / 7% gray / 35% red, with `58% positive`, `7% neutral`, `35% negative`
-sitting beneath the bar at its left, centre, and right. A hairline divider, then
-the disclaimer.
+Insights card (keep the title and the Auto-generated badge):
+- Body → "Recent discussions reveal a dual landscape of rapid analytical
+  progress and persistent access challenges in academy scouting. Tracking data
+  is accelerating individualized development plans. While there is a growing
+  focus on player welfare and long-term progression, the most critical hurdle
+  is persistent disparity in scout coverage, particularly in rural catchments."
+- The Sentiment heading, the bar, and its three labels stay.
 
-**Feed card** — a tab row across the top, each tab a label with a count in
-lighter gray. `X/Twitter 48` is active: darker label, blue underline. The rest:
-`LinkedIn 12`, `Instagram 2`, `Facebook 4`, `YouTube 7`, `TikTok 1`, `Reddit 8`,
-`Scout Reports 3`, `News 21`.
+Channel tabs:
+- "Blogs" → "Scout Reports". Every other tab label and every count stays.
+  X/Twitter stays the active tab.
 
-Beneath, stacked post cards. Each: an empty avatar circle, the author name at
-15/600, `@handle · Nh ago` at 13px `#667085`, a sentiment chip at the far right,
-the post body at 15px, and an engagement row of three icon+number pairs (heart,
-comment, share).
-
-- **Dana Whitfield** · @danawhitfield · 4h ago · chip `Positive` — "Breaking down
-  the movement patterns that separate elite academy wingers. Our latest report
-  identifies markers that could change how clubs recruit." · 76 · 7 · 129
-- **Marcus Feld** · @marcusfeld · 2h ago · chip `Neutral` — "Scouts are digging
-  deeper into academy data, uncovering insights that could change recruitment
-  protocols. Stay tuned for updates." · 43 · 5 · 210
-- **Emma Zhang** · @emmazhang · 1h ago · chip `Negative` — "Leading scouts in
-  youth football are emphasizing the need for individualized development plans.
-  Accessibility and tailored coaching are" — let this one run off the bottom edge
-  of the frame mid-sentence, so the feed reads as scrollable.
-
-The circular AI button floats bottom-right as on frame 1.
+Posts, top to bottom:
+- Post 1: name "Maryam Lustberg" → "Dana Whitfield"; handle "@maryamlustberg"
+  → "@danawhitfield"; body → "Breaking down the movement patterns that separate
+  elite academy wingers. Our latest report identifies markers that could change
+  how clubs recruit."
+- Post 2: name "Dr. John Smith" → "Marcus Feld"; handle "@drjohnsmith" →
+  "@marcusfeld"; body → "Scouts are digging deeper into academy data,
+  uncovering insights that could change recruitment protocols. Stay tuned for
+  updates."
+- Post 3: keep "Emma Zhang" and "@emmazhang"; body → "Leading scouts in youth
+  football are emphasizing the need for individualized development plans.
+  Accessibility and tailored coaching are" — this post runs off the bottom of
+  the frame mid-sentence today; keep it that way.
+- Timestamps, sentiment chips, avatars, engagement counts, and the floating
+  pink AI button stay.
+```
 
 ---
 
-## Frame 3 — `expert-insights-03`, Social Explorer
+## navigator-03 — Social Explorer
 
-Page title `Social Explorer` left. Right: a bordered `Saved Reports ⌄` button,
-a `Filters` button, the date-range pill.
+```
+This screen is the Social Explorer view of a scout-intelligence platform used by
+a sports representation agency. It compares scout conversation about up to
+three players side by side. Update the text so the screen reads as that
+product. Change only what is listed below. Keep the layout, type styles,
+colors, icons, figures, chips, and spacing exactly as they are. Text layers may
+reflow to fit new strings; do not change type sizes to compensate.
 
-**Keyword row** — three equal bordered inputs, each with a 12px label above
-(`Keyword 1`, `Keyword 2`, `Keyword 3`), a magnifier icon, a value, and a small
-filled blue `Add` button inside its right edge. Values: `Toma Vasquez`,
-`Elias Braun`, `Dembe Osei`.
+Shell:
+- Wordmark, top-left: replace "Navigator365™ Matrix" with "Expert Insights".
+  Replace the pink molecule icon beside it with a simple geometric mark in the
+  same pink — a filled circle with three short white horizontal bars of
+  increasing length is fine. Nothing that reads as a molecule, atom, or network.
+- Left nav: "Experts" → "Scouts"; "Conferences" → "Showcases";
+  "Therapeutic Areas" → "Leagues". Keep Dashboard, Analysis, Social Explorer,
+  Search, Logout, and every icon. Social Explorer stays the active item.
+- Disclaimer inside the Combined Analysis card: change "regulatory, clinical,
+  or strategic advice" to "scouting, contractual, or strategic advice". Leave
+  the rest of the paragraph as is.
 
-**Combined Analysis** — full-width card, title plus the Auto-generated badge,
-then:
+Keyword row (keep the three labels, the Add buttons, Saved Reports, Filters,
+and the date-range button):
+- Keyword 1 value "Deruxtecan" → "Toma Vasquez"
+- Keyword 2 value "Pertuzmab, Emtansine" → "Elias Braun"
+- Keyword 3 value "Talazoparib" → "Dembe Osei"
 
-> Comparative Analysis: Elias Braun leads in overall conversation volume with 332
-> active scouts, suggesting broader network reach. However, Toma Vasquez shows
-> the strongest positive sentiment (50%), driven largely by regional academy
-> coaches. While Elias Braun has visibility, qualitative analysis suggests Toma
-> Vasquez is winning on scout perception.
+Combined Analysis (keep the title and the Auto-generated badge):
+- Body → "Comparative Analysis: Elias Braun leads in overall conversation
+  volume with 332 active scouts, suggesting broader network reach. However,
+  Toma Vasquez shows the strongest positive sentiment (50%), driven largely by
+  academy coaches. While Elias Braun has visibility, qualitative analysis
+  suggests Toma Vasquez is winning on scout perception."
 
-Then the disclaimer.
+Comparison columns, left to right:
+- Column titles: "Deruxtecan" → "Toma Vasquez"; "Pertuzmab, Emtansine" →
+  "Elias Braun"; "Talazoparib" → "Dembe Osei".
+- "Top Experts" → "Top Scouts" in all three columns.
+- The Discussions figures, sentiment bars and labels, "View full list" links,
+  the four scout rows per column with their chips and post counts, and the
+  floating pink AI button stay.
+```
 
-**Three comparison columns** — equal-width cards in a row, structurally
-identical so differences read across a single line. Each contains, top to
-bottom: the player name at 22/600; the label `Discussions` and the figure
-`3,120` at 28/600; a `Sentiment` heading with a three-segment bar
-(58 green / 7 gray / 35 red) and `58% positive`, `7% neutral`, `35% negative`
-beneath it; a hairline divider; a `Top Scouts` heading with a blue
-`View full list ›` link on the same line; then four bordered rows, each holding a
-name, a green `Positive` chip, and a post count.
+---
 
-Column headings, left to right: `Toma Vasquez`, `Elias Braun`, `Dembe Osei`.
+## navigator-04 — Dashboard with the Ask panel open
 
-The four scout rows are the same in all three columns:
+```
+This screen is the Dashboard of a scout-intelligence platform used by a sports
+representation agency, with its AI "Ask anything" panel open over the sentiment
+table. Update the text so the screen reads as that product. Change only what is
+listed below. Keep the layout, type styles, colors, icons, figures, chips, and
+spacing exactly as they are. Text layers may reflow to fit new strings; let the
+suggestion chips widen or narrow to their new text without wrapping; do not
+change type sizes to compensate.
 
-- Sophie Greenfield · Positive · 78 posts
-- Liam Hargrove · Positive · 44 posts
-- Oliver Chen · Positive · 31 posts
-- Mia Turner · Positive · 29 posts
+Shell:
+- Wordmark, top-left: replace "Navigator365™ Matrix" with "Expert Insights".
+  Replace the pink molecule icon beside it with a simple geometric mark in the
+  same pink — a filled circle with three short white horizontal bars of
+  increasing length is fine. Nothing that reads as a molecule, atom, or network.
+- Left nav: "Experts" → "Scouts"; "Conferences" → "Showcases";
+  "Therapeutic Areas" → "Leagues". Keep Dashboard, Analysis, Social Explorer,
+  Search, Logout, and every icon.
+- Disclaimer under What's Moving: change "regulatory, clinical, or strategic
+  advice" to "scouting, contractual, or strategic advice". Leave the rest of the
+  paragraph as is.
 
-Let a fifth row begin and clip at the bottom frame edge so the lists read as
-longer than the viewport. The circular AI button floats bottom-right.
+Dashboard content (identical to the plain Dashboard screen):
+- Stat card "active experts" → "active scouts". Keep "total discussions" and
+  all four figures and deltas.
+- Competitive Shift body → "Kestrel Sports Group's #NextWave campaign gained 23%
+  share of voice, primarily through amplification of tracking data."
+- Sentiment Driver body → "Negative sentiment spike (-12%) linked to
+  release-clause discussions around Toma Vasquez"
+- Emerging Theme body → "Load-management discussions up 340% following league
+  guidance update on under-21 minutes"
+- Table title "Brand Sentiment" → "Roster Sentiment"; column header
+  "Top Expert" → "Top Scout"; group label "My Brands" → "My Players";
+  "Competitor Brands" → "Rival Players".
+- Row names, top to bottom: "Palbociclib" → "Toma Vasquez"; "Ribociclib" →
+  "Elias Braun"; "Abemaciclib" → "Ruben Achterberg"; "Talazoparib" → "Dembe Osei";
+  "Trastuzumab" → "Rafael Eikeland". Every figure and scout name stays.
+
+Ask panel (bottom-right):
+- Keep the placeholder "Ask anything..." and the help icon.
+- Suggestion chips, in order:
+  - "What's driving Keytruda's positive sentiment?" → "What's driving Elias
+    Braun's positive sentiment?"
+  - "Compare Opdivo vs Tecentriq this quarter" → "Compare Idris Falk vs Mateus
+    Oyelaran this quarter"
+  - "Which DOLs are most active on combination therapy?" → "Which scouts are
+    most active on under-21 prospects?"
+  - "Summarize sentiment trends for my brands" → "Summarize sentiment trends
+    for my players"
+- The floating pink AI button stays.
+```
+
+---
+
+## navigator-05 — Dashboard with an answer open: sentiment driver
+
+```
+This screen is the Dashboard of a scout-intelligence platform used by a sports
+representation agency, with an AI answer panel open over the sentiment table.
+Update the text so the screen reads as that product. Change only what is listed
+below. Keep the layout, type styles, colors, icons, figures, chips, and spacing
+exactly as they are. Text layers may reflow to fit new strings; do not change
+type sizes to compensate.
+
+Shell:
+- Wordmark, top-left: replace "Navigator365™ Matrix" with "Expert Insights".
+  Replace the pink molecule icon beside it with a simple geometric mark in the
+  same pink — a filled circle with three short white horizontal bars of
+  increasing length is fine. Nothing that reads as a molecule, atom, or network.
+- Left nav: "Experts" → "Scouts"; "Conferences" → "Showcases";
+  "Therapeutic Areas" → "Leagues". Keep Dashboard, Analysis, Social Explorer,
+  Search, Logout, and every icon.
+- Disclaimer under What's Moving (partly hidden behind the panel — edit it
+  anyway): change "regulatory, clinical, or strategic advice" to "scouting,
+  contractual, or strategic advice".
+
+Dashboard content behind the panel (identical to the plain Dashboard screen;
+edit the layers even where the panel covers them):
+- Stat card "active experts" → "active scouts". Keep all figures and deltas.
+- Competitive Shift body → "Kestrel Sports Group's #NextWave campaign gained 23%
+  share of voice, primarily through amplification of tracking data."
+- Sentiment Driver body → "Negative sentiment spike (-12%) linked to
+  release-clause discussions around Toma Vasquez"
+- Emerging Theme body → "Load-management discussions up 340% following league
+  guidance update on under-21 minutes"
+- Table title "Brand Sentiment" → "Roster Sentiment"; column header
+  "Top Expert" → "Top Scout"; group label "My Brands" → "My Players";
+  "Competitor Brands" → "Rival Players".
+- Row names, top to bottom: "Palbociclib" → "Toma Vasquez"; "Ribociclib" →
+  "Elias Braun"; "Abemaciclib" → "Ruben Achterberg"; "Talazoparib" → "Dembe Osei";
+  "Trastuzumab" → "Rafael Eikeland". Every figure and scout name stays.
+
+Answer panel:
+- Title "What's driving Keytruda's positive sentiment?" → "What's driving Elias
+  Braun's positive sentiment?"
+- Insights body (keep the heading and the Auto-generated badge) → "Elias
+  Braun's positive sentiment increased 18% this quarter, primarily driven by
+  strong tracking data from the autumn fixtures and an expanded first-team
+  role. Scout discussions emphasize his passing range under pressure."
+- Under "What's driving sentiment": row "DESTINY trial data" → "Autumn tracking
+  data"; row "HER2-low expansion" → "First-team role". Both chips stay Positive.
+- "Top experts discussing" → "Top scouts discussing". The avatar row, "+5", and
+  "View full list" stay.
+- The follow-up input, Send button, thumbs, "Based on 847 discussions • Nov 3 -
+  Dec 3, 2025", download icon, close icon, and the floating pink AI button
+  stay.
+```
+
+---
+
+## navigator-06 — Dashboard with an answer open: most active scouts
+
+```
+This screen is the Dashboard of a scout-intelligence platform used by a sports
+representation agency, with an AI answer panel open over the sentiment table.
+Update the text so the screen reads as that product. Change only what is listed
+below. Keep the layout, type styles, colors, icons, figures, chips, and spacing
+exactly as they are. Text layers may reflow to fit new strings; do not change
+type sizes to compensate.
+
+Shell:
+- Wordmark, top-left: replace "Navigator365™ Matrix" with "Expert Insights".
+  Replace the pink molecule icon beside it with a simple geometric mark in the
+  same pink — a filled circle with three short white horizontal bars of
+  increasing length is fine. Nothing that reads as a molecule, atom, or network.
+- Left nav: "Experts" → "Scouts"; "Conferences" → "Showcases";
+  "Therapeutic Areas" → "Leagues". Keep Dashboard, Analysis, Social Explorer,
+  Search, Logout, and every icon.
+- Disclaimer under What's Moving (partly hidden behind the panel — edit it
+  anyway): change "regulatory, clinical, or strategic advice" to "scouting,
+  contractual, or strategic advice".
+
+Dashboard content behind the panel (identical to the plain Dashboard screen;
+edit the layers even where the panel covers them):
+- Stat card "active experts" → "active scouts". Keep all figures and deltas.
+- Competitive Shift body → "Kestrel Sports Group's #NextWave campaign gained 23%
+  share of voice, primarily through amplification of tracking data."
+- Sentiment Driver body → "Negative sentiment spike (-12%) linked to
+  release-clause discussions around Toma Vasquez"
+- Emerging Theme body → "Load-management discussions up 340% following league
+  guidance update on under-21 minutes"
+- Table title "Brand Sentiment" → "Roster Sentiment"; column header
+  "Top Expert" → "Top Scout"; group label "My Brands" → "My Players";
+  "Competitor Brands" → "Rival Players".
+- Row names, top to bottom: "Palbociclib" → "Toma Vasquez"; "Ribociclib" →
+  "Elias Braun"; "Abemaciclib" → "Ruben Achterberg"; "Talazoparib" → "Dembe Osei";
+  "Trastuzumab" → "Rafael Eikeland". Every figure and scout name stays.
+
+Answer panel:
+- Title "Which DOLs are most active on combination therapy?" → "Which scouts
+  are most active on under-21 prospects?"
+- Insights body (keep the heading and the Auto-generated badge) → "Sarah Chen
+  leads under-21 prospect discussions with 47 posts this quarter, followed by
+  Michael Ross (38 posts) and Lisa Park (31 posts). Focus areas: academy
+  graduates and loan-spell performance."
+- List heading "Experts" → "Scouts". The five rows, their sentiment chips, and
+  post counts stay.
+- The follow-up input, Send button, thumbs, "Based on 847 discussions • Nov 3 -
+  Dec 3, 2025", download icon, close icon, and the floating pink AI button
+  stay.
+```
+
+---
+
+## navigator-07 — Dashboard with an answer open: two-player comparison
+
+```
+This screen is the Dashboard of a scout-intelligence platform used by a sports
+representation agency, with an AI answer panel open over the sentiment table
+comparing two players. Update the text so the screen reads as that product.
+Change only what is listed below. Keep the layout, type styles, colors, icons,
+figures, chips, bar lengths, and spacing exactly as they are. Text layers may
+reflow to fit new strings; do not change type sizes to compensate.
+
+Shell:
+- Wordmark, top-left: replace "Navigator365™ Matrix" with "Expert Insights".
+  Replace the pink molecule icon beside it with a simple geometric mark in the
+  same pink — a filled circle with three short white horizontal bars of
+  increasing length is fine. Nothing that reads as a molecule, atom, or network.
+- Left nav: "Experts" → "Scouts"; "Conferences" → "Showcases";
+  "Therapeutic Areas" → "Leagues". Keep Dashboard, Analysis, Social Explorer,
+  Search, Logout, and every icon.
+- Disclaimer under What's Moving (partly hidden behind the panel — edit it
+  anyway): change "regulatory, clinical, or strategic advice" to "scouting,
+  contractual, or strategic advice".
+
+Dashboard content behind the panel (identical to the plain Dashboard screen;
+edit the layers even where the panel covers them):
+- Stat card "active experts" → "active scouts". Keep all figures and deltas.
+- Competitive Shift body → "Kestrel Sports Group's #NextWave campaign gained 23%
+  share of voice, primarily through amplification of tracking data."
+- Sentiment Driver body → "Negative sentiment spike (-12%) linked to
+  release-clause discussions around Toma Vasquez"
+- Emerging Theme body → "Load-management discussions up 340% following league
+  guidance update on under-21 minutes"
+- Table title "Brand Sentiment" → "Roster Sentiment"; column header
+  "Top Expert" → "Top Scout"; group label "My Brands" → "My Players";
+  "Competitor Brands" → "Rival Players".
+- Row names, top to bottom: "Palbociclib" → "Toma Vasquez"; "Ribociclib" →
+  "Elias Braun"; "Abemaciclib" → "Ruben Achterberg"; "Talazoparib" → "Dembe Osei";
+  "Trastuzumab" → "Rafael Eikeland". Every figure and scout name stays.
+
+Answer panel:
+- Title "Compare Opdivo vs Tecentriq this quarter" → "Compare Idris Falk vs
+  Mateus Oyelaran this quarter"
+- Insights body (keep the heading and the Auto-generated badge) → "Idris Falk
+  leads on sentiment with a 58% positive rate vs Mateus Oyelaran's 35%.
+  However, Mateus Oyelaran shows stronger momentum, with sentiment improving
+  +8% vs Idris Falk's +2% this quarter."
+- Legend: "Opdivo" → "Idris Falk"; "Tecentriq" → "Mateus Oyelaran". Keep the
+  blue and orange dots and their colors.
+- Bar label "Experts discussing" → "Scouts discussing". "Discussion volume",
+  "Positive sentiment", and "Negative sentiment" stay. All four bars and the
+  eight figures beneath them stay exactly as they are.
+- The follow-up input, Send button, thumbs, "Based on 847 discussions • Nov 3 -
+  Dec 3, 2025", download icon, close icon, and the floating pink AI button
+  stay.
+```
