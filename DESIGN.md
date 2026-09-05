@@ -132,10 +132,22 @@ The design system is entirely flat and paper-like. Depth is conveyed strictly vi
 ### Case Index Rows
 - **Layout:** 4-column baseline aligned grid (`3.5rem 1fr minmax(0, 11rem) 4rem`) with hairline separator border.
 - **States:** Hover triggers full row inversion (background turns to Ink Black, text turns to Warm Paper). Margin expands slightly (`-12px`) and padding shifts (`12px`) to pad the inverted block. Number turns to Accent Red.
+- **Below 768px:** The year stops being a column. The row folds to two lines — the title runs the full measure beside the thumbnail, and the kind and the year share a meta line beneath it, the year still set right against the rule. The `Year` column label in the section header is dropped with it.
 
 ### Sites List
 - **Structure:** Compact ledger rows (name + domain label), demoted below Selected Work. No screenshot grid.
 - **States:** Hover/focus inverts to ink background and paper text, matching index-row tactile response at a quieter weight (hairline `--line` separators, not strong rules).
+- **Below 768px:** The industry label stacks under the site name, so the `Industry` column label in the section header is dropped.
+
+### Section Headers
+
+- **Layout:** A left label and a right-hand counterpart on one rule-bottomed line.
+- **Below 768px:** Two kinds of right-hand label part ways. A column label (`.section-head__col`) heads nothing once its column collapses, so it is hidden. A statement (`.section-head__note`) keeps its content and wraps to a full-width second line, left aligned.
+
+### Roster
+
+- **Layout:** Org name against a right-aligned mono role-and-dates line, separated by strong rules.
+- **Below 768px:** The two halves stack, both left aligned, rather than letting the mono line wrap ragged against the org name.
 
 ### Split Panel
 - **Layout:** Sticky column, full height (`100vh`). Ink background, paper text. Includes structural coordinate metrics at the top and bio/location metadata at the bottom.

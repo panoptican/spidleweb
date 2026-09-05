@@ -754,15 +754,48 @@ a { color: inherit; }
   .section-head { margin-top: 64px; }
   .contact { padding-top: 64px; }
 
-  /* Content-sized year column: wide enough for a full range (2022-24),
-     never wider, so the title keeps every pixel it can get */
+  /* No year column at this width: three columns of the desktop ledger don't
+     fit a phone, and the year was the one crowding the display type. The row
+     folds into two lines instead — title across the full measure, then a meta
+     line carrying the kind and the year, which keeps the right-hand rule the
+     years align to. */
   .index__row {
     grid-template-columns: 3.25rem 1fr auto;
-    gap: 10px;
+    grid-template-areas:
+      "thumb title title"
+      "thumb kind  year";
+    column-gap: 12px;
+    row-gap: 4px;
   }
+  .index__main { display: contents; }
   .index__thumb {
     display: block;
     width: 3.25rem;
+    grid-area: thumb;
+  }
+  .index__title { grid-area: title; }
+  .index__kind {
+    grid-area: kind;
+    align-self: baseline;
+  }
+  .index__year {
+    grid-area: year;
+    align-self: baseline;
+    padding-top: 0;
+    font-size: var(--text-micro);
+    opacity: 0.75;
+  }
+
+  /* A column label heads nothing once the rows stack, so it goes. The profile
+     note isn't a column label — it's a statement, and it takes its own line. */
+  .section-head {
+    flex-wrap: wrap;
+    gap: 2px var(--gap);
+  }
+  .section-head__col { display: none; }
+  .section-head__note {
+    flex-basis: 100%;
+    text-align: left;
   }
 
   .contact__mail {
@@ -789,6 +822,17 @@ a { color: inherit; }
     flex-basis: 100%;
     text-align: left;
   }
+
+  /* Same reasoning as .sites__row: a right-aligned role line wraps ragged
+     against the org name at this width, so each entry gets two lines */
+  .roster li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 12px 0;
+  }
+  .roster li > span:last-child { text-align: left; }
+  .roster__org { white-space: normal; }
 }
 
 /* ---- Typographic utility ---- */
