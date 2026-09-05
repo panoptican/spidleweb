@@ -45,12 +45,20 @@ inversions, grayscale imagery that colorizes on hover.
   criticism, individual names, and internal product codenames (Phoenix,
   Vault, CMS, MDD) — apps are described by domain instead. Links to the
   public style guide at design.ever.ag (verified live 2026-08-19).
-- Ever.Ag imagery: `assets/everag-01..05.png` from `qa/260819-screens/`;
-  02/03/05 are crops of two deck slides (Use of Color, Product Examples)
-  trimmed to product imagery. A Mobile Manifest phone crop was tried and
-  cut on review (Jason: looked wrong in the layout); the field app stays
-  in the copy only. OG captured from the live page at 1200×630 with
-  Playwright's headless Chromium shell.
+- Ever.Ag imagery: `assets/everag-01..07.png`. 01 is the design-system
+  dashboard template from `qa/260819-screens/`. 02–07 (re-exported
+  2026-09-04) are six of the twelve 2x Figma exports in `qa/everag/`
+  (ignored): hauler routes, payroll home, swine marketing at full height in
+  a scroll frame, ground corn overview cropped to 2880×2176 at the gap above
+  its open-orders card, and two phones, the markets watchlist (12px black
+  bezel trimmed to 780×1688) and the dry whey detail. Left out on review:
+  the applications launcher (it prints the internal codenames the copy
+  avoids), producer listings, and the brokerage, insurance, futures-chart,
+  and watchlist-picker phones. The earlier 02/03/05 deck-slide crops and
+  the 1x swine dashboard came off the page the same day. A Mobile Manifest
+  phone crop was tried before that and cut on review (Jason: looked wrong
+  in the layout); the field app stays in the copy only. OG captured from
+  the live page at 1200×630 with Playwright's headless Chromium shell.
 - Bio: jasonspidle.com + `application/resume-draft.md`.
 - Site-wide copy pass (2026-09-03), reviewed against the `jason-voice` skill,
   the job-search project's writing-style guide, and the Evolve cover letter
