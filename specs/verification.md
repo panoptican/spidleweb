@@ -176,3 +176,27 @@ Python Playwright (Chromium, `reduced_motion='reduce'`) against the
 - Hover colorization on the new figures (CSS unchanged, same `.figure`
   pattern as every other case).
 - The gate on a deployed preview.
+
+## Gate removal (2026-09-04)
+
+Client approved both Precision case studies without changes, so the
+client-preview gate came out.
+
+### Checked
+
+- `functions/` is gone entirely (the middleware was its only file), so the
+  project deploys as pure static again.
+- `sitemap.xml` parses (`xmllint --noout`) and lists all seven pages,
+  `/work/expert-insights` and `/work/campaign-sim` restored with a 2026-09-04
+  `lastmod`.
+- Neither case page carries a `noindex` meta; the only `noindex` was the
+  header the middleware set, so nothing else keeps search engines out.
+- `grep` for `middleware`, `PREVIEW_PASSWORD`, `PREVIEW_COOKIE_KEY`, and
+  `noindex` across the site, docs, and specs turns up only the historical
+  notes in `docs/deployment.md` and the specs.
+
+### Not verified
+
+- The live site: the gate is removed on push, and the two Pages secrets stay
+  set on the project until deleted by hand (commands in
+  `docs/deployment.md`).

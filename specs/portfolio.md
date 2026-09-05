@@ -156,8 +156,10 @@ inversions, grayscale imagery that colorizes on hover.
    the analytical model — three-way sentiment split, own-brand versus
    competitor benchmarking, top-expert-per-row, three-way side-by-side compare
    — survive the translation intact and stay recognizable to anyone in the
-   original market. Permission is still being sought, and both pages stay
-   behind the preview gate in `functions/_middleware.js` until it lands.
+   original market. Jason's contact at the client (Doug) reviewed both pages
+   and approved them without changes on 2026-09-04 for display without
+   password protection. The preview gate (`functions/_middleware.js`) and
+   the two sitemap omissions were removed the same day.
 
    **Screens redrawn 2026-09-04.** All eleven frames were edited in Figma
    from the prompts in `specs/case-studies/domain-shift.md` and exported to
@@ -171,8 +173,8 @@ inversions, grayscale imagery that colorizes on hover.
    852px measure where the full frame showed it at 59%. Every frame is a 2x
    export (2880x2048); the Campaign Sim set first came out at 1x and was
    re-exported the same day. Both OG images were regenerated from the local
-   pages. The two `-01` files stay public as index thumbnails; everything
-   from `-02` up is in the gate.
+   pages. All eleven files have been public since the gate came out on
+   2026-09-04.
 
    One content slip was caught on review and fixed in the re-export: the
    Review Campaign Resources card had been filled with youth-movement

@@ -89,16 +89,15 @@ Done 2026-09-04, once the exports landed:
 - `work/expert-insights.html`: new closing section, "The answer takes the
   shape of the question", with `-04` full frame and `-05` to `-07` cropped to
   the answer panel (crop geometry in `specs/portfolio.md`).
-- Both OG images regenerated. `functions/_middleware.js` gates the five new
-  assets alongside the old ones; `docs/deployment.md` lists them.
+- Both OG images regenerated. The five new assets were added to the preview
+  gate for the review period.
 - Review Campaign's Resources card had been filled with youth-movement
   Scouting costs (trail permits, campsite fees) where the source had
   placeholders; fixed in Figma to Match Travel, Showcase Fees, and Video
   Analysis. The Campaign Sim set, first exported at 1x, was re-exported at
   2x in the same pass.
 
-Still open:
-
-- The gate stays until client permission lands (`specs/portfolio.md`,
-  assumption 1). Lifting it means deleting the middleware and restoring the
-  two sitemap entries.
+Closed 2026-09-04: Doug at the client approved both case studies without
+changes for display without password protection. The middleware and the two
+sitemap omissions are gone; `docs/deployment.md` notes that the two Pages
+secrets are now unused and can be deleted.
