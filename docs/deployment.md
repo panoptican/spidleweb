@@ -12,10 +12,12 @@ deployed by hand.
 
 Do not run `wrangler pages deploy`. It would upload a one-off deployment out of
 band from git and leave the dashboard's build history disagreeing with `main`.
-`wrangler` is still the right tool for secrets and local dev, below.
+`wrangler` is still the right tool for inspecting deployments and managing
+project secrets, below.
 
-There is no build step: plain HTML, CSS, and JS are served as-is, and anything
-under `functions/` is compiled by Cloudflare into a Pages Function.
+There is no build step and there are no Pages Functions: plain HTML, CSS, and
+JS are served as-is. (A `functions/_middleware.js` client-preview gate existed
+from 2026-08-20 to 2026-09-04; see below.)
 
 ## Environment variables and secrets
 
@@ -61,81 +63,32 @@ promoting it.
 Variables are scoped per environment. A value set only on Production is absent
 from preview branch deployments, and vice versa.
 
-Current variables, both required by the client-preview gate:
+**No variables are currently required.** `PREVIEW_PASSWORD` and
+`PREVIEW_COOKIE_KEY` served the client-preview gate and are unused now that it
+is gone. If they are still set on the project they are harmless, but they can
+be deleted:
 
-- `PREVIEW_PASSWORD` — the shared password the client types.
-- `PREVIEW_COOKIE_KEY` — signs the unlock cookie. Generate a long random value
-  (`openssl rand -hex 32`); do not reuse the password here.
+```
+wrangler pages secret delete PREVIEW_PASSWORD --project-name spidleweb
+wrangler pages secret delete PREVIEW_COOKIE_KEY --project-name spidleweb
+```
 
-## Client-preview gate
+## The client-preview gate, removed 2026-09-04
 
-`functions/_middleware.js` puts a password gate in front of the case studies
-that are still being cleared with the client. It runs on every request and
-returns `next()` untouched for anything not in its `GATED` set, so the rest of
-the site is unaffected.
-
-Currently gated:
-
-- `/work/expert-insights` and `/work/campaign-sim` (clean and `.html` forms)
-- `assets/expert-insights-02.png` through `-07.png` and
-  `assets/campaign-sim-02.png` through `-04.png`
-- `assets/og/expert-insights.png` and `assets/og/campaign-sim.png`
-
-Deliberately left public: `assets/expert-insights-01.png` and
-`assets/campaign-sim-01.png`, because the homepage index renders them as row
-thumbnails. Gating them would break the public index.
-
-### How unlocking works
-
-A gated request without a valid cookie gets a styled page with a single
-password field — deliberately **not** HTTP Basic Auth, which would show a
-browser dialog containing a username box the client would have to be told to
-ignore. Nothing sends a `WWW-Authenticate` header, so no native dialog appears.
-
-Submitting the right password sets `sw_preview`, an `HttpOnly; Secure;
-SameSite=Lax` cookie scoped to `/` and good for 30 days, then redirects back
-with a 303. The cookie is `<expiry-ms>.<hmac>`, where the HMAC-SHA256 is taken
-over the expiry using `PREVIEW_COOKIE_KEY`. The expiry travels in the clear but
-is signed, so it cannot be extended without the key, and verification is done
-with `crypto.subtle.verify`, which compares in constant time. One unlock covers
-every gated path, pages and images alike.
-
-Rotating either secret invalidates outstanding cookies and signs everyone out.
-
-### Operational notes
-
-If either variable is unset, gated paths return **500**, not the content. The
-gate fails closed, so a missing secret is a broken page rather than a leak.
-
-Use an ASCII password. It is compared to a value parsed from a form body, so
-non-ASCII generally survives, but keeping it ASCII avoids encoding surprises
-when the client copies it out of an email.
-
-To change what is gated, edit the `GATED` set. To lift the gate entirely,
-delete `functions/_middleware.js` and restore the affected `<url>` entries in
-`sitemap.xml` — gated routes are kept out of the sitemap on purpose.
+While the Expert Insights and Campaign Sim case studies were being cleared with
+the client, `functions/_middleware.js` put a shared-password gate in front of
+those two pages, their non-thumbnail screenshots, and their OG images, and the
+two routes were kept out of `sitemap.xml`. The client approved both case
+studies without changes for display without password protection on
+2026-09-04, and the Function, its secrets' purpose, and the sitemap omissions
+were removed the same day. The implementation (a styled 401 form setting a
+signed, HttpOnly cookie, failing closed if either secret was unset) is in git
+history at `functions/_middleware.js` should a gate be needed again.
 
 ## Local development
 
-Static-only changes need nothing more than opening the files or any static
-server. To exercise `functions/`, run the Pages runtime with both bindings:
-
-```
-wrangler pages dev . --binding PREVIEW_PASSWORD=localtest PREVIEW_COOKIE_KEY=localkey
-```
-
-If that fails with `This Worker requires compatibility date "<today>", but the
-newest date supported by this server binary is "<older>"`, the installed
-wrangler's bundled `workerd` is behind the date wrangler defaults to. Pin it:
-
-```
-wrangler pages dev . --compatibility-date=2026-07-15 --binding PREVIEW_PASSWORD=localtest PREVIEW_COOKIE_KEY=localkey
-```
-
-This only affects local dev; deployed Functions run on Cloudflare's edge.
-Upgrading wrangler is the real fix.
-
-Note that the gate page returns 401, and Chrome's extension screenshot API
-refuses to capture a frame with an error status. To screenshot it, either save
-the markup as a static file or use headless Chrome directly
-(`--headless --screenshot=out.png <url>`), which captures 401 bodies fine.
+Static-only: open the files directly or run any static server.
+`.claude/launch.json` defines `spidleweb-static`, a Python `http.server` on
+port 8765, which is what the verification captures in `specs/verification.md`
+run against. With no Functions there is nothing for `wrangler pages dev` to
+exercise.
