@@ -1,0 +1,9 @@
+{
+  "resource": "https://spidleweb.net",
+  "resource_name": "Jason Spidle public portfolio",
+  "resource_documentation": "https://spidleweb.net/",
+  "scopes_supported": [
+    "site:read"
+  ],
+  "bearer_methods_supported": []
+}
