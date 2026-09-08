@@ -63,6 +63,9 @@ body {
 
 ::selection { background: var(--accent); color: var(--paper); }
 
+/* <picture> only selects the format; it must not become the layout box,
+   or it would displace <img> as the flex/grid item in thumb and frame. */
+picture { display: contents; }
 img { display: block; max-width: 100%; }
 
 a { color: inherit; }
