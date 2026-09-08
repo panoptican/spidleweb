@@ -66,7 +66,11 @@ body {
 /* <picture> only selects the format; it must not become the layout box,
    or it would displace <img> as the flex/grid item in thumb and frame. */
 picture { display: contents; }
-img { display: block; max-width: 100%; }
+/* height:auto is required, not cosmetic: the width/height attributes on
+   <img> are presentational hints, so without it the height attribute
+   applies as a literal CSS height and the image renders stretched.
+   .index__thumb img overrides with height:100% on higher specificity. */
+img { display: block; max-width: 100%; height: auto; }
 
 a { color: inherit; }
 
