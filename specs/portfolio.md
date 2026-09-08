@@ -146,23 +146,26 @@ inversions, grayscale imagery that colorizes on hover.
   `assets/sites/*.png`, captured 2026-07-17 from the four live sites at
   1440×1024 @2x with Playwright's headless Chromium shell. Ascensus is
   top-cropped to 1240px to remove a cookie banner.
-- LinkedIn Featured thumbnails (added 2026-09-04): `assets/linkedin/*.png`
-  for Conservis, Ever.Ag, Vidscrip, and PLINTH, 1200×627 (the 1.91:1 ratio
-  LinkedIn's Featured cards use; they display at roughly 500px wide). Jason
+- LinkedIn Featured thumbnails (made 2026-09-04, not kept here): four
+  1200×627 images for Conservis, Ever.Ag, Vidscrip, and PLINTH — the 1.91:1
+  ratio LinkedIn's Featured cards use, displayed at roughly 500px wide. Jason
   asked for the project's own screens rather than the case-study page UI, and
   then for no labels at all since LinkedIn prints the title and description
   under the card, so each one is a crop of an existing asset with no text or
-  portfolio chrome added. Rendered with Playwright's headless Chromium
-  shell from an HTML template kept locally in `qa/linkedin-thumbs/build.py`
-  (ignored), which holds the crop numbers. Conservis is the fields map from
-  `conservis-03.png` with the sidebar cropped out; Ever.Ag is the swine
-  dashboard from the pre-2026-09-04 `everag-04.png` below the sub-nav (that
-  file is now the swine marketing export, so the script's crop numbers no
-  longer apply to it); Vidscrip is two 0.72-scale columns of
-  `vidscrip-01.png`, the page top and the physician video; PLINTH is a
-  two-by-two of issues 06, 04, 05, and 03. Nothing on the
-  site references them yet; they are upload assets, though they would also
-  work as replacements for the page-capture OG images.
+  portfolio chrome added. Rendered with Playwright's headless Chromium shell
+  from an HTML template in `qa/linkedin-thumbs/build.py` (ignored), which
+  holds the crop numbers. Conservis is the fields map from `conservis-03.png`
+  with the sidebar cropped out; Ever.Ag is the swine dashboard from the
+  pre-2026-09-04 `everag-04.png` below the sub-nav (that file is now the swine
+  marketing export, so the script's crop numbers no longer apply to it);
+  Vidscrip is two 0.72-scale columns of `vidscrip-01.png`, the page top and
+  the physician video; PLINTH is a two-by-two of issues 06, 04, 05, and 03.
+
+  The exports briefly lived at `assets/linkedin/` and were removed on
+  2026-09-08: nothing on the site references them, they are already uploaded
+  to LinkedIn, and the designs live in Figma. Export anywhere but this repo if
+  they are rebuilt. The entry stays because the framing decisions above are
+  worth keeping.
 
 ## Assumptions (flagged for Jason)
 
