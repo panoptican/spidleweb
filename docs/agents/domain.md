@@ -1,51 +1,67 @@
 # Domain Docs
 
-How the engineering skills should consume this repo's domain documentation when exploring the codebase.
+Where this repo's documentation lives and how to consume it. Spidleweb is a
+static portfolio: plain HTML, CSS, and JS with no build step, no framework, and
+no application domain model. There is no `CONTEXT.md` and no `docs/adr/`, and
+none is wanted — the documents below are the sources of truth.
 
-## Before exploring, read these
+## Before changing anything, read the relevant one
 
-- **`CONTEXT.md`** at the repo root, or
-- **`CONTEXT-MAP.md`** at the repo root if it exists — it points at one `CONTEXT.md` per context. Read each one relevant to the topic.
-- **`docs/adr/`** — read ADRs that touch the area you're about to work in. In multi-context repos, also check `src/<context>/docs/adr/` for context-scoped decisions.
+Read only what the task touches. None of these are required reading for a
+one-line copy fix.
 
-If any of these files don't exist, **proceed silently**. Don't flag their absence; don't suggest creating them upfront. The `/domain-modeling` skill (reached via `/grill-with-docs` and `/improve-codebase-architecture`) creates them lazily when terms or decisions actually get resolved.
+- **`PRODUCT.md`** — who the site is for and the brand register it has to hold
+  (editorial, precise, brutalist) plus the anti-references. Read it before
+  writing visitor-facing copy or proposing a visual direction.
+- **`DESIGN.md`** — the design system, "The Documentarian Ledger." Colors,
+  type ramp, and spacing live in its frontmatter. Read it before touching
+  `style.css` or adding a page. Values here and in `style.css` must agree; if
+  they disagree, `style.css` is what ships and `DESIGN.md` is the bug.
+- **`specs/portfolio.md`** — the living spec for the site as built: every
+  section, every case study, where each asset came from, and the decisions
+  behind them. This is the first place to look for "why is it like this," and
+  the place to record a decision that outlives the change.
+- **`specs/verification.md`** — what has actually been checked and how. There
+  are no automated tests for the site itself; this file is the record.
+- **`docs/deployment.md`** — how the site ships. Read it before anything that
+  touches deployment, secrets, or a redeploy.
+- **`docs/agents/agent-access.md`** — the machine-readable surface
+  (`/openapi.json`, `/.well-known/`, `robots.txt`, `sitemap.xml`) and the
+  Cloudflare bot rules. Read it when changing routes, adding pages, or editing
+  those files.
 
-## File structure
+## Supporting material, not sources of truth
 
-Single-context repo (most repos):
+- **`specs/case-studies/`** — client source material the case studies were
+  written from (PDFs, Figma prompts). Reference, not spec.
+- **`specs/research/`** — background research. Informative; may be stale.
+- **`specs/archive/`** — superseded specs, kept for history. Never cite as
+  current.
+- **`plans/`** — numbered, self-contained animation plans, all marked DONE.
+  Historical record of shipped motion work.
+- **`tests/`** — `test_agent_readiness.py` checks agent readability only:
+  that the homepage carries meaningful raw HTML with sequential headings, and
+  that `openapi.json`, the protected-resource metadata, and `_headers` agree
+  with `agent-access.md`. It does not exercise appearance or behavior.
 
-```
-/
-├── CONTEXT.md
-├── docs/adr/
-│   ├── 0001-event-sourced-orders.md
-│   └── 0002-postgres-for-write-model.md
-└── src/
-```
+## Rules
 
-Multi-context repo (presence of `CONTEXT-MAP.md` at the root):
+**Use the vocabulary these documents already use.** `PRODUCT.md` and
+`DESIGN.md` name things deliberately. When your output names a concept — an
+issue title, a commit message, a CSS class, a spec heading — use the term
+already in use rather than a synonym.
 
-```
-/
-├── CONTEXT-MAP.md
-├── docs/adr/                          ← system-wide decisions
-└── src/
-    ├── ordering/
-    │   ├── CONTEXT.md
-    │   └── docs/adr/                  ← context-specific decisions
-    └── billing/
-        ├── CONTEXT.md
-        └── docs/adr/
-```
+**Record decisions in `specs/portfolio.md`,** not in a new file. A decision
+worth keeping goes in the relevant section there. Add a new document only when
+a topic genuinely has no home; prefer growing the living spec.
 
-## Use the glossary's vocabulary
+**Surface contradictions instead of silently overriding.** If a change would
+contradict what `PRODUCT.md`, `DESIGN.md`, or `specs/portfolio.md` says, say so
+and name the document, rather than changing code and leaving the doc stale:
 
-When your output names a domain concept (in an issue title, a refactor proposal, a hypothesis, a test name), use the term as defined in `CONTEXT.md`. Don't drift to synonyms the glossary explicitly avoids.
+> _`specs/portfolio.md` says the Conservis 100% metric is unsourceable and
+> banned — but you've asked for a metric there, so which source should it
+> cite?_
 
-If the concept you need isn't in the glossary yet, that's a signal — either you're inventing language the project doesn't use (reconsider) or there's a real gap (note it for `/domain-modeling`).
-
-## Flag ADR conflicts
-
-If your output contradicts an existing ADR, surface it explicitly rather than silently overriding:
-
-> _Contradicts ADR-0007 (event-sourced orders) — but worth reopening because…_
+**Update the doc in the same change as the code.** A change that makes one of
+these documents wrong is not finished.
