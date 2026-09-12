@@ -5,8 +5,8 @@
 /.wrangler/
 /drafts/
 /docs/
-/fonts/*.woff
-/fonts/*.woff2
+/fonts/*
+!/fonts/README.md
 /plans/
 /specs/
 /.agents/
