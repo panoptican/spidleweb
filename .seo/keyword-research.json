@@ -1,0 +1,16 @@
+{
+  "baseline": {
+    "domain_rating": null,
+    "source": "none",
+    "_comment": "2026-09-11: no keyword tool connected (no DataForSEO, no GSC yet). Selection runs in fallback mode until one answers."
+  },
+  "difficulty": {
+    "playable_bucket": "easy",
+    "kd_source": "none",
+    "derived_at": "2026-09-11",
+    "evidence": ["cold start — no GSC rankings data yet; default easy per foundation.md §6"]
+  },
+  "gsc_baseline": null,
+  "clusters": {},
+  "candidates": []
+}
