@@ -8,7 +8,7 @@
 
 | # | Phase | Pattern | Status | PR |
 |---|---|---|---|---|
-| 0 | Technical foundations | Setup | in_progress | branch `seo/phase-0-schema` (PR TBD) |
+| 0 | Technical foundations | Setup | in_progress | #18 |
 
 **Conventions:**
 - `pending` → `in_progress` → `completed` (in same commit as PR)
