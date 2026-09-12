@@ -4,6 +4,9 @@
 /variant-rating/
 /.wrangler/
 /drafts/
+/docs/
+/plans/
+/specs/
 /.agents/
 /.claude/
 /.codex/
