@@ -1,7 +1,8 @@
 # Fonts
 
-GT America web files, referenced from `style.css` and preloaded from every
-page:
+GT America web files are stored in the private `spidleweb-fonts` R2 bucket,
+served by the `/fonts/*` Pages Function, referenced from `style.css`, and
+preloaded from every page:
 
 - `GT-America-Standard-Medium.woff2` / `.woff` — GT America Medium
   (body, weight 500)
@@ -32,6 +33,5 @@ so grep the atomic-tools repo first. And because of that year-long cache,
 replacing a face means giving the file a new name — overwriting one in place
 leaves year-old copies in browsers that already have it.
 
-Licensing note: these are licensed font files from Grilli Type. **This repo
-must stay private.** Do not copy them into a public repo; link to the URLs
-above instead.
+Licensing note: these are licensed font files from Grilli Type. The `.woff`
+and `.woff2` files must not be committed to this repository.
