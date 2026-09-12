@@ -698,6 +698,7 @@ a { color: inherit; }
 .index li:nth-child(5).reveal { transition-delay: 240ms; }
 .index li:nth-child(6).reveal { transition-delay: 300ms; }
 .index li:nth-child(7).reveal { transition-delay: 360ms; }
+.index li:nth-child(8).reveal { transition-delay: 420ms; }
 
 .sites li:nth-child(1).reveal { transition-delay: 0ms; }
 .sites li:nth-child(2).reveal { transition-delay: 60ms; }
@@ -892,8 +893,24 @@ a { color: inherit; }
   --panel-bg: oklch(22% var(--panel-chroma) 265);
 }
 
+/* Vault's neutrals are a cool near-black graphite and the ruby is the only warm
+   thing in the system, so the panel runs on a colder hue than the accent. */
+.theme-vault {
+  --c-chroma: calc(0.20 * var(--p-color-amount, 1));
+  --paper-chroma: calc(0.006 * var(--p-color-amount, 1));
+  --panel-chroma: calc(0.025 * var(--p-color-amount, 1));
+
+  --paper: oklch(96.5% var(--paper-chroma) 16);
+  --ink: oklch(13% var(--paper-chroma) 16);
+  --accent: oklch(56% var(--c-chroma) 16);
+  --panel-bg: oklch(17% var(--panel-chroma) 290);
+}
+
 /* ---- Home index row custom hover accents (each matches its case theme) ----
    Keyed by case, not by position: the index reorders whenever work is added. */
+.index li[data-case="vault"] {
+  --row-accent: oklch(56% calc(0.20 * var(--p-color-amount, 1)) 16);
+}
 .index li[data-case="insights"] {
   --row-accent: oklch(52% calc(0.17 * var(--p-color-amount, 1)) 260);
 }
