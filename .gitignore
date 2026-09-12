@@ -4,6 +4,14 @@
 /variant-rating/
 /.wrangler/
 /drafts/
-/.impeccable/*.png
 /.agents/
+/.claude/
+/.codex/
+/.impeccable/
 /.seo/
+/.well-known/
+/AGENTS.md
+/CLAUDE.md
+/DESIGN.md
+/PRODUCT.md
+/openapi.json
