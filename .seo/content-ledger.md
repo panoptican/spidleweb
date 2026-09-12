@@ -12,10 +12,10 @@ The six case studies shipped before the ledger existed — backfilled 2026-09-11
 |---|---|---|---|---|---|---|---|---|---|---|
 | 2026-09-04 | Expert Insights | case-study | /work/expert-insights | scout dashboard design, sports data platform | | | first-hand project account | n/a | Homepage index | pre-ledger |
 | 2026-09-04 | Campaign Sim | case-study | /work/campaign-sim | campaign planning simulation, sports representation software | | | first-hand project account | n/a | Homepage index | pre-ledger |
-| 2026-08-19 | Ever.Ag | case-study | /work/everag | agtech design system, enterprise design system | | | first-hand project account | n/a | Homepage index | pre-ledger |
-| 2026-07-18 | Conservis | case-study | /work/conservis | farm management dashboard, agtech dashboard design | | | first-hand project account | n/a | Homepage index | pre-ledger |
-| 2026-07-18 | Vidscrip | case-study | /work/vidscrip | clinical workflow design, patient journey timeline | | | first-hand project account | n/a | Homepage index | pre-ledger |
-| 2026-08-20 | PLINTH | case-study | /work/plinth | literary journal design, editorial typography | | | first-hand project account | n/a | Homepage index | pre-ledger |
+| 2026-09-04 | Ever.Ag | case-study | /work/everag | agtech design system, enterprise design system | | | first-hand project account | n/a | Homepage index | pre-ledger |
+| 2026-09-03 | Conservis | case-study | /work/conservis | farm management dashboard, agtech dashboard design | | | first-hand project account | n/a | Homepage index | pre-ledger |
+| 2026-09-03 | Vidscrip | case-study | /work/vidscrip | clinical workflow design, patient journey timeline | | | first-hand project account | n/a | Homepage index | pre-ledger |
+| 2026-09-03 | PLINTH | case-study | /work/plinth | literary journal design, editorial typography | | | first-hand project account | n/a | Homepage index | pre-ledger |
 
 ---
 
@@ -62,3 +62,4 @@ The six case studies shipped before the ledger existed — backfilled 2026-09-11
 - **This is a portfolio, not a content business:** `create-editorial` candidates must serve the hiring-manager audience (PRODUCT.md) and carry first-hand evidence. Volume-chasing pieces are off-brand per `brand.md` anti-positioning #5.
 - **One piece per run.**
 - **Refresh beats rewrite.** Case-study refresh = new numbers, new screens, sharper opening — same URL.
+- **2026-09-12 repair (branch `seo/phase-0-schema`):** the backfilled dates above were stale sitemap `lastmod` values; re-derived from git history (last commit touching visible copy/imagery, delivery-plumbing commits excluded) and the sitemap corrected to match. Same branch added JSON-LD to all 7 pages and repointed internal links from `.html` hrefs to canonical clean URLs after the first health_diff fingerprint (`health/2026-09-12.json`, 21 violations) traced orphan/redirect violations to that root cause. Post-fix local fingerprint: `health/2026-09-12-post.json`, 0 violations.

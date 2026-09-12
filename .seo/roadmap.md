@@ -8,7 +8,7 @@
 
 | # | Phase | Pattern | Status | PR |
 |---|---|---|---|---|
-| 0 | Technical foundations | Setup | pending | – |
+| 0 | Technical foundations | Setup | in_progress | branch `seo/phase-0-schema` (PR TBD) |
 
 **Conventions:**
 - `pending` → `in_progress` → `completed` (in same commit as PR)
@@ -57,7 +57,7 @@ Plain HTML pages, no content collections. Case-study facts live in each page's `
 
 **Internal-link minimums per page:** every case study links back to the homepage index (← Index); any future editorial page takes ≥3 in-body links from `.seo/link-inventory.md` and ≥2 inbound links, one from the homepage.
 
-**Schema:** none exists today. Phase 0 adds `Person` + `WebSite` JSON-LD to the homepage and `Article`/`BreadcrumbList` to case studies — hand-written JSON-LD blocks, no build step.
+**Schema:** hand-written JSON-LD `@graph` blocks, no build step (added 2026-09-12). Homepage: `Person` (`https://spidleweb.net/#person`) + `WebSite` (`#website`). Case studies: compact `Person` + `Article` + `BreadcrumbList`. New pages must carry the same pattern — see `.agents/skills/seo/references/schema-examples.md`.
 
 **Deployment is merging to `main`.** Never merge from a run.
 
@@ -80,7 +80,7 @@ Empty — no keyword tool connected (2026-09-11). First research pass runs when 
 1. ~~Sitemap.xml~~ — exists, 7 URLs, real lastmod dates.
 2. ~~robots.txt~~ — allows all, references sitemap.
 3. ~~Unique title + description per page~~ — present on all 7 pages, plus canonical and full OG/Twitter cards with per-page 1200×630 images.
-4. **Add JSON-LD schema** — `Person` + `WebSite` on the homepage (name, url, jobTitle, address locality Minneapolis, sameAs LinkedIn, email); `Article` + `BreadcrumbList` on the six case studies. See `.agents/skills/seo/references/schema-examples.md`.
+4. ~~Add JSON-LD schema~~ — done 2026-09-12 on branch `seo/phase-0-schema`: `Person` + `WebSite` on the homepage, `Article` + `BreadcrumbList` on the six case studies, dates from git content history. Same pass repaired 5 stale sitemap `lastmod` values and repointed all internal links to canonical clean URLs (health_diff baseline 21 violations → 0 on the post-fix local fingerprint).
 5. **Submit sitemap in Google Search Console** (human step, blocked on NY-1) and Bing Webmaster Tools (NY-3).
 6. Optional: `llms.txt` at the root — the site is text-dense and already crawlable; low priority.
 
