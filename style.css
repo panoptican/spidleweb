@@ -153,7 +153,63 @@ a { color: inherit; }
 /* Home panel */
 .panel--home .panel__type { font-size: var(--text-hero); }
 .panel--home .panel__type span:nth-child(2) { padding-left: 0.18em; }
-.panel--home .panel__meta { justify-content: flex-start; }
+
+/* ==== Mode switch: Portfolio / Feed ====
+   Shared with the Feed page, which carries the same markup with aria-current on
+   the Feed link. Whichever branch merges second keeps one copy of this block.
+   The dot marks the current view from the outer end and is drawn from
+   aria-current, so the labels never reorder and no empty slot is reserved. */
+
+.mode-switch {
+  --switch-on: #f2f2ef;
+  --switch-off: #9a9a96;
+  --switch-rule: #5a5a57;
+  display: flex;
+  align-items: center;
+}
+
+/* The rule between the two labels */
+.mode-switch::before {
+  content: "";
+  order: 1;
+  flex: none;
+  width: 40px;
+  height: 1px;
+  margin: 0 16px;
+  background: var(--switch-rule);
+}
+
+.mode-switch__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  /* A 44px hit area that moves nothing: the margin cancels the padding */
+  padding: 15px 10px;
+  margin: -15px -10px;
+  color: var(--switch-off);
+  text-decoration: none;
+}
+.mode-switch__link:last-child { order: 2; }
+
+.mode-switch__link[aria-current="page"],
+.mode-switch__link[aria-current="page"]:hover { color: var(--switch-on); }
+
+.mode-switch__link[aria-current="page"]:first-child::before,
+.mode-switch__link[aria-current="page"]:last-child::after {
+  content: "";
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.mode-switch__link:focus-visible { outline: 2px solid var(--accent); outline-offset: -8px; }
+@media (hover: hover) and (pointer: fine) {
+  .mode-switch__link:not([aria-current]):hover { color: var(--accent); }
+}
+
+/* ==== End mode switch ==== */
 
 /* ---- Archive (right column) ---- */
 

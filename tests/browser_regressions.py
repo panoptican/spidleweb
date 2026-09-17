@@ -573,6 +573,31 @@ class BrowserRegressions(unittest.TestCase):
         thumb = page.locator('.index__thumb').first.bounding_box()
         self.assertEqual((thumb['width'], thumb['height']), (72, 45))
 
+    def test_mode_switch_marks_the_current_view_from_the_leading_side(self):
+        for width, height in [(1440, 900), (390, 844)]:
+            page = self.open(self.context(viewport={'width': width, 'height': height}))
+            switch = page.locator('nav.mode-switch')
+            self.assertEqual(switch.get_attribute('aria-label'), 'View')
+            self.assertIsNone(switch.get_attribute('role'))
+            links = switch.locator('a.mode-switch__link')
+            self.assertEqual(links.evaluate_all('els => els.map(el => [el.textContent, el.getAttribute("href"), el.getAttribute("aria-current")])'),
+                             [['Portfolio', 'index.html', 'page'], ['Feed', 'feed/', None]])
+            marks = links.evaluate_all("""els => els.map(el => ['::before', '::after'].map(pseudo => {
+              const style = getComputedStyle(el, pseudo);
+              return style.content === 'none' ? null : [style.width, style.backgroundColor];
+            }))""")
+            self.assertEqual(marks, [[['6px', 'rgb(250, 25, 0)'], None], [None, None]])
+            boxes = [link.bounding_box() for link in links.all()]
+            for box in boxes:
+                self.assertGreaterEqual(box['width'], 44)
+                self.assertGreaterEqual(box['height'], 44)
+            # The labels keep their order and their hit areas do not overlap.
+            self.assertLessEqual(boxes[0]['x'] + boxes[0]['width'], boxes[1]['x'])
+            # The padded hit areas leave the switch one text line tall.
+            self.assertAlmostEqual(switch.bounding_box()['height'], links.first.evaluate(
+                'el => parseFloat(getComputedStyle(el).lineHeight)'), delta=0.5)
+            page.close()
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
