@@ -29,6 +29,8 @@
   --line-strong: var(--ink);
   --panel-paper: color-mix(in srgb, var(--paper) 70%, transparent);
   --frame-bg: #d9d9d5;
+  --ink-muted: #6b6b68;
+  --rule-muted: #a8a8a4;
   --panel-line: color-mix(in srgb, var(--panel-fg, var(--paper)) 25%, transparent);
 
   --body: "GT America", Helvetica, Arial, sans-serif;
@@ -319,6 +321,138 @@ a { color: inherit; }
 @media (hover: hover) and (pointer: fine) {
   .archive__header a:hover { color: var(--accent); }
 }
+
+/* ---- Featured (manual pager above the Work list) ---- */
+
+/* The label, the list and the pager share one grid cell: the label sits top left
+   beside each item's type, the pager bottom right beside each item's CTA. */
+.featured {
+  display: grid;
+  padding: var(--gap) var(--gap) 12px;
+  container-type: inline-size;
+}
+.featured > * { grid-area: 1 / 1; }
+
+/* Same size as the section heads below it, which the label and the type mirror */
+.featured__label,
+.featured__type { font-size: var(--text-small); }
+.featured__label { justify-self: start; align-self: start; }
+
+.featured__list { display: grid; list-style: none; }
+
+/* Every item fills the same cell, so the tallest one sets the height and a swap
+   never moves the page. The headline row takes the slack, which keeps the media
+   band and the CTA in one place from item to item. */
+.featured__item {
+  grid-area: 1 / 1;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  justify-items: start;
+  min-width: 0;
+}
+
+/* Without the script only the first item shows, and the pager stays hidden. */
+.featured__item:not(:first-child) { display: none; }
+.featured.is-enhanced .featured__item { display: grid; visibility: hidden; opacity: 0; }
+.featured.is-enhanced .featured__item.is-current {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.18s ease-out;
+}
+
+.featured__type { justify-self: end; margin-bottom: 12px; color: var(--ink-muted); }
+
+/* Sentence case, as drawn: the headline is a description, not a name. */
+.featured__headline {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(1.25rem, 5.6vw, 1.875rem);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  max-inline-size: 20.67em; /* 620px at 30px */
+  text-wrap: balance;
+  margin-bottom: 18px;
+}
+
+/* The slot owns the size, so a <video> can replace the <img> with no new rules. */
+.featured__media {
+  justify-self: stretch;
+  height: clamp(176px, 52vw, 244px);
+  border: 1px solid var(--line);
+  background: var(--frame-bg);
+  overflow: hidden;
+}
+.featured__media :is(img, video) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.featured__cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 14px;
+  padding: 9px 14px;
+  border: 1px solid var(--ink);
+  text-decoration: none;
+}
+/* Extends the 36px button to a 44px touch target */
+.featured__cta::after { content: ""; position: absolute; inset: -5px -1px; }
+.featured__cta .accent { color: var(--accent); }
+
+.featured__cta:focus-visible {
+  background: var(--ink);
+  color: var(--paper);
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.featured__cta:focus-visible .accent { color: var(--paper); }
+
+/* Centered on the CTA: the 44px button overhangs the 36px CTA by 4px each way */
+.featured__pager {
+  justify-self: end;
+  align-self: end;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: -4px;
+}
+.featured__pager[hidden] { display: none; }
+
+.featured__count { color: var(--ink-muted); }
+.featured__rule { flex: none; width: 24px; height: 1px; background: var(--rule-muted); }
+
+.featured__next {
+  padding: 14px 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+.featured__next:focus-visible { color: var(--accent); outline: 2px solid var(--accent); outline-offset: 2px; }
+
+@media (hover: hover) and (pointer: fine) {
+  .featured__cta { transition: background-color 0.15s cubic-bezier(0.23, 1, 0.32, 1), color 0.15s cubic-bezier(0.23, 1, 0.32, 1); }
+  .featured__cta:hover { background: var(--ink); color: var(--paper); }
+  .featured__cta:hover .accent { color: var(--paper); }
+  .featured__next:hover { color: var(--accent); }
+}
+
+/* Too narrow for the CTA and the pager on one line: the pager takes its own row. */
+@container (max-width: 520px) {
+  .featured.is-enhanced .featured__item { padding-bottom: 32px; }
+  .featured__pager { justify-self: start; margin-bottom: -14px; }
+}
+
+/* The Work head follows Featured directly, so it drops the section gap. */
+.featured + section > .section-head { margin-top: 10px; }
 
 /* ---- Index rows ---- */
 
@@ -626,8 +760,12 @@ a { color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .js-active .reveal,
   .js-active .reveal.is-in { opacity: 1; transform: none; transition: none; }
+  .featured.is-enhanced .featured__item.is-current { transition: none; }
   .index__row, .sites__row {
     transition: color 0.05s ease-out;
+  }
+  .featured__cta {
+    transition: background-color 0.05s ease-out, color 0.05s ease-out;
   }
   .index__row::before, .sites__row::before {
     transition: opacity 0.05s ease-out;
@@ -675,6 +813,8 @@ a { color: inherit; }
 
   .section-head, .contact { margin-top: 0; }
   .section-head { margin-top: 64px; }
+  .featured { padding-top: 20px; }
+  .featured + section > .section-head { margin-top: 28px; }
   .contact { padding-top: 64px; }
 
   /* No year column at this width: three columns of the desktop ledger don't

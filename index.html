@@ -74,6 +74,48 @@
         </nav>
       </header>
 
+      <!-- Featured has no id on purpose: the section nav tracks main.archive > section[id],
+           and Featured has no nav link. Every item is in the markup; the first one works
+           without JavaScript. To add an item, copy an <li>: data-name is the short name the
+           pager shows, the year after the type is optional, and media takes an <img> or a <video>. -->
+      <section class="featured" aria-labelledby="featured-title">
+        <h2 id="featured-title" class="featured__label micro">Featured</h2>
+        <ol class="featured__list">
+          <li class="featured__item" data-name="Expert Insights">
+            <p class="featured__type micro">Case study · 2025</p>
+            <h3 class="featured__headline">AI-powered dashboard for soccer scouts</h3>
+            <div class="featured__media">
+              <picture>
+                <source srcset="assets/expert-insights-01-850.avif 850w, assets/expert-insights-01-1250.avif 1250w, assets/expert-insights-01-1700.avif 1700w" sizes="(max-width: 768px) calc(100vw - 48px), calc(56vw - 48px)" type="image/avif">
+                <img src="assets/expert-insights-01.png" alt="Scout insights dashboard: discussion totals, auto-generated highlights, and a roster sentiment table" width="2880" height="2048" fetchpriority="high">
+              </picture>
+            </div>
+            <a class="featured__cta micro" href="work/expert-insights.html"><span>View case study<span class="visually-hidden">: Expert Insights</span></span> <span class="accent" aria-hidden="true">↗</span></a>
+          </li>
+          <li class="featured__item" data-name="Atomic Tools">
+            <p class="featured__type micro">Tools</p>
+            <h3 class="featured__headline">Small browser tools for words and text</h3>
+            <div class="featured__media">
+              <img src="assets/placeholder-atomic-tools.svg" alt="" width="1516" height="488" loading="lazy">
+            </div>
+            <a class="featured__cta micro" href="https://tools.spidleweb.net"><span>Use the tools<span class="visually-hidden">: Atomic Tools</span></span> <span class="accent" aria-hidden="true">↗</span></a>
+          </li>
+          <li class="featured__item" data-name="Two by Four">
+            <p class="featured__type micro">Game</p>
+            <h3 class="featured__headline">A word-grouping puzzle with 968 tiles</h3>
+            <div class="featured__media">
+              <img src="assets/placeholder-two-by-four.svg" alt="" width="1516" height="488" loading="lazy">
+            </div>
+            <a class="featured__cta micro" href="https://twobyfour.spidleweb.net"><span>Play the game<span class="visually-hidden">: Two by Four</span></span> <span class="accent" aria-hidden="true">↗</span></a>
+          </li>
+        </ol>
+        <div class="featured__pager micro" hidden>
+          <span class="featured__count" aria-live="polite" aria-atomic="true"><span class="featured__position">01 / 03</span><span class="featured__current-name visually-hidden">, Expert Insights</span></span>
+          <span class="featured__rule" aria-hidden="true"></span>
+          <button class="featured__next" type="button">Next: <span class="featured__next-name">Atomic Tools</span> <span aria-hidden="true">→</span></button>
+        </div>
+      </section>
+
       <section id="work" aria-labelledby="work-title">
         <h2 id="work-title" class="section-head micro">
           <span>Work</span>
