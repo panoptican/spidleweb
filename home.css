@@ -83,32 +83,37 @@
 
 /* ---- Featured (manual pager above the Work list) ---- */
 
-/* The label, the list and the pager share one grid cell: the label sits top left
-   beside each item's type, the pager bottom right beside each item's CTA. */
+/* The section is the query container and its grid sits one level down, since a
+   container query cannot restyle the container itself. */
 .featured {
-  display: grid;
-  padding: var(--gap) var(--gap) 12px;
+  padding: var(--gap) var(--gap) 8px;
   container-type: inline-size;
 }
-.featured > * { grid-area: 1 / 1; }
 
-/* Same size as the section heads below it, which the label and the type mirror */
-.featured__label,
-.featured__type { font-size: var(--text-small); }
-.featured__label { justify-self: start; align-self: start; }
-
-.featured__list { display: grid; list-style: none; }
-
-/* Every item fills the same cell, so the tallest one sets the height and a swap
-   never moves the page. The headline row takes the slack, which keeps the media
-   band and the CTA in one place from item to item. */
-.featured__item {
-  grid-area: 1 / 1;
+/* Four named rows. The label sits beside each item's type, and the pager beside
+   each item's CTA, in real tracks: nothing is overlaid or offset into place. */
+.featured__grid {
   display: grid;
-  grid-template-rows: auto 1fr auto auto;
-  justify-items: start;
-  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "label type"
+    "head  head"
+    "media media"
+    "cta   pager";
 }
+
+/* The list and every item are subgrids spanning the whole section, so each
+   item's parts land in the shared rows. Every item contributes to the row
+   sizes, so the tallest sets each row and a swap never moves anything. */
+.featured__list,
+.featured__item {
+  grid-area: 1 / 1 / -1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-template-rows: subgrid;
+}
+.featured__list { list-style: none; }
+.featured__item { min-width: 0; }
 
 /* Without the script only the first item shows, and the pager stays hidden. */
 .featured__item:not(:first-child) { display: none; }
@@ -119,10 +124,16 @@
   transition: opacity 0.18s ease-out;
 }
 
-.featured__type { justify-self: end; margin-bottom: 12px; color: var(--ink-muted); }
+/* Same size as the section heads below it, which the label and the type mirror */
+.featured__label,
+.featured__type { font-size: var(--text-small); margin-bottom: 12px; }
+.featured__label { grid-area: label; align-self: start; }
+.featured__type { grid-area: type; justify-self: end; color: var(--ink-muted); }
 
 /* Sentence case, as drawn: the headline is a description, not a name. */
 .featured__headline {
+  grid-area: head;
+  justify-self: start;
   font-family: var(--display);
   font-weight: 400;
   font-size: clamp(1.25rem, 5.6vw, 1.875rem);
@@ -135,7 +146,7 @@
 
 /* The slot owns the size, so a <video> can replace the <img> with no new rules. */
 .featured__media {
-  justify-self: stretch;
+  grid-area: media;
   height: clamp(176px, 52vw, 244px);
   border: 1px solid var(--line);
   background: var(--frame-bg);
@@ -149,12 +160,18 @@
   object-position: top;
 }
 
+/* The footer row is as tall as the 44px Next button. The CTA's margins centre
+   its 36px box on it, so the CTA sits 14px under the media and 12px above the
+   section's end. */
 .featured__cta {
+  grid-area: cta;
+  justify-self: start;
+  align-self: center;
   position: relative;
   display: inline-flex;
   align-items: center;
   gap: 18px;
-  margin-top: 14px;
+  margin: 14px 0 4px;
   padding: 9px 14px;
   border: 1px solid var(--ink);
   text-decoration: none;
@@ -171,14 +188,16 @@
 }
 .featured__cta:focus-visible .accent { color: var(--paper); }
 
-/* Centered on the CTA: the 44px button overhangs the 36px CTA by 4px each way */
 .featured__pager {
+  grid-area: pager;
   justify-self: end;
-  align-self: end;
+  align-self: center;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 16px;
-  margin-bottom: -4px;
+  column-gap: 16px;
+  margin-top: 10px;
+  min-width: 0;
 }
 .featured__pager[hidden] { display: none; }
 
@@ -193,6 +212,7 @@
   font: inherit;
   letter-spacing: inherit;
   text-transform: inherit;
+  text-align: start;
   cursor: pointer;
 }
 .featured__next:focus-visible { color: var(--accent); outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -204,10 +224,20 @@
   .featured__next:hover { color: var(--accent); }
 }
 
-/* Too narrow for the CTA and the pager on one line: the pager takes its own row. */
-@container (max-width: 520px) {
-  .featured.is-enhanced .featured__item { padding-bottom: 32px; }
-  .featured__pager { justify-self: start; margin-bottom: -14px; }
+/* Too narrow for the CTA and the pager side by side: the pager gets a real fifth
+   row, sized by its own content. The threshold is in em, so it follows the text
+   size the row has to fit. 32.5em is 520px at the default root size. */
+@container (max-width: 32.5em) {
+  .featured__grid {
+    grid-template-areas:
+      "label type"
+      "head  head"
+      "media media"
+      "cta   cta"
+      "pager pager";
+  }
+  /* 4px plus the CTA's 4px margin clears its 5px touch extension */
+  .featured__pager { justify-self: start; margin-top: 4px; }
 }
 
 /* The Work head follows Featured directly, so it drops the section gap. */

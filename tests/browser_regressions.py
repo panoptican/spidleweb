@@ -714,6 +714,38 @@ class BrowserRegressions(unittest.TestCase):
         self.assertNotEqual(page.locator('.featured__item.is-current').evaluate(
             'el => getComputedStyle(el).transitionDuration'), '0s')
 
+    def test_featured_controls_never_overlap_with_enlarged_text_or_long_names(self):
+        # Review finding: a simulated second row let Next overlap the CTA once the text grew.
+        for width, height in [(320, 900), (390, 844), (834, 1112), (1440, 900)]:
+            page = self.open(self.context(viewport={'width': width, 'height': height}, reduced_motion='reduce'))
+            page.add_style_tag(content='html { font-size: 20px; }')
+            for step in range(len(self.FEATURED)):
+                page.locator('.featured__next-name').evaluate("el => { el.textContent = 'A considerably longer short name'; }")
+                # On phones the footer starts below the fold; the click must land inside the viewport.
+                page.locator('.featured__next').scroll_into_view_if_needed()
+                self.settle(page)
+                boxes = page.evaluate("""() => {
+                  const rect = el => { const b = el.getBoundingClientRect(); return {top: b.top, bottom: b.bottom, left: b.left, right: b.right}; };
+                  const cta = rect(document.querySelector('.featured__item.is-current .featured__cta'));
+                  const target = {top: cta.top - 5, bottom: cta.bottom + 5, left: cta.left - 1, right: cta.right + 1};
+                  const next = rect(document.querySelector('.featured__next'));
+                  const overlap = Math.min(target.right, next.right) > Math.max(target.left, next.left) &&
+                    Math.min(target.bottom, next.bottom) > Math.max(target.top, next.top);
+                  return {overlap, next, wrapped: next.bottom - next.top > 50, scrollWidth: document.documentElement.scrollWidth};
+                }""")
+                with self.subTest(viewport=(width, height), step=step):
+                    self.assertFalse(boxes['overlap'], boxes)
+                    self.assertLessEqual(boxes['scrollWidth'], width)
+                    if width == 320:
+                        self.assertTrue(boxes['wrapped'], boxes)
+                    # The corner of Next nearest the CTA must advance the pager, not follow the link.
+                    next_box = boxes['next']
+                    page.mouse.click(next_box['left'] + 2, next_box['top'] + 2)
+                    self.settle(page)
+                    self.assertEqual(page.url, f'{ORIGIN}/index.html')
+                    self.assertEqual(self.featured_state(page)['shown'], [self.FEATURED[(step + 1) % 3][0]])
+            page.close()
+
     def test_work_list_still_lists_all_six_projects(self):
         page = self.open(self.context(reduced_motion='reduce'))
         self.assertEqual(page.locator('.index__row').evaluate_all('els => els.map(el => el.getAttribute("href"))'),
