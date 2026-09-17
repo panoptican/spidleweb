@@ -560,6 +560,18 @@ class BrowserRegressions(unittest.TestCase):
             self.assertEqual(image.get_attribute('width'), '2880')
             self.assertEqual(image.get_attribute('height'), '2048')
 
+    # ---- Homepage variant E: Featured, mode switch, feed door ----
+
+    def test_work_list_still_lists_all_six_projects(self):
+        page = self.open(self.context(reduced_motion='reduce'))
+        self.assertEqual(page.locator('.index__row').evaluate_all('els => els.map(el => el.getAttribute("href"))'),
+                         [f'work/{slug}.html' for slug in ['expert-insights', 'campaign-sim', 'everag', 'vidscrip', 'conservis', 'plinth']])
+        self.assertEqual(page.locator('.archive__nav a').first.inner_text(), 'WORK')
+        self.assertEqual(page.locator('#work-title span').first.inner_text(), 'WORK')
+        # Featured has no nav link, so it stays out of the scroll-spy's sections.
+        self.assertEqual(page.locator('.archive__nav .is-active').get_attribute('href'), '#work')
+        thumb = page.locator('.index__thumb').first.bounding_box()
+        self.assertEqual((thumb['width'], thumb['height']), (72, 45))
 
 
 if __name__ == '__main__':

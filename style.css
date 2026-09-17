@@ -200,10 +200,11 @@ a { color: inherit; }
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-columns: 5rem 1fr 4rem;
+  grid-template-columns: 4.5rem 1fr 4.5rem;
   gap: 16px;
   align-items: center;
-  padding: 20px 0;
+  min-height: 64px;
+  padding: 8px 0;
   border-bottom: 1px solid var(--line-strong);
   text-decoration: none;
 }
@@ -245,7 +246,7 @@ a { color: inherit; }
 
 .index__thumb {
   display: block;
-  width: 5rem;
+  width: 4.5rem;
   aspect-ratio: 16 / 10;
   overflow: hidden;
   border: 1px solid var(--line-strong);
@@ -272,14 +273,14 @@ a { color: inherit; }
 .index__main {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   min-width: 0;
 }
 
 .index__title {
   font-family: var(--display);
   font-weight: 400;
-  font-size: var(--text-title);
+  font-size: clamp(1.35rem, 1.736vw, 1.75rem); /* 25px at 1440 */
   line-height: 1;
   letter-spacing: -0.01em;
   text-transform: uppercase;
@@ -288,7 +289,7 @@ a { color: inherit; }
 
 .index__kind { font-size: var(--text-small); opacity: 0.75; }
 /* nowrap: a range like 2022-24 is one token, never split at the en dash */
-.index__year { font-family: var(--mono); font-size: var(--text-small); text-align: right; align-self: baseline; padding-top: 4px; white-space: nowrap; }
+.index__year { font-family: var(--mono); font-size: var(--text-small); text-align: right; white-space: nowrap; }
 
 /* ---- Section headers within the archive ---- */
 
@@ -552,6 +553,8 @@ a { color: inherit; }
       "thumb kind  year";
     column-gap: 12px;
     row-gap: 4px;
+    min-height: 0;
+    padding: 20px 0;
   }
   .index__main { display: contents; }
   .index__thumb {
