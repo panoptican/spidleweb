@@ -670,7 +670,7 @@ class BrowserRegressions(unittest.TestCase):
         self.assertEqual(external, ['tools.spidleweb.net', 'twobyfour.spidleweb.net'])
         # No year is shown unless one is known.
         self.assertEqual([text.strip() for text in page.locator('.featured__type').all_text_contents()],
-                         ['Case study · 2025', 'Tools', 'Game'])
+                         ['Case study · 2025', 'Tools · 2025–26', 'Game'])
 
     def test_featured_images_decode_from_the_checkout(self):
         for strip_avif in (False, True):
