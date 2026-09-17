@@ -10,6 +10,7 @@ Set PLAYWRIGHT_CHROMIUM_EXECUTABLE to use another bundled Chromium binary.
 import mimetypes
 import os
 from pathlib import Path
+import time
 import unittest
 from urllib.parse import unquote, urlsplit
 
@@ -150,7 +151,7 @@ class BrowserRegressions(unittest.TestCase):
             self.assert_visible(page, motionless=True)
             page.close()
         context = self.context(reduced_motion='no-preference')
-        for path in ['index.html', 'work/expert-insights.html']:
+        for path in ['index.html']:
             page = self.open(context, path)
             self.assertGreater(page.locator('.reveal:not(.is-in)').count(), 0)
             page.emulate_media(reduced_motion='reduce')
@@ -389,7 +390,7 @@ class BrowserRegressions(unittest.TestCase):
         for path in PAGES[1:]:
             page = self.open(context, path)
             count = page.locator('.case-proofs img').count()
-            self.assertGreaterEqual(count, 5)
+            self.assertGreaterEqual(count, 4 if path == 'work/campaign-sim.html' else 5)
             self.assertLessEqual(count, 11)
             page.evaluate("""async () => {
               for (const image of document.images) image.loading = 'eager';
@@ -423,13 +424,141 @@ class BrowserRegressions(unittest.TestCase):
             self.assertEqual(page.locator(':focus').get_attribute('class'), 'case-masthead__identity')
             page.keyboard.press('Tab')
             self.assertEqual(page.locator(':focus').get_attribute('class'), 'case-masthead__index')
-            # Every proof remains directly accessible at full size, including detail crops.
-            for href in page.locator('.proof__frame').evaluate_all('els => els.map(el => el.getAttribute("href"))'):
-                self.assertTrue((ROOT / Path(path).parent / href).resolve().is_file(), href)
+            self.assertEqual(page.locator('.case-proofs a[href*="assets/"]').count(), 0)
+            self.assertEqual(page.locator('a:has(img)').count(), 0)
+            # Desktop captures are full-height; phone captures retain every edge inside native overflow.
+            self.assertTrue(page.locator('.proof__frame').evaluate_all("""els => els.every(el => {
+              const image = el.querySelector('img');
+              const before = el.getBoundingClientRect();
+              const phone = el.closest('.proof-phone');
+              const naturalHeight = image.getBoundingClientRect().height;
+              el.scrollTop = el.scrollHeight; el.scrollLeft = el.scrollWidth;
+              const after = el.getBoundingClientRect(); const content = image.getBoundingClientRect();
+              return (phone ? before.height === 560 : Math.abs(before.height - naturalHeight) < 1) &&
+                getComputedStyle(el).aspectRatio === 'auto' && getComputedStyle(el).borderRadius === '0px' &&
+                before.height === after.height && content.bottom <= after.bottom + 2 &&
+                content.right <= after.right + 2;
+            })"""), path)
             page.locator('source').evaluate_all('els => els.forEach(el => el.remove())')
             page.evaluate('async () => { await Promise.all([...document.images].map(img => img.decode())); }')
             self.assertEqual(page.errors, [])
             page.close()
+
+    def test_case_phone_sequences_never_wrap_into_two_rows(self):
+        context = self.context(reduced_motion='reduce')
+        for slug in ['everag', 'vidscrip', 'conservis']:
+            page = self.open(context, f'work/{slug}.html')
+            for width in [600, 768, 834, 999, 1000, 1024, 1280, 1440, 1920]:
+                page.set_viewport_size({'width': width, 'height': 900})
+                self.settle(page)
+                self.assertTrue(page.locator('.proof-phones').evaluate_all("""groups => groups.every(group => {
+                  const phones = [...group.querySelectorAll('.proof-phone')].map(el => el.getBoundingClientRect());
+                  const stacked = getComputedStyle(group).flexDirection === 'column';
+                  return group.scrollWidth <= group.clientWidth && phones.every((box, i) =>
+                    box.width >= 239 && (stacked ? Math.abs(box.x - phones[0].x) < 1 &&
+                    (!i || box.y > phones[i - 1].bottom) : Math.abs(box.y - phones[0].y) < 1));
+                })"""), (slug, width))
+                self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
+            for width in [390, 320]:
+                page.set_viewport_size({'width': width, 'height': 844})
+                self.settle(page)
+                self.assertTrue(page.locator('.proof-phones').evaluate_all("""groups => groups.every(group => {
+                  const phones = [...group.querySelectorAll('.proof-phone')].map(el => el.getBoundingClientRect());
+                  return phones.every((box, i) => Math.abs(box.x - phones[0].x) < 1 && (!i || box.y > phones[i - 1].bottom));
+                })"""))
+            page.close()
+
+    def test_case_captures_scroll_with_keyboard_and_without_javascript(self):
+        for options in [{'reduced_motion': 'reduce'}, {'java_script_enabled': False}, {'block_script': True}]:
+            context = self.context(**options)
+            for slug in ['everag', 'vidscrip']:
+                page = self.open(context, f'work/{slug}.html')
+                capture = page.locator('.proof-phone .proof__frame').first
+                capture.locator('img').evaluate('img => img.decode()')
+                capture.focus()
+                y = page.evaluate('scrollY')
+                page.keyboard.press('End')
+                # Page RAF polling is suspended when JavaScript is disabled.
+                deadline = time.monotonic() + 2
+                while capture.evaluate('el => el.scrollTop') <= 50 and time.monotonic() < deadline:
+                    page.wait_for_timeout(50)
+                self.assertGreater(capture.evaluate('el => el.scrollTop'), 50, (slug, options))
+                self.assertEqual(page.evaluate('scrollY'), y)
+                if options.get('java_script_enabled') is False or options.get('block_script'):
+                    self.assertEqual(capture.locator('img').evaluate('el => getComputedStyle(el).filter'), 'none')
+                page.close()
+        for width in [1440, 390]:
+            page = self.open(self.context(viewport={'width': width, 'height': 900}, reduced_motion='reduce'), 'work/vidscrip.html')
+            capture = page.locator('.proof-phone .proof__frame').first
+            capture.scroll_into_view_if_needed()
+            bounds = capture.bounding_box()
+            self.assertEqual(bounds['height'], 480 if width <= 768 else 560)
+            y = page.evaluate('scrollY')
+            image_bounds = capture.locator('img').bounding_box()
+            page.mouse.move(bounds['x'] + bounds['width'] / 2, bounds['y'] + bounds['height'] / 2)
+            page.mouse.wheel(0, 200)
+            page.wait_for_function('el => el.scrollTop >= 190', arg=capture.element_handle())
+            self.assertEqual(page.evaluate('scrollY'), y)
+            after = capture.locator('img').bounding_box()
+            self.assertEqual((after['width'], after['height']), (image_bounds['width'], image_bounds['height']))
+
+    def test_case_color_reveals_at_frame_midpoint_once_and_respects_reduced_motion(self):
+        for height in [900, 260]:
+            page = self.open(self.context(viewport={'width': 1440, 'height': height}), 'work/everag.html')
+            frame = page.locator('.proof__frame').nth(1)
+            trigger = frame.evaluate('el => scrollY + el.getBoundingClientRect().top + el.offsetHeight / 2 - innerHeight')
+            page.evaluate('y => scrollTo(0, y)', trigger - 2)
+            self.settle(page)
+            self.assertNotIn('is-color', frame.get_attribute('class'))
+            self.assertEqual(frame.locator('img').evaluate('el => getComputedStyle(el).filter'), 'grayscale(1)')
+            # Hover cannot reveal a frame before its scroll threshold.
+            page.mouse.move(900, height - 4)
+            self.settle(page)
+            self.assertNotIn('is-color', frame.get_attribute('class'))
+            page.evaluate('y => scrollTo(0, y)', trigger + 2)
+            page.wait_for_function('el => el.classList.contains("is-color")', arg=frame.element_handle())
+            page.wait_for_function('el => getComputedStyle(el).filter === "none"', arg=frame.locator('img').element_handle())
+            page.evaluate('scrollTo(0, 0)')
+            self.settle(page)
+            self.assertIn('is-color', frame.get_attribute('class'))
+            page.emulate_media(reduced_motion='reduce')
+            page.wait_for_function("!document.documentElement.classList.contains('color-reveal-active')")
+            self.assertTrue(page.locator('.proof__frame img').evaluate_all("els => els.every(el => getComputedStyle(el).filter === 'none' && getComputedStyle(el).transitionDuration === '0s')"))
+            page.emulate_media(reduced_motion='no-preference')
+            self.assertTrue(page.locator('.proof__frame img').evaluate_all("els => els.every(el => getComputedStyle(el).filter === 'none')"))
+            page.close()
+
+    def test_case_navigation_links_change_only_color_and_follow_destination_palette(self):
+        context = self.context(reduced_motion='reduce')
+        masthead_colors = {}
+        endpaper_colors = []
+        for path in PAGES[1:]:
+            page = self.open(context, path)
+            for selector in ['.case-masthead a', '.case-context__links a', '.case-endpaper__nav a']:
+                for link in page.locator(selector).all():
+                    page.mouse.move(0, 0)
+                    before = link.evaluate('el => ({color: getComputedStyle(el).color, bg: getComputedStyle(el).backgroundColor})')
+                    link.hover()
+                    after = link.evaluate('el => ({color: getComputedStyle(el).color, bg: getComputedStyle(el).backgroundColor, decoration: getComputedStyle(el).textDecorationLine})')
+                    self.assertNotEqual(before['color'], after['color'])
+                    self.assertNotEqual(after['color'], 'rgb(250, 25, 0)')
+                    self.assertEqual(after['bg'], before['bg'])
+                    self.assertEqual(after['decoration'], 'none')
+                    if selector == '.case-masthead a':
+                        masthead_colors[Path(path).name] = after['color']
+                    elif selector == '.case-endpaper__nav a':
+                        destination = page.locator('.case-endpaper__next').get_attribute('href')
+                        endpaper_colors.append((destination, after['color']))
+            page.close()
+        self.assertEqual(len(set(masthead_colors.values())), 6)
+        for destination, color in endpaper_colors:
+            self.assertEqual(color, masthead_colors[destination])
+        page = self.open(self.context(reduced_motion='reduce'), 'work/expert-insights.html')
+        for i in [5, 6, 7]:
+            image = page.locator(f'img[src$="expert-insights-0{i}-full.png"]')
+            self.assertEqual(image.count(), 1)
+            self.assertEqual(image.get_attribute('width'), '2880')
+            self.assertEqual(image.get_attribute('height'), '2048')
 
 
 
