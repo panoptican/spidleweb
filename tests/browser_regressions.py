@@ -562,6 +562,8 @@ class BrowserRegressions(unittest.TestCase):
 
     # ---- Homepage variant E: Featured, mode switch, feed door ----
 
+    VIEWPORTS = [(1440, 900), (834, 1112), (390, 844), (320, 844), (1440, 400)]
+
     def test_work_list_still_lists_all_six_projects(self):
         page = self.open(self.context(reduced_motion='reduce'))
         self.assertEqual(page.locator('.index__row').evaluate_all('els => els.map(el => el.getAttribute("href"))'),
@@ -596,6 +598,50 @@ class BrowserRegressions(unittest.TestCase):
             # The padded hit areas leave the switch one text line tall.
             self.assertAlmostEqual(switch.bounding_box()['height'], links.first.evaluate(
                 'el => parseFloat(getComputedStyle(el).lineHeight)'), delta=0.5)
+            page.close()
+
+    def test_feed_door_is_one_decorated_link_that_clears_the_seam(self):
+        for width, height in self.VIEWPORTS:
+            page = self.open(self.context(viewport={'width': width, 'height': height}, reduced_motion='reduce'))
+            door = page.locator('a.feed-door')
+            self.assertEqual(door.count(), 1)
+            # The href is asserted, not followed: feed/ arrives with the Feed page.
+            self.assertEqual(door.get_attribute('href'), 'feed/')
+            self.assertEqual(page.locator('a[href="feed/"]').count(), 2)
+            self.assertIn('FEED', door.inner_text())
+            self.assertEqual(door.locator('img').evaluate_all('els => els.map(el => el.getAttribute("alt"))'), [''] * 5)
+            page.locator('.panel').evaluate('el => { el.scrollTop = el.scrollHeight; }')
+            clearance = page.evaluate("""() => {
+              const panel = document.querySelector('.panel').getBoundingClientRect();
+              const door = document.querySelector('.feed-door').getBoundingClientRect();
+              const about = document.querySelector('.panel__about').getBoundingClientRect();
+              const right = door.right - panel.left, bottom = door.bottom - panel.top;
+              // Desktop seam: (100%, 4%) to (93.5%, 100%). Phone seam: (0, 100%) to (100%, 93%).
+              const split = getComputedStyle(document.querySelector('.panel')).position === 'sticky';
+              const seamX = panel.width * (1 - 0.065 * (bottom - 0.04 * panel.height) / (0.96 * panel.height));
+              const seamY = panel.height * (1 - 0.07 * right / panel.width);
+              return {gap: split ? seamX - right : seamY - bottom, inside: door.left >= panel.left && door.bottom <= panel.bottom,
+                bottoms: Math.abs(door.bottom - about.bottom), beside: door.left >= about.right, split};
+            }""")
+            with self.subTest(viewport=(width, height)):
+                self.assertGreaterEqual(clearance['gap'], 16, clearance)
+                self.assertTrue(clearance['inside'], clearance)
+                thumbs = door.locator('.feed-door__thumbs')
+                if (width, height) == (1440, 900):
+                    self.assertLess(clearance['bottoms'], 1, clearance)
+                    self.assertTrue(clearance['beside'], clearance)
+                    box = thumbs.bounding_box()
+                    self.assertEqual((box['width'], box['height']), (188, 76))
+                    sizes = thumbs.locator('img').evaluate_all('els => els.map(el => [el.offsetWidth, el.offsetHeight])')
+                    self.assertEqual(sizes, [[60, 76], [60, 34], [60, 38], [60, 48], [60, 24]])
+                    self.assertTrue(thumbs.locator('img').evaluate_all("""async images => {
+                      images.forEach(image => { image.loading = 'eager'; });
+                      await Promise.all(images.map(image => image.decode()));
+                      return images.every(image => image.naturalWidth > 0);
+                    }"""))
+                # The thumbnails fold away on phones and short panels; the link itself never does.
+                self.assertEqual(thumbs.is_visible(), width > 768 and height > 560)
+                self.assertTrue(door.is_visible())
             page.close()
 
 
