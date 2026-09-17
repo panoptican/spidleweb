@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Feed | Jason Spidle</title>
+  <meta name="description" content="A visual feed of product screens, websites, and tools by product designer Jason Spidle.">
+  <link rel="canonical" href="https://spidleweb.net/feed/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Feed | Jason Spidle">
+  <meta property="og:description" content="A visual feed of product screens, websites, and tools by product designer Jason Spidle.">
+  <meta property="og:url" content="https://spidleweb.net/feed/">
+  <meta property="og:image" content="https://spidleweb.net/assets/og/index.png">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="../fonts/GT-America-Standard-Medium.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/GT-America-Expanded-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../style.css">
+  <script defer src="feed.js"></script>
+  <script defer src="https://analytics.spidleweb.net/script.js" data-website-id="49720a36-6280-4d69-9531-c1d0c36b8f11"></script>
+</head>
+<body class="feed-body">
+  <a class="skip-link" href="#feed-stream">Skip to feed</a>
+
+  <div class="feed-page" data-feed-page>
+    <header class="feed-masthead">
+      <nav class="mode-switch micro" aria-label="View">
+        <a class="mode-switch__link" href="../index.html">Portfolio</a>
+        <a class="mode-switch__link" href="./" aria-current="page">Feed</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="feed-controls" aria-labelledby="feed-title">
+        <h1 class="visually-hidden" id="feed-title">Feed</h1>
+        <div class="feed-filters" data-feed-filters hidden>
+          <details class="feed-filter" data-filter="type">
+            <summary><span>Type: <span data-filter-label>All</span></span></summary>
+            <div class="feed-filter__menu" role="group" aria-label="Filter by type">
+              <button type="button" data-filter-value="all" aria-pressed="true"><span>All types</span><span data-filter-count>9</span></button>
+              <button type="button" data-filter-value="screens" aria-pressed="false"><span>Screens</span><span data-filter-count>7</span></button>
+              <button type="button" data-filter-value="websites" aria-pressed="false"><span>Websites</span><span data-filter-count>1</span></button>
+              <button type="button" data-filter-value="tools" aria-pressed="false"><span>Tools</span><span data-filter-count>1</span></button>
+            </div>
+          </details>
+
+          <details class="feed-filter" data-filter="industry">
+            <summary><span>Industry: <span data-filter-label>All</span></span></summary>
+            <div class="feed-filter__menu" role="group" aria-label="Filter by industry">
+              <button type="button" data-filter-value="all" aria-pressed="true"><span>All industries</span><span data-filter-count>9</span></button>
+              <button type="button" data-filter-value="agriculture" aria-pressed="false"><span>Agriculture</span><span data-filter-count>4</span></button>
+              <button type="button" data-filter-value="healthcare" aria-pressed="false"><span>Healthcare</span><span data-filter-count>1</span></button>
+              <button type="button" data-filter-value="publishing" aria-pressed="false"><span>Publishing</span><span data-filter-count>1</span></button>
+              <button type="button" data-filter-value="productivity" aria-pressed="false"><span>Productivity</span><span data-filter-count>1</span></button>
+              <button type="button" data-filter-value="sports" aria-pressed="false"><span>Sports</span><span data-filter-count>2</span></button>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section class="feed-stream" id="feed-stream" aria-label="Work feed" aria-live="polite">
+        <article class="feed-card feed-card--tool" data-feed-card data-type="tools" data-industry="productivity">
+          <a class="feed-card__link" href="https://tools.spidleweb.net/rich-text-markdown/">
+            <div class="feed-card__tool-preview">
+              <span class="micro">Atomic Tools</span>
+              <span class="feed-card__tool-title">Markdown ↔ rich text</span>
+              <span class="micro">tools.spidleweb.net</span>
+            </div>
+            <div class="feed-card__title-row">
+              <h2>Markdown ↔ rich text</h2>
+              <time datetime="2025">2025–26</time>
+            </div>
+            <div class="feed-card__footer">
+              <span>Tool</span>
+              <span class="feed-card__action">Use tool <span aria-hidden="true">↗</span></span>
+            </div>
+          </a>
+        </article>
+
+        <article class="feed-card" data-feed-card data-type="screens" data-industry="agriculture">
+          <a class="feed-card__link" href="#everag-feed-overview" data-dialog-link="everag-feed-overview">
+            <div class="feed-card__media">
+              <picture>
+                <source srcset="../assets/everag-feed-overview-850.avif 850w, ../assets/everag-feed-overview-1250.avif 1250w, ../assets/everag-feed-overview-1700.avif 1700w" sizes="(max-width: 639px) calc(100vw - 40px), (max-width: 999px) calc((100vw - 88px) / 2), 432px" type="image/avif">
+                <img src="../assets/everag-feed-overview.png" width="2904" height="3244" alt="Feed overview with stacked monthly coverage charts for corn-based, soybean-meal-based, and other ingredients" loading="eager" fetchpriority="high" decoding="async">
+              </picture>
+            </div>
+            <div class="feed-card__title-row">
+              <h2>Ever.Ag · Feed overview</h2>
+              <time datetime="2022">2022–24</time>
+            </div>
+            <div class="feed-card__footer">
+              <span>Screen</span>
+              <span class="feed-card__action">Enlarge <span class="feed-card__enlarge" aria-hidden="true"></span></span>
+            </div>
+          </a>
+        </article>
+
+        <article class="feed-card" data-feed-card data-type="screens" data-industry="agriculture">
+          <a class="feed-card__link" href="#conservis-planning" data-dialog-link="conservis-planning">
+            <div class="feed-card__media">
+              <picture>
+                <source srcset="../assets/conservis-crop-plan-850.avif 850w, ../assets/conservis-crop-plan-1250.avif 1250w, ../assets/conservis-crop-plan-1700.avif 1700w" sizes="(max-width: 639px) calc(100vw - 40px), (max-width: 999px) calc((100vw - 88px) / 2), 432px" type="image/avif">
+                <img src="../assets/conservis-crop-plan.png" width="2880" height="1800" alt="Crop planning step with editable crop acreage, yield, price, and production rows" loading="lazy" decoding="async">
+              </picture>
+            </div>
+            <div class="feed-card__title-row">
+              <h2>Conservis · Planning</h2>
+              <time datetime="2016">2016–21</time>
+            </div>
+            <div class="feed-card__footer">
+              <span>Screen</span>
+              <span class="feed-card__action">Enlarge <span class="feed-card__enlarge" aria-hidden="true"></span></span>
+            </div>
+          </a>
+        </article>
+
+        <article class="feed-card" data-feed-card data-type="websites" data-industry="publishing">
+          <a class="feed-card__link" href="https://plinth.us/issue07/">
+            <div class="feed-card__media">
+              <picture>
+                <source srcset="../assets/plinth-07-850.avif 850w, ../assets/plinth-07-1250.avif 1250w, ../assets/plinth-07-1440.avif 1440w" sizes="(max-width: 639px) calc(100vw - 40px), (max-width: 999px) calc((100vw - 88px) / 2), 432px" type="image/avif">
+                <img src="../assets/plinth-07.jpg" width="1440" height="1000" alt="PLINTH issue 07 contents page with bracket rules beside a photograph of black volcanic rock lit from within by red" loading="lazy" decoding="async">
+              </picture>
+            </div>
+            <div class="feed-card__title-row">
+              <h2>PLINTH · Issue 07</h2>
+              <time datetime="2014">2014–19</time>
+            </div>
+            <div class="feed-card__footer">
+              <span>Website</span>
+              <span class="feed-card__action">Visit website <span aria-hidden="true">↗</span></span>
+            </div>
+          </a>
+        </article>
+
+        <article class="feed-card" data-feed-card data-type="screens" data-industry="sports">
+          <a class="feed-card__link" href="#campaign-sim" data-dialog-link="campaign-sim">
+            <div class="feed-card__media">
+              <picture>
+                <source srcset="../assets/campaign-sim-03-850.avif 850w, ../assets/campaign-sim-03-1250.avif 1250w, ../assets/campaign-sim-03-1700.avif 1700w" sizes="(max-width: 639px) calc(100vw - 40px), (max-width: 999px) calc((100vw - 88px) / 2), 432px" type="image/avif">
+                <img src="../assets/campaign-sim-03.png" width="2880" height="2048" alt="Channel Insights table listing every channel with expected exposure, reach, impact, and cost" loading="lazy" decoding="async">
+              </picture>
+            </div>
+            <div class="feed-card__title-row">
+              <h2>Campaign Sim</h2>
+              <time datetime="2025">2025</time>
+            </div>
+            <div class="feed-card__footer">
+              <span>Screen · 4 images</span>
+              <span class="feed-card__action">View screens <span class="feed-card__enlarge" aria-hidden="true"></span></span>
+            </div>
+          </a>
+        </article>
+
+        <article class="feed-card" data-feed-card data-type="screens" data-industry="healthcare">
+          <a class="feed-card__link" href="#vidscrip-care-journey" data-dialog-link="vidscrip-care-journey">
+            <div class="feed-card__media">
+              <picture>
+                <source srcset="../assets/vidscrip-desktop-journey-850.avif 850w, ../assets/vidscrip-desktop-journey-1250.avif 1250w, ../assets/vidscrip-desktop-journey-1700.avif 1700w" sizes="(max-width: 639px) calc(100vw - 40px), (max-width: 999px) calc((100vw - 88px) / 2), 432px" type="image/avif">
+                <img src="../assets/vidscrip-desktop-journey.png" width="2880" height="2048" alt="Vidscrip desktop journey with three procedure phases and a physician video expanded in the preparation column" loading="lazy" decoding="async">
+              </picture>
+            </div>
+            <div class="feed-card__title-row">
+              <h2>Vidscrip · Care journey</h2>
+              <time datetime="2021">2021</time>
+            </div>
+            <div class="feed-card__footer">
+              <span>Screen</span>
+              <span class="feed-card__action">Enlarge <span class="feed-card__enlarge" aria-hidden="true"></span></span>
+            </div>
+          </a>
+        </article>
+
+        <article class="feed-card" data-feed-card data-type="screens" data-industry="sports">
+          <a class="feed-card__link" href="#expert-insights" data-dialog-link="expert-insights">
+            <div class="feed-card__media">
+              <picture>
+                <source srcset="../assets/expert-insights-01-850.avif 850w, ../assets/expert-insights-01-1250.avif 1250w, ../assets/expert-insights-01-1700.avif 1700w" sizes="(max-width: 639px) calc(100vw - 40px), (max-width: 999px) calc((100vw - 88px) / 2), 432px" type="image/avif">
+                <img src="../assets/expert-insights-01.png" width="2880" height="2048" alt="Scout insights dashboard with discussion totals, generated highlights, and a roster sentiment table" loading="lazy" decoding="async">
+              </picture>
+            </div>
+            <div class="feed-card__title-row">
+              <h2>Expert Insights</h2>
+              <time datetime="2025">2025</time>
+            </div>
+            <div class="feed-card__footer">
+              <span>Screen · 4 images</span>
+              <span class="feed-card__action">View screens <span class="feed-card__enlarge" aria-hidden="true"></span></span>
+            </div>
+          </a>
+        </article>
+
+        <article class="feed-card" data-feed-card data-type="screens" data-industry="agriculture">
+          <a class="feed-card__link" href="#everag-brokerage" data-dialog-link="everag-brokerage">
+            <div class="feed-card__media feed-card__media--phone">
+              <picture>
+                <source srcset="../assets/everag-brokerage-780.avif 780w" sizes="(max-width: 639px) calc(100vw - 40px), (max-width: 999px) calc((100vw - 88px) / 2), 432px" type="image/avif">
+                <img src="../assets/everag-brokerage.png" width="780" height="1688" alt="Brokerage overview on a phone, with open positions and recent transactions" loading="lazy" decoding="async">
+              </picture>
+            </div>
+            <div class="feed-card__title-row">
+              <h2>Ever.Ag · Brokerage</h2>
+              <time datetime="2022">2022–24</time>
+            </div>
+            <div class="feed-card__footer">
+              <span>Screen</span>
+              <span class="feed-card__action">Enlarge <span class="feed-card__enlarge" aria-hidden="true"></span></span>
+            </div>
+          </a>
+        </article>
+
+        <article class="feed-card" data-feed-card data-type="screens" data-industry="agriculture">
+          <a class="feed-card__link" href="#conservis-in-the-field" data-dialog-link="conservis-in-the-field">
+            <div class="feed-card__media">
+              <picture>
+                <source srcset="../assets/conservis-field-task-850.avif 850w, ../assets/conservis-field-task-1250.avif 1250w, ../assets/conservis-field-task-1700.avif 1700w" sizes="(max-width: 639px) calc(100vw - 40px), (max-width: 999px) calc((100vw - 88px) / 2), 432px" type="image/avif">
+                <img src="../assets/conservis-field-task.png" width="2048" height="1536" alt="Tablet production task showing a field map, start task action, equipment, inputs, and work instructions" loading="lazy" decoding="async">
+              </picture>
+            </div>
+            <div class="feed-card__title-row">
+              <h2>Conservis · In the field</h2>
+              <time datetime="2016">2016–21</time>
+            </div>
+            <div class="feed-card__footer">
+              <span>Screen</span>
+              <span class="feed-card__action">Enlarge <span class="feed-card__enlarge" aria-hidden="true"></span></span>
+            </div>
+          </a>
+        </article>
+      </section>
+      <p class="feed-empty" data-feed-empty hidden>No work matches both filters.</p>
+    </main>
+
+    <aside class="feed-endpaper">
+      <a class="feed-endpaper__link" href="../index.html#work">
+        <span class="micro">More work, with context</span>
+        <span class="feed-endpaper__title">Selected work <span aria-hidden="true">↗</span></span>
+      </a>
+      <footer class="footer micro">
+        <span>© <span id="year">2026</span> Jason Spidle</span>
+        <a href="https://www.linkedin.com/in/jspidle">LinkedIn ↗</a>
+      </footer>
+    </aside>
+  </div>
+
+  <dialog class="feed-dialog" id="everag-feed-overview" aria-labelledby="everag-feed-overview-title" data-feed-dialog>
+    <div class="feed-dialog__topbar">
+      <span class="micro">Feed / Screens</span>
+      <a class="feed-dialog__close micro" href="#feed-stream" data-dialog-close><span aria-hidden="true">Esc</span> Close ×</a>
+    </div>
+    <div class="feed-dialog__viewport">
+      <figure data-dialog-slide>
+        <picture><source srcset="../assets/everag-feed-overview-850.avif 850w, ../assets/everag-feed-overview-1250.avif 1250w, ../assets/everag-feed-overview-1700.avif 1700w" type="image/avif"><img src="../assets/everag-feed-overview.png" width="2904" height="3244" alt="Feed overview with stacked monthly coverage charts for corn-based, soybean-meal-based, and other ingredients" loading="lazy" decoding="async"></picture>
+      </figure>
+    </div>
+    <div class="feed-dialog__caption"><h2 id="everag-feed-overview-title">Ever.Ag · Feed overview</h2><time datetime="2022">2022–24</time><span class="micro" data-dialog-count>01 / 01</span></div>
+  </dialog>
+
+  <dialog class="feed-dialog" id="conservis-planning" aria-labelledby="conservis-planning-title" data-feed-dialog>
+    <div class="feed-dialog__topbar"><span class="micro">Feed / Screens</span><a class="feed-dialog__close micro" href="#feed-stream" data-dialog-close><span aria-hidden="true">Esc</span> Close ×</a></div>
+    <div class="feed-dialog__viewport"><figure data-dialog-slide><picture><source srcset="../assets/conservis-crop-plan-850.avif 850w, ../assets/conservis-crop-plan-1250.avif 1250w, ../assets/conservis-crop-plan-1700.avif 1700w" type="image/avif"><img src="../assets/conservis-crop-plan.png" width="2880" height="1800" alt="Crop planning step with editable crop acreage, yield, price, and production rows" loading="lazy" decoding="async"></picture></figure></div>
+    <div class="feed-dialog__caption"><h2 id="conservis-planning-title">Conservis · Planning</h2><time datetime="2016">2016–21</time><span class="micro" data-dialog-count>01 / 01</span></div>
+  </dialog>
+
+  <dialog class="feed-dialog" id="campaign-sim" aria-labelledby="campaign-sim-title" data-feed-dialog>
+    <div class="feed-dialog__topbar"><span class="micro">Feed / Screens</span><a class="feed-dialog__close micro" href="#feed-stream" data-dialog-close><span aria-hidden="true">Esc</span> Close ×</a></div>
+    <div class="feed-dialog__viewport">
+      <button class="feed-dialog__arrow feed-dialog__arrow--previous" type="button" data-dialog-previous aria-label="Previous screen">←</button>
+      <figure data-dialog-slide><picture><source srcset="../assets/campaign-sim-03-850.avif 850w, ../assets/campaign-sim-03-1250.avif 1250w, ../assets/campaign-sim-03-1700.avif 1700w" type="image/avif"><img src="../assets/campaign-sim-03.png" width="2880" height="2048" alt="Channel Insights table listing every channel with expected exposure, reach, impact, and cost" loading="lazy" decoding="async"></picture></figure>
+      <figure data-dialog-slide hidden><picture><source srcset="../assets/campaign-sim-01-850.avif 850w, ../assets/campaign-sim-01-1250.avif 1250w, ../assets/campaign-sim-01-1700.avif 1700w" type="image/avif"><img src="../assets/campaign-sim-01.png" width="2880" height="2048" alt="Select Channels screen with a scout profile beside a grid of channel cards" loading="lazy" decoding="async"></picture></figure>
+      <figure data-dialog-slide hidden><picture><source srcset="../assets/campaign-sim-02-850.avif 850w, ../assets/campaign-sim-02-1250.avif 1250w, ../assets/campaign-sim-02-1700.avif 1700w" type="image/avif"><img src="../assets/campaign-sim-02.png" width="2880" height="2048" alt="Select Content screen with content types listed inside the selected channel" loading="lazy" decoding="async"></picture></figure>
+      <figure data-dialog-slide hidden><picture><source srcset="../assets/campaign-sim-04-850.avif 850w, ../assets/campaign-sim-04-1250.avif 1250w, ../assets/campaign-sim-04-1700.avif 1700w" type="image/avif"><img src="../assets/campaign-sim-04.png" width="2880" height="2048" alt="Review Campaign screen with investment tables and mix breakdowns" loading="lazy" decoding="async"></picture></figure>
+      <button class="feed-dialog__arrow feed-dialog__arrow--next" type="button" data-dialog-next aria-label="Next screen">→</button>
+    </div>
+    <div class="feed-dialog__caption"><h2 id="campaign-sim-title">Campaign Sim</h2><time datetime="2025">2025</time><span class="micro" data-dialog-count aria-live="polite">01 / 04</span></div>
+  </dialog>
+
+  <dialog class="feed-dialog" id="vidscrip-care-journey" aria-labelledby="vidscrip-care-journey-title" data-feed-dialog>
+    <div class="feed-dialog__topbar"><span class="micro">Feed / Screens</span><a class="feed-dialog__close micro" href="#feed-stream" data-dialog-close><span aria-hidden="true">Esc</span> Close ×</a></div>
+    <div class="feed-dialog__viewport"><figure data-dialog-slide><picture><source srcset="../assets/vidscrip-desktop-journey-850.avif 850w, ../assets/vidscrip-desktop-journey-1250.avif 1250w, ../assets/vidscrip-desktop-journey-1700.avif 1700w" type="image/avif"><img src="../assets/vidscrip-desktop-journey.png" width="2880" height="2048" alt="Vidscrip desktop journey with three procedure phases and a physician video expanded in the preparation column" loading="lazy" decoding="async"></picture></figure></div>
+    <div class="feed-dialog__caption"><h2 id="vidscrip-care-journey-title">Vidscrip · Care journey</h2><time datetime="2021">2021</time><span class="micro" data-dialog-count>01 / 01</span></div>
+  </dialog>
+
+  <dialog class="feed-dialog" id="expert-insights" aria-labelledby="expert-insights-title" data-feed-dialog>
+    <div class="feed-dialog__topbar"><span class="micro">Feed / Screens</span><a class="feed-dialog__close micro" href="#feed-stream" data-dialog-close><span aria-hidden="true">Esc</span> Close ×</a></div>
+    <div class="feed-dialog__viewport">
+      <button class="feed-dialog__arrow feed-dialog__arrow--previous" type="button" data-dialog-previous aria-label="Previous screen">←</button>
+      <figure data-dialog-slide><picture><source srcset="../assets/expert-insights-01-850.avif 850w, ../assets/expert-insights-01-1250.avif 1250w, ../assets/expert-insights-01-1700.avif 1700w" type="image/avif"><img src="../assets/expert-insights-01.png" width="2880" height="2048" alt="Scout insights dashboard with discussion totals, generated highlights, and a roster sentiment table" loading="lazy" decoding="async"></picture></figure>
+      <figure data-dialog-slide hidden><picture><source srcset="../assets/expert-insights-02-850.avif 850w, ../assets/expert-insights-02-1250.avif 1250w, ../assets/expert-insights-02-1700.avif 1700w" type="image/avif"><img src="../assets/expert-insights-02.png" width="2880" height="2048" alt="Search results with an insights summary, sentiment bar, and per-channel post feed" loading="lazy" decoding="async"></picture></figure>
+      <figure data-dialog-slide hidden><picture><source srcset="../assets/expert-insights-03-850.avif 850w, ../assets/expert-insights-03-1250.avif 1250w, ../assets/expert-insights-03-1700.avif 1700w" type="image/avif"><img src="../assets/expert-insights-03.png" width="2880" height="2048" alt="Social Explorer comparing three players with analysis, sentiment bars, and top scout lists" loading="lazy" decoding="async"></picture></figure>
+      <figure data-dialog-slide hidden><picture><source srcset="../assets/expert-insights-04-850.avif 850w, ../assets/expert-insights-04-1250.avif 1250w, ../assets/expert-insights-04-1700.avif 1700w" type="image/avif"><img src="../assets/expert-insights-04.png" width="2880" height="2048" alt="Dashboard with the ask panel open over the roster table, offering four suggested questions" loading="lazy" decoding="async"></picture></figure>
+      <button class="feed-dialog__arrow feed-dialog__arrow--next" type="button" data-dialog-next aria-label="Next screen">→</button>
+    </div>
+    <div class="feed-dialog__caption"><h2 id="expert-insights-title">Expert Insights</h2><time datetime="2025">2025</time><span class="micro" data-dialog-count aria-live="polite">01 / 04</span></div>
+  </dialog>
+
+  <dialog class="feed-dialog" id="everag-brokerage" aria-labelledby="everag-brokerage-title" data-feed-dialog>
+    <div class="feed-dialog__topbar"><span class="micro">Feed / Screens</span><a class="feed-dialog__close micro" href="#feed-stream" data-dialog-close><span aria-hidden="true">Esc</span> Close ×</a></div>
+    <div class="feed-dialog__viewport"><figure data-dialog-slide><picture><source srcset="../assets/everag-brokerage-780.avif 780w" type="image/avif"><img src="../assets/everag-brokerage.png" width="780" height="1688" alt="Brokerage overview on a phone, with open positions and recent transactions" loading="lazy" decoding="async"></picture></figure></div>
+    <div class="feed-dialog__caption"><h2 id="everag-brokerage-title">Ever.Ag · Brokerage</h2><time datetime="2022">2022–24</time><span class="micro" data-dialog-count>01 / 01</span></div>
+  </dialog>
+
+  <dialog class="feed-dialog" id="conservis-in-the-field" aria-labelledby="conservis-in-the-field-title" data-feed-dialog>
+    <div class="feed-dialog__topbar"><span class="micro">Feed / Screens</span><a class="feed-dialog__close micro" href="#feed-stream" data-dialog-close><span aria-hidden="true">Esc</span> Close ×</a></div>
+    <div class="feed-dialog__viewport"><figure data-dialog-slide><picture><source srcset="../assets/conservis-field-task-850.avif 850w, ../assets/conservis-field-task-1250.avif 1250w, ../assets/conservis-field-task-1700.avif 1700w" type="image/avif"><img src="../assets/conservis-field-task.png" width="2048" height="1536" alt="Tablet production task showing a field map, start task action, equipment, inputs, and work instructions" loading="lazy" decoding="async"></picture></figure></div>
+    <div class="feed-dialog__caption"><h2 id="conservis-in-the-field-title">Conservis · In the field</h2><time datetime="2016">2016–21</time><span class="micro" data-dialog-count>01 / 01</span></div>
+  </dialog>
+</body>
+</html>
