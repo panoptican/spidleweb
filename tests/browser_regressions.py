@@ -755,7 +755,7 @@ class BrowserRegressions(unittest.TestCase):
         # Featured has no nav link, so it stays out of the scroll-spy's sections.
         self.assertEqual(page.locator('.archive__nav .is-active').get_attribute('href'), '#work')
         thumb = page.locator('.index__thumb').first.bounding_box()
-        self.assertEqual((thumb['width'], thumb['height']), (72, 45))
+        self.assertEqual((thumb['width'], thumb['height']), (80, 50))
 
     def test_mode_switch_marks_the_current_view_from_the_leading_side(self):
         for width, height in [(1440, 900), (390, 844)]:
