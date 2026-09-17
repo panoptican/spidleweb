@@ -20,6 +20,7 @@
   <link rel="preload" href="fonts/GT-America-Standard-Medium.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/GT-America-Expanded-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="home.css">
   <script defer src="https://analytics.spidleweb.net/script.js" data-website-id="49720a36-6280-4d69-9531-c1d0c36b8f11"></script>
 </head>
 <body>
@@ -28,9 +29,10 @@
 
     <aside class="panel panel--home">
 
-      <div class="panel__meta micro">
-        <span>Vol. 01</span>
-      </div>
+      <nav class="mode-switch micro" aria-label="View">
+        <a class="mode-switch__link" href="index.html" aria-current="page">Portfolio</a>
+        <a class="mode-switch__link" href="feed/">Feed</a>
+      </nav>
 
       <h1 class="panel__type">
         <span>Jason</span>
@@ -39,9 +41,26 @@
       </h1>
 
       <div class="panel__footer">
-        <p class="panel__blurb">Product design for data-heavy software, from dashboards and complex workflows to the design systems that keep them coherent.</p>
-        <p class="micro">Minneapolis</p>
-        <p class="micro"><a href="mailto:jason@spidleweb.net">jason@spidleweb.net</a></p>
+        <div class="panel__about">
+          <p class="panel__blurb">Product design for data-heavy software, from dashboards and complex workflows to the design systems that keep them coherent.</p>
+          <p class="micro">Minneapolis</p>
+          <p class="micro"><a href="mailto:jason@spidleweb.net">jason@spidleweb.net</a></p>
+        </div>
+
+        <a class="feed-door" href="feed/">
+          <span class="feed-door__thumbs" aria-hidden="true">
+            <picture><source srcset="assets/conservis-03-240.avif" type="image/avif"><img src="assets/conservis-03.png" alt="" width="60" height="76" loading="lazy"></picture>
+            <picture><source srcset="assets/expert-insights-01-240.avif" type="image/avif"><img src="assets/expert-insights-01.png" alt="" width="60" height="34" loading="lazy"></picture>
+            <picture><source srcset="assets/campaign-sim-01-240.avif" type="image/avif"><img src="assets/campaign-sim-01.png" alt="" width="60" height="38" loading="lazy"></picture>
+            <picture><source srcset="assets/plinth-06-240.avif" type="image/avif"><img src="assets/plinth-06.jpg" alt="" width="60" height="48" loading="lazy"></picture>
+            <picture><source srcset="assets/everag-01-240.avif" type="image/avif"><img src="assets/everag-01.png" alt="" width="60" height="24" loading="lazy"></picture>
+          </span>
+          <span class="feed-door__label micro">Just the screens</span>
+          <span class="feed-door__title">
+            Feed
+            <svg class="feed-door__arrow" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M3 17L17 3M6 3H17V14" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+          </span>
+        </a>
       </div>
     </aside>
 
@@ -49,16 +68,60 @@
 
       <header class="archive__header micro">
         <nav class="archive__nav" aria-label="Page sections">
-          <a href="#work">Index</a>
+          <a href="#work">Work</a>
           <a href="#sites">Sites</a>
           <a href="#profile">Profile</a>
           <a href="#contact">Contact</a>
         </nav>
       </header>
 
+      <!-- Featured has no id on purpose: the section nav tracks main.archive > section[id],
+           and Featured has no nav link. Every item is in the markup; the first one works
+           without JavaScript. To add an item, copy an <li>: data-name is the short name the
+           pager shows, the year after the type is optional, and media takes an <img> or a <video>. -->
+      <section class="featured" aria-labelledby="featured-title">
+        <div class="featured__grid">
+          <h2 id="featured-title" class="featured__label micro">Featured</h2>
+          <ol class="featured__list">
+            <li class="featured__item" data-name="Expert Insights">
+              <p class="featured__type micro">Case study · 2025</p>
+              <h3 class="featured__headline">AI-powered dashboard for soccer scouts</h3>
+              <div class="featured__media">
+                <picture>
+                  <source srcset="assets/expert-insights-01-850.avif 850w, assets/expert-insights-01-1250.avif 1250w, assets/expert-insights-01-1700.avif 1700w" sizes="(max-width: 768px) calc(100vw - 48px), calc(56vw - 48px)" type="image/avif">
+                  <img src="assets/expert-insights-01.png" alt="Scout insights dashboard: discussion totals, auto-generated highlights, and a roster sentiment table" width="2880" height="2048" fetchpriority="high">
+                </picture>
+              </div>
+              <a class="featured__cta micro" href="work/expert-insights.html"><span>View case study<span class="visually-hidden">: Expert Insights</span></span> <span class="accent" aria-hidden="true">↗</span></a>
+            </li>
+            <li class="featured__item" data-name="Atomic Tools">
+              <p class="featured__type micro">Tools · <span class="nobreak">2025–26</span></p>
+              <h3 class="featured__headline">Small browser tools for words and text</h3>
+              <div class="featured__media">
+                <img src="assets/placeholder-atomic-tools.svg" alt="" width="1516" height="488" loading="lazy">
+              </div>
+              <a class="featured__cta micro" href="https://tools.spidleweb.net"><span>Use the tools<span class="visually-hidden">: Atomic Tools</span></span> <span class="accent" aria-hidden="true">↗</span></a>
+            </li>
+            <li class="featured__item" data-name="Two by Four">
+              <p class="featured__type micro">Game</p>
+              <h3 class="featured__headline">Connections, but the grid is <span class="nobreak">22 × 44</span></h3>
+              <div class="featured__media">
+                <img src="assets/placeholder-two-by-four.svg" alt="" width="1516" height="488" loading="lazy">
+              </div>
+              <a class="featured__cta micro" href="https://twobyfour.spidleweb.net"><span>Play the game<span class="visually-hidden">: Two by Four</span></span> <span class="accent" aria-hidden="true">↗</span></a>
+            </li>
+          </ol>
+          <div class="featured__pager micro" hidden>
+            <span class="featured__count" aria-live="polite" aria-atomic="true"><span class="featured__position">01 / 03</span><span class="featured__current-name visually-hidden">, Expert Insights</span></span>
+            <span class="featured__rule" aria-hidden="true"></span>
+            <button class="featured__next" type="button">Next: <span class="featured__next-name">Atomic Tools</span> <span aria-hidden="true">→</span></button>
+          </div>
+        </div>
+      </section>
+
       <section id="work" aria-labelledby="work-title">
         <h2 id="work-title" class="section-head micro">
-          <span>Selected Work</span>
+          <span>Work</span>
           <span class="section-head__col">Year</span>
         </h2>
         <ul class="index">
@@ -69,7 +132,7 @@
               </span>
               <span class="index__main">
                 <span class="index__title">Expert Insights</span>
-                <span class="index__kind">Scout dashboards</span>
+                <span class="index__kind">Scout dashboard</span>
               </span>
               <span class="index__year">2025</span>
             </a>
