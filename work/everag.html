@@ -62,6 +62,11 @@
           <h2 class="article__head">A product suite, acquired one company at a time.</h2>
           <p>Ever.Ag makes software for the agricultural supply chain, from dairy production and hauling through livestock markets and futures trading to the back-office systems that pay everyone. Much of that suite arrived through acquisition, and it looked like it. More than ten products each carried the interface of the company it used to be.</p>
           <p>In 2022 Ever.Ag brought in Foundry to make it one product family. I pitched the work, led design across the multi-year engagement that followed, and from September 2022 owned the design system hands-on. The system had to come first. There was nothing to redesign the products with until it existed.</p>
+
+          <figure class="figure">
+            <div class="figure__frame"><picture><source srcset="../assets/everag-02-850.avif 850w, ../assets/everag-02-1250.avif 1250w, ../assets/everag-02-1700.avif 1700w" sizes="(max-width: 1024px) 94vw, (max-width: 1620px) 53vw, 850px" type="image/avif"><img src="../assets/everag-02.png" width="2880" height="2048" alt="Hauler routes screen: a list of routes with last completed date, destination, and pickup count, beside a map of southern Minnesota tracing the selected route and its stops with pickup times" loading="lazy"></picture></div>
+            <figcaption class="micro">Hauler routes: every pickup on the map, in the order it happens</figcaption>
+          </figure>
         </section>
 
         <section class="article__section reveal">
@@ -81,11 +86,6 @@
           <p>Producers got a portal that puts their production and quality numbers against the market price of milk. Haulers got routes drawn on a map with every pickup in sequence, and a field app that walks each stop in the order it physically happens, from producer and weight through seals and samples. And the co-op back office got load search with saved presets, and tables that turn thousands of deliveries into payroll.</p>
 
           <figure class="figure">
-            <div class="figure__frame"><picture><source srcset="../assets/everag-02-850.avif 850w, ../assets/everag-02-1250.avif 1250w, ../assets/everag-02-1700.avif 1700w" sizes="(max-width: 1024px) 94vw, (max-width: 1620px) 53vw, 850px" type="image/avif"><img src="../assets/everag-02.png" width="2880" height="2048" alt="Hauler routes screen: a list of routes with last completed date, destination, and pickup count, beside a map of southern Minnesota tracing the selected route and its stops with pickup times" loading="lazy"></picture></div>
-            <figcaption class="micro">Hauler routes: every pickup on the map, in the order it happens</figcaption>
-          </figure>
-
-          <figure class="figure">
             <div class="figure__frame"><picture><source srcset="../assets/everag-03-850.avif 850w, ../assets/everag-03-1250.avif 1250w, ../assets/everag-03-1700.avif 1700w" sizes="(max-width: 1024px) 94vw, (max-width: 1620px) 53vw, 850px" type="image/avif"><img src="../assets/everag-03.png" width="2880" height="2048" alt="Producer payroll home: a welcome card with product updates, a recent list of plant reconciliations, lab reports, and loads, and a saved list of the same" loading="lazy"></picture></div>
             <figcaption class="micro">Co-op back office: recent work and saved searches</figcaption>
           </figure>
@@ -93,8 +93,7 @@
 
         <section class="article__section reveal">
           <h2 class="article__head">Then the market side.</h2>
-          <p>The products we shaped most were the financial ones, risk management and commodity tools for producers who hedge feed costs and livestock sales. On the sales side, projected revenue sits beside hedge coverage month by month. On the feed side, an ingredient's usage and purchases sit beside its live futures price. Both are built from the same chart and table components as everything else in the suite.</p>
-          <p>The same foundation carried to mobile. We took a brokerage product built for big, data-dense trading screens and rethought its markets views for the phone. The new chart and table patterns fed back into the system for the next product to use.</p>
+          <p>The products we shaped most were the financial ones, risk management and commodity tools for producers who hedge feed costs and livestock sales. On the sales side, projected revenue sits beside hedge coverage month by month. On the feed side, an overview uses the same months and legend across ingredient groups, with a path into each ingredient's usage, purchases, and futures price. Both are built from the same chart and table components as everything else in the suite.</p>
 
           <figure class="figure">
             <div class="phone-frame" tabindex="0" aria-label="Scrollable capture of the full swine marketing screen">
@@ -104,22 +103,41 @@
           </figure>
 
           <figure class="figure">
+            <div class="figure__frame"><picture><source srcset="../assets/everag-feed-overview-850.avif 850w, ../assets/everag-feed-overview-1250.avif 1250w, ../assets/everag-feed-overview-1700.avif 1700w" sizes="(max-width: 1024px) 94vw, (max-width: 1620px) 53vw, 850px" type="image/avif"><img src="../assets/everag-feed-overview.png" width="2904" height="3244" alt="Feed overview with monthly coverage charts for corn-based, soybean-meal-based, and other ingredients, using a shared purchasing and hedge-status legend" loading="lazy"></picture></div>
+            <figcaption class="micro">Feed coverage: the same months and legend across ingredient groups</figcaption>
+          </figure>
+
+          <figure class="figure">
             <div class="figure__frame"><picture><source srcset="../assets/everag-05-850.avif 850w, ../assets/everag-05-1250.avif 1250w, ../assets/everag-05-1700.avif 1700w" sizes="(max-width: 1024px) 94vw, (max-width: 1620px) 53vw, 850px" type="image/avif"><img src="../assets/everag-05.png" width="2880" height="2176" alt="Ground corn overview: a corn futures card with last price, session change, and volume, a usage-with-pricing table, a purchases-and-hedges table, and a stacked bar chart of corn-based ingredients by hedge status" loading="lazy"></picture></div>
             <figcaption class="micro">Feed: an ingredient's usage and purchases beside its futures price</figcaption>
           </figure>
+        </section>
+
+        <section class="article__section reveal">
+          <h2 class="article__head">A watchlist built around the grower.</h2>
+          <p>The same foundation carried to mobile. We took a brokerage product built for big, data-dense trading screens and rethought its markets views for the phone. The new chart and table patterns fed back into the system for the next product to use.</p>
+          <p>A watchlist starts with the products a grower follows. Search results show prices beside controls for adding products, and a sheet on the product page lets the grower choose which lists it belongs to. Price charts and front futures stay on the product page, so list management can happen without losing that context.</p>
 
           <div class="phones">
             <figure class="figure">
               <div class="phone-frame" tabindex="0" aria-label="Scrollable capture of the markets watchlist">
                 <picture><source srcset="../assets/everag-06-780.avif 780w" sizes="(max-width: 1024px) 94vw, (max-width: 1620px) 53vw, 850px" type="image/avif"><img src="../assets/everag-06.png" width="780" height="1688" alt="Markets watchlist on a phone: a Dairy NZ list of skimmed milk contracts with last price and change" loading="lazy"></picture>
               </div>
-              <figcaption class="micro">Markets on the phone: a watchlist</figcaption>
+              <figcaption class="micro">Markets on the phone: a watchlist · scroll the frame</figcaption>
+            </figure>
+            <figure class="figure">
+              <div class="phone-frame" tabindex="0" aria-label="Scrollable capture of the markets product search"><picture><source srcset="../assets/everag-market-search-780.avif 780w" sizes="(max-width: 768px) calc(100vw - 48px), (max-width: 1024px) calc(50vw - 36px), (max-width: 1620px) calc(27vw - 36px), 414px" type="image/avif"><img src="../assets/everag-market-search.png" width="780" height="1688" alt="Markets search on a phone with commodity prices and plus or check controls showing which products are in the watchlist" loading="lazy"></picture></div>
+              <figcaption class="micro">Find products and add them to a watchlist · scroll the frame</figcaption>
             </figure>
             <figure class="figure">
               <div class="phone-frame" tabindex="0" aria-label="Scrollable capture of the full dry whey product screen">
                 <picture><source srcset="../assets/everag-07-780.avif 780w" sizes="(max-width: 1024px) 94vw, (max-width: 1620px) 53vw, 850px" type="image/avif"><img src="../assets/everag-07.png" width="780" height="3796" alt="Dry whey overview on a phone: a cash price card, a pricing chart with a calls and puts toggle, and a front futures table by expiry month" loading="lazy"></picture>
               </div>
               <figcaption class="micro">Cash price, options chart, and front futures · scroll the frame</figcaption>
+            </figure>
+            <figure class="figure">
+              <div class="phone-frame" tabindex="0" aria-label="Scrollable capture of the product watchlist controls"><picture><source srcset="../assets/everag-manage-product-780.avif 780w" sizes="(max-width: 768px) calc(100vw - 48px), (max-width: 1024px) calc(50vw - 36px), (max-width: 1620px) calc(27vw - 36px), 414px" type="image/avif"><img src="../assets/everag-manage-product.png" width="780" height="1688" alt="Manage Product sheet over the dry whey overview with selected watchlists and a Create New Watchlist action" loading="lazy"></picture></div>
+              <figcaption class="micro">Choose watchlists from the product page · scroll the frame</figcaption>
             </figure>
           </div>
         </section>
