@@ -145,6 +145,39 @@ if (sections.length && navLinks.length) {
   updateNavigation();
 }
 
+// Featured is a manual pager: it never advances on its own, and focus stays on
+// the button. Every item is already in the markup, so adding one needs no change here.
+const featured = document.querySelector('.featured');
+if (featured) {
+  const items = [...featured.querySelectorAll('.featured__item')];
+  const pager = featured.querySelector('.featured__pager');
+  if (items.length > 1 && pager) {
+    const position = pager.querySelector('.featured__position');
+    const currentName = pager.querySelector('.featured__current-name');
+    const nextName = pager.querySelector('.featured__next-name');
+    const pad = (number) => String(number).padStart(2, '0');
+    let current = 0;
+
+    function showItem(index) {
+      current = index;
+      items.forEach((item, i) => item.classList.toggle('is-current', i === current));
+      // The live region also names the item, since the count alone says little when read out.
+      position.textContent = `${pad(current + 1)} / ${pad(items.length)}`;
+      currentName.textContent = `, ${items[current].dataset.name}`;
+      nextName.textContent = items[(current + 1) % items.length].dataset.name;
+    }
+
+    // Hidden items would otherwise wait for a lazy load at the moment they are shown.
+    featured.querySelectorAll('img[loading="lazy"]').forEach((image) => { image.loading = 'eager'; });
+    pager.querySelector('.featured__next').addEventListener('click', () => {
+      showItem((current + 1) % items.length);
+    });
+    showItem(0);
+    featured.classList.add('is-enhanced');
+    pager.hidden = false;
+  }
+}
+
 // A complete context column sticks only when every item fits the viewport.
 const caseContext = document.querySelector('.case-context');
 if (caseContext) {

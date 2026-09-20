@@ -108,6 +108,22 @@ class BrowserRegressions(unittest.TestCase):
             page.wait_for_function('el => getComputedStyle(el).opacity === "1"', arg=target.element_handle())
         self.assert_visible(page)
 
+    def show_featured_link(self, page, link):
+        """Page Featured forward until the item holding this link is the current one."""
+        for _ in range(page.locator('.featured__item').count()):
+            if link.is_visible():
+                return
+            page.locator('.featured__next').click()
+
+    def featured_state(self, page):
+        return page.evaluate("""() => {
+          const items = [...document.querySelectorAll('.featured__item')];
+          const shown = items.filter(el => getComputedStyle(el).display !== 'none' && getComputedStyle(el).visibility === 'visible');
+          return {shown: shown.map(el => el.dataset.name),
+            count: document.querySelector('.featured__position').textContent,
+            next: document.querySelector('.featured__next-name').textContent};
+        }""")
+
     def screenshot(self, page, name):
         if SCREENSHOTS:
             directory = Path(SCREENSHOTS)
@@ -299,6 +315,7 @@ class BrowserRegressions(unittest.TestCase):
                 with self.subTest(path=path, href=href):
                     link = page.locator(f'a[href="{href}"]')
                     self.assertIn(link.get_attribute('target'), [None, '_self'])
+                    self.show_featured_link(page, link)
                     link.click()
                     page.wait_for_url(link_info['url'])
                     self.assertEqual(len(context.pages), 1)
@@ -749,6 +766,254 @@ class BrowserRegressions(unittest.TestCase):
             self.assertEqual(image.get_attribute('width'), '2880')
             self.assertEqual(image.get_attribute('height'), '2048')
 
+    # ---- Homepage variant E: Featured, mode switch, feed door ----
+
+    FEATURED = [('Expert Insights', 'work/expert-insights.html', 'VIEW CASE STUDY'),
+                ('Atomic Tools', 'https://tools.spidleweb.net', 'USE THE TOOLS'),
+                ('Two by Four', 'https://twobyfour.spidleweb.net', 'PLAY THE GAME')]
+    VIEWPORTS = [(1440, 900), (834, 1112), (390, 844), (320, 844), (1440, 400)]
+
+    def test_featured_never_advances_on_its_own(self):
+        page = self.open(self.context(reduced_motion='no-preference'))
+        before = self.featured_state(page)
+        self.assertEqual(before, {'shown': ['Expert Insights'], 'count': '01 / 03', 'next': 'Atomic Tools'})
+        page.wait_for_timeout(6000)
+        self.assertEqual(self.featured_state(page), before)
+        self.assertEqual(page.errors, [])
+
+    def test_featured_next_wraps_through_every_item_without_moving_the_page(self):
+        page = self.open(self.context(reduced_motion='reduce'))
+        button = page.locator('.featured__next')
+        self.assertEqual(page.locator('.featured__count').get_attribute('aria-live'), 'polite')
+        names = [name for name, _, _ in self.FEATURED]
+        geometry = []
+        for step in range(len(names) + 1):
+            index = step % len(names)
+            state = self.featured_state(page)
+            self.assertEqual(state['shown'], [names[index]])
+            self.assertEqual(state['count'], f'0{index + 1} / 03')
+            self.assertEqual(state['next'], names[(index + 1) % len(names)])
+            self.assertIn(names[index], page.locator('.featured__count').text_content())
+            item = page.locator('.featured__item.is-current')
+            self.assertEqual(item.locator('.featured__cta').get_attribute('href'), self.FEATURED[index][1])
+            self.assertIn(self.FEATURED[index][2], item.locator('.featured__cta').inner_text())
+            self.assertTrue(item.locator('.featured__cta').is_visible())
+            # Hidden items leave the tab order and the accessibility tree.
+            self.assertEqual(page.locator('.featured__cta:visible').count(), 1)
+            geometry.append(page.evaluate("""() => {
+              const top = selector => document.querySelector(selector).getBoundingClientRect().top;
+              const media = document.querySelector('.featured__item.is-current .featured__media').getBoundingClientRect();
+              return [top('#work'), top('.featured__pager'), media.top, media.height];
+            }"""))
+            button.click()
+        self.assertEqual(len(set(map(tuple, geometry))), 1, geometry)
+        self.assertEqual(geometry[0][3], 244)
+        self.assertEqual(page.errors, [])
+
+    def test_featured_next_works_from_the_keyboard_and_keeps_focus(self):
+        page = self.open(self.context(reduced_motion='reduce'))
+        page.locator('.featured__item.is-current .featured__cta').focus()
+        page.keyboard.press('Tab')
+        self.assertEqual(page.locator(':focus').get_attribute('class'), 'featured__next')
+        for key, expected in [('Enter', 'Atomic Tools'), ('Space', 'Two by Four'), ('Enter', 'Expert Insights')]:
+            page.keyboard.press(key)
+            self.assertEqual(self.featured_state(page)['shown'], [expected])
+            self.assertEqual(page.locator(':focus').get_attribute('class'), 'featured__next')
+        self.assertEqual(page.evaluate('scrollY'), 0)
+
+    def test_featured_first_item_works_without_javascript(self):
+        for options in ({'java_script_enabled': False}, {'block_script': True}):
+            page = self.open(self.context(**options))
+            with self.subTest(options=options):
+                self.assertEqual(page.locator('.featured__item:visible').count(), 1)
+                first = page.locator('.featured__item').first
+                self.assertTrue(first.locator('.featured__headline').is_visible())
+                self.assertEqual(first.locator('.featured__headline').inner_text(), 'AI-powered dashboard for soccer scouts')
+                cta = first.locator('.featured__cta')
+                self.assertTrue(cta.is_visible())
+                self.assertEqual(cta.get_attribute('href'), 'work/expert-insights.html')
+                self.assertFalse(page.locator('.featured__pager').is_visible())
+                self.assertFalse(page.locator('.featured__next').is_visible())
+                image = first.locator('img')
+                self.assertTrue(image.is_visible())
+                self.assertEqual(image.bounding_box()['height'], 242)
+            page.close()
+        page = self.open(self.context(java_script_enabled=False))
+        page.locator('.featured__item .featured__cta').first.click()
+        page.wait_for_url('**/work/expert-insights.html')
+
+    def test_featured_items_are_complete_and_external_links_use_the_subdomains(self):
+        page = self.open(self.context(reduced_motion='reduce'))
+        items = page.locator('.featured__item')
+        self.assertEqual(items.count(), len(self.FEATURED))
+        for index, (name, href, label) in enumerate(self.FEATURED):
+            item = items.nth(index)
+            self.assertEqual(item.get_attribute('data-name'), name)
+            self.assertTrue(item.locator('.featured__type').text_content().strip())
+            self.assertTrue(item.locator('.featured__headline').text_content().strip())
+            self.assertEqual(item.locator('.featured__media').locator('img, video').count(), 1)
+            cta = item.locator('.featured__cta')
+            self.assertEqual(cta.get_attribute('href'), href)
+            self.assertIn(cta.get_attribute('target'), [None, '_self'])
+        external = page.locator('.featured__cta[href^="https://"]').evaluate_all('els => els.map(el => el.hostname)')
+        self.assertEqual(external, ['tools.spidleweb.net', 'twobyfour.spidleweb.net'])
+        # No year is shown unless one is known.
+        self.assertEqual([text.strip() for text in page.locator('.featured__type').all_text_contents()],
+                         ['Case study · 2025', 'Tools · 2025–26', 'Game'])
+
+    def test_featured_images_decode_from_the_checkout(self):
+        for strip_avif in (False, True):
+            page = self.open(self.context(reduced_motion='reduce'))
+            if strip_avif:
+                page.locator('.featured source').evaluate_all('els => els.forEach(el => el.remove())')
+                page.locator('.featured img').evaluate_all("els => els.forEach(el => { el.src = el.getAttribute('src'); })")
+            sources = page.locator('.featured img').evaluate_all("""async images => {
+              await Promise.all(images.map(image => image.decode()));
+              return images.map(image => ({src: image.currentSrc, ok: image.complete && image.naturalWidth > 0}));
+            }""")
+            self.assertEqual(len(sources), 3)
+            for source in sources:
+                self.assertTrue(source['ok'], source)
+                self.assertTrue(source['src'].startswith(f'{ORIGIN}/assets/'), source)
+                self.assertTrue((ROOT / source['src'][len(ORIGIN) + 1:]).is_file(), source)
+            self.assertEqual(sum('/assets/placeholder-' in source['src'] for source in sources), 2)
+            page.close()
+
+    def test_featured_headlines_never_strand_a_word_and_swap_without_motion_when_reduced(self):
+        for width, height in self.VIEWPORTS:
+            page = self.open(self.context(viewport={'width': width, 'height': height}, reduced_motion='reduce'))
+            for index in range(len(self.FEATURED)):
+                lines = page.locator('.featured__item.is-current .featured__headline').evaluate("""el => {
+                  const text = el.firstChild; const lines = new Map();
+                  for (const match of text.textContent.matchAll(/\\S+/g)) {
+                    const range = document.createRange();
+                    range.setStart(text, match.index); range.setEnd(text, match.index + match[0].length);
+                    const top = Math.round(range.getBoundingClientRect().top);
+                    lines.set(top, (lines.get(top) || 0) + 1);
+                  }
+                  return [...lines.values()];
+                }""")
+                self.assertGreaterEqual(lines[-1], 2, ((width, height), index, lines))
+                self.assertEqual(page.locator('.featured__item.is-current').evaluate(
+                    'el => getComputedStyle(el).transitionDuration'), '0s')
+                page.locator('.featured__next').click()
+            self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
+            page.close()
+        page = self.open(self.context(reduced_motion='no-preference'))
+        self.assertNotEqual(page.locator('.featured__item.is-current').evaluate(
+            'el => getComputedStyle(el).transitionDuration'), '0s')
+
+    def test_featured_controls_never_overlap_with_enlarged_text_or_long_names(self):
+        # Review finding: a simulated second row let Next overlap the CTA once the text grew.
+        for width, height in [(320, 900), (390, 844), (834, 1112), (1440, 900)]:
+            page = self.open(self.context(viewport={'width': width, 'height': height}, reduced_motion='reduce'))
+            page.add_style_tag(content='html { font-size: 20px; }')
+            for step in range(len(self.FEATURED)):
+                page.locator('.featured__next-name').evaluate("el => { el.textContent = 'A considerably longer short name'; }")
+                # On phones the footer starts below the fold; the click must land inside the viewport.
+                page.locator('.featured__next').scroll_into_view_if_needed()
+                self.settle(page)
+                boxes = page.evaluate("""() => {
+                  const rect = el => { const b = el.getBoundingClientRect(); return {top: b.top, bottom: b.bottom, left: b.left, right: b.right}; };
+                  const cta = rect(document.querySelector('.featured__item.is-current .featured__cta'));
+                  const target = {top: cta.top - 5, bottom: cta.bottom + 5, left: cta.left - 1, right: cta.right + 1};
+                  const next = rect(document.querySelector('.featured__next'));
+                  const overlap = Math.min(target.right, next.right) > Math.max(target.left, next.left) &&
+                    Math.min(target.bottom, next.bottom) > Math.max(target.top, next.top);
+                  return {overlap, next, wrapped: next.bottom - next.top > 50, scrollWidth: document.documentElement.scrollWidth};
+                }""")
+                with self.subTest(viewport=(width, height), step=step):
+                    self.assertFalse(boxes['overlap'], boxes)
+                    self.assertLessEqual(boxes['scrollWidth'], width)
+                    if width == 320:
+                        self.assertTrue(boxes['wrapped'], boxes)
+                    # The corner of Next nearest the CTA must advance the pager, not follow the link.
+                    next_box = boxes['next']
+                    page.mouse.click(next_box['left'] + 2, next_box['top'] + 2)
+                    self.settle(page)
+                    self.assertEqual(page.url, f'{ORIGIN}/index.html')
+                    self.assertEqual(self.featured_state(page)['shown'], [self.FEATURED[(step + 1) % 3][0]])
+            page.close()
+
+    def test_work_list_still_lists_all_six_projects(self):
+        page = self.open(self.context(reduced_motion='reduce'))
+        self.assertEqual(page.locator('.index__row').evaluate_all('els => els.map(el => el.getAttribute("href"))'),
+                         [f'work/{slug}.html' for slug in ['expert-insights', 'campaign-sim', 'everag', 'vidscrip', 'conservis', 'plinth']])
+        self.assertEqual(page.locator('.archive__nav a').first.inner_text(), 'WORK')
+        self.assertEqual(page.locator('#work-title span').first.inner_text(), 'WORK')
+        # Featured has no nav link, so it stays out of the scroll-spy's sections.
+        self.assertEqual(page.locator('.archive__nav .is-active').get_attribute('href'), '#work')
+        thumb = page.locator('.index__thumb').first.bounding_box()
+        self.assertEqual((thumb['width'], thumb['height']), (80, 50))
+
+    def test_mode_switch_marks_the_current_view_from_the_leading_side(self):
+        for width, height in [(1440, 900), (390, 844)]:
+            page = self.open(self.context(viewport={'width': width, 'height': height}))
+            switch = page.locator('nav.mode-switch')
+            self.assertEqual(switch.get_attribute('aria-label'), 'View')
+            self.assertIsNone(switch.get_attribute('role'))
+            links = switch.locator('a.mode-switch__link')
+            self.assertEqual(links.evaluate_all('els => els.map(el => [el.textContent, el.getAttribute("href"), el.getAttribute("aria-current")])'),
+                             [['Portfolio', 'index.html', 'page'], ['Feed', 'feed/', None]])
+            marks = links.evaluate_all("""els => els.map(el => ['::before', '::after'].map(pseudo => {
+              const style = getComputedStyle(el, pseudo);
+              return style.content === 'none' ? null : [style.width, style.backgroundColor];
+            }))""")
+            self.assertEqual(marks, [[['6px', 'rgb(250, 25, 0)'], None], [None, None]])
+            boxes = [link.bounding_box() for link in links.all()]
+            for box in boxes:
+                self.assertGreaterEqual(box['width'], 44)
+                self.assertGreaterEqual(box['height'], 44)
+            # The labels keep their order and their hit areas do not overlap.
+            self.assertLessEqual(boxes[0]['x'] + boxes[0]['width'], boxes[1]['x'])
+            # The padded hit areas leave the switch one text line tall.
+            self.assertAlmostEqual(switch.bounding_box()['height'], links.first.evaluate(
+                'el => parseFloat(getComputedStyle(el).lineHeight)'), delta=0.5)
+            page.close()
+
+    def test_feed_door_is_one_decorated_link_that_clears_the_seam(self):
+        for width, height in self.VIEWPORTS:
+            page = self.open(self.context(viewport={'width': width, 'height': height}, reduced_motion='reduce'))
+            door = page.locator('a.feed-door')
+            self.assertEqual(door.count(), 1)
+            # The href is asserted, not followed: feed/ arrives with the Feed page.
+            self.assertEqual(door.get_attribute('href'), 'feed/')
+            self.assertEqual(page.locator('a[href="feed/"]').count(), 2)
+            self.assertIn('FEED', door.inner_text())
+            self.assertEqual(door.locator('img').evaluate_all('els => els.map(el => el.getAttribute("alt"))'), [''] * 5)
+            page.locator('.panel').evaluate('el => { el.scrollTop = el.scrollHeight; }')
+            clearance = page.evaluate("""() => {
+              const panel = document.querySelector('.panel').getBoundingClientRect();
+              const door = document.querySelector('.feed-door').getBoundingClientRect();
+              const about = document.querySelector('.panel__about').getBoundingClientRect();
+              const right = door.right - panel.left, bottom = door.bottom - panel.top;
+              // Desktop seam: (100%, 4%) to (93.5%, 100%). Phone seam: (0, 100%) to (100%, 93%).
+              const split = getComputedStyle(document.querySelector('.panel')).position === 'sticky';
+              const seamX = panel.width * (1 - 0.065 * (bottom - 0.04 * panel.height) / (0.96 * panel.height));
+              const seamY = panel.height * (1 - 0.07 * right / panel.width);
+              return {gap: split ? seamX - right : seamY - bottom, inside: door.left >= panel.left && door.bottom <= panel.bottom,
+                bottoms: Math.abs(door.bottom - about.bottom), beside: door.left >= about.right, split};
+            }""")
+            with self.subTest(viewport=(width, height)):
+                self.assertGreaterEqual(clearance['gap'], 16, clearance)
+                self.assertTrue(clearance['inside'], clearance)
+                thumbs = door.locator('.feed-door__thumbs')
+                if (width, height) == (1440, 900):
+                    self.assertLess(clearance['bottoms'], 1, clearance)
+                    self.assertTrue(clearance['beside'], clearance)
+                    box = thumbs.bounding_box()
+                    self.assertEqual((box['width'], box['height']), (188, 76))
+                    sizes = thumbs.locator('img').evaluate_all('els => els.map(el => [el.offsetWidth, el.offsetHeight])')
+                    self.assertEqual(sizes, [[60, 76], [60, 34], [60, 38], [60, 48], [60, 24]])
+                    self.assertTrue(thumbs.locator('img').evaluate_all("""async images => {
+                      images.forEach(image => { image.loading = 'eager'; });
+                      await Promise.all(images.map(image => image.decode()));
+                      return images.every(image => image.naturalWidth > 0);
+                    }"""))
+                # The thumbnails fold away on phones and short panels; the link itself never does.
+                self.assertEqual(thumbs.is_visible(), width > 768 and height > 560)
+                self.assertTrue(door.is_visible())
+            page.close()
 
 
 if __name__ == '__main__':
