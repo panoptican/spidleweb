@@ -18,7 +18,8 @@ from playwright.sync_api import sync_playwright
 
 ROOT = Path(os.environ.get('SPIDLEWEB_TEST_ROOT', Path(__file__).resolve().parents[1]))
 ORIGIN = 'https://portfolio.test'
-PAGES = ['index.html', *[str(p.relative_to(ROOT)) for p in sorted((ROOT / 'work').glob('*.html'))]]
+CASE_PAGES = [str(p.relative_to(ROOT)) for p in sorted((ROOT / 'work').glob('*.html'))]
+PAGES = ['index.html', 'feed/index.html', *CASE_PAGES]
 SCREENSHOTS = os.environ.get('SPIDLEWEB_TEST_SCREENSHOTS')
 
 
@@ -61,11 +62,11 @@ class BrowserRegressions(unittest.TestCase):
                 else:
                     route.abort()
                 return
-            if block_script and url.path == '/script.js':
+            if block_script and url.path in ['/script.js', '/feed/feed.js']:
                 route.abort()
                 return
             path = (ROOT / unquote(url.path).lstrip('/')).resolve()
-            if path == ROOT:
+            if path.is_relative_to(ROOT) and path.is_dir():
                 path = path / 'index.html'
             if not path.is_relative_to(ROOT) or not path.is_file():
                 route.fulfill(status=404, body='Not found')
@@ -121,7 +122,11 @@ class BrowserRegressions(unittest.TestCase):
                 with self.subTest(path=path, options=options):
                     page = self.open(context, path)
                     self.assert_visible(page, motionless=True)
-                    self.assertTrue(page.locator('h1').is_visible())
+                    if path == 'feed/index.html':
+                        self.assertEqual(page.locator('h1').count(), 1)
+                        self.assertTrue(page.locator('[data-feed-card]').first.is_visible())
+                    else:
+                        self.assertTrue(page.locator('h1').is_visible())
                     self.assertEqual(page.errors, [])
                     if path == 'index.html' and options == {'block_script': True}:
                         self.screenshot(page, 'b01-blocked-script')
@@ -238,7 +243,7 @@ class BrowserRegressions(unittest.TestCase):
             })""")
             self.assertLessEqual(bounds['footer'], bounds['panel'] - 20)
             page.close()
-            for path in PAGES[1:]:
+            for path in CASE_PAGES:
                 page = self.open(context, path)
                 rail = page.locator('.case-context')
                 self.assertEqual(rail.evaluate('el => getComputedStyle(el).position'), 'static')
@@ -249,7 +254,7 @@ class BrowserRegressions(unittest.TestCase):
 
     def test_b07_mobile_top_index_link_returns_home_on_every_case(self):
         context = self.context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True)
-        for path in PAGES[1:]:
+        for path in CASE_PAGES:
             with self.subTest(path=path):
                 page = self.open(context, path)
                 link = page.locator('.case-masthead__index')
@@ -323,6 +328,190 @@ class BrowserRegressions(unittest.TestCase):
                     self.assertEqual(page.errors, [])
                     page.close()
 
+    def test_feed_monolith_layout_titles_icons_and_type_mix(self):
+        page = self.open(self.context(viewport={'width': 1440, 'height': 900}), 'feed/')
+        cards = page.locator('[data-feed-card]')
+        self.assertEqual(cards.count(), 20)
+        self.assertEqual(cards.evaluate_all("els => els.reduce((counts, el) => { counts[el.dataset.type] = (counts[el.dataset.type] || 0) + 1; return counts; }, {})"),
+                         {'screens': 13, 'prototypes': 3, 'posts': 1, 'websites': 2, 'tools': 1})
+        self.assertEqual(page.locator('.feed-stream').evaluate('el => getComputedStyle(el).columnCount'), '3')
+        self.assertTrue(cards.evaluate_all("""els => els.every(card => {
+          const footer = card.querySelector('.feed-card__footer').getBoundingClientRect();
+          const title = card.querySelector('h2').getBoundingClientRect();
+          const icons = card.querySelectorAll('.feed-card__type-icon img');
+          const link = card.querySelector('[data-feed-action]');
+          return card.id && link.dataset.feedAction === 'viewer' && link.hash === `#${card.id}` &&
+            card.querySelector('h2').textContent.trim().length > 8 &&
+            title.width <= footer.width * 0.62 && icons.length === 2;
+        })"""))
+        self.assertTrue(page.locator('.feed-card__media img').evaluate_all("""async images => {
+          await Promise.all(images.map(image => image.decode()));
+          return images.every(image => {
+            const declaredRatio = Number(image.getAttribute('width')) / Number(image.getAttribute('height'));
+            const loadedRatio = image.naturalWidth / image.naturalHeight;
+            return image.complete && image.naturalWidth > 0 && Math.abs(declaredRatio - loadedRatio) < 0.01 &&
+              image.alt.trim() && image.currentSrc.endsWith('.avif');
+          });
+        }"""))
+        self.assertEqual(page.locator('.feed-card__media picture source[type="image/avif"]').count(), 20)
+        self.assertTrue(page.locator('.feed-card__media picture source').evaluate_all(
+            "els => els.every(el => el.srcset.includes(' 480w') && el.sizes.trim())"))
+        self.assertEqual(page.locator('[data-status="placeholder"]').count(), 7)
+        self.assertEqual(page.errors, [])
+
+    def test_feed_hover_reveals_color_lift_and_red_icon_with_reduced_motion_fallback(self):
+        page = self.open(self.context(), 'feed/')
+        link = page.locator('[data-dialog-link="scouting-sentiment-search"]')
+        before = link.evaluate("""el => ({
+          slab: getComputedStyle(el, '::before').backgroundColor,
+          slabTransform: getComputedStyle(el, '::before').transform,
+          surface: getComputedStyle(el.querySelector('.feed-card__surface')).transform,
+          black: getComputedStyle(el.querySelector('.feed-card__type-icon img:first-child')).opacity,
+          red: getComputedStyle(el.querySelector('.feed-card__type-icon img:last-child')).opacity
+        })""")
+        link.hover()
+        page.wait_for_timeout(180)
+        after = link.evaluate("""el => ({
+          slab: getComputedStyle(el, '::before').backgroundColor,
+          slabTransform: getComputedStyle(el, '::before').transform,
+          surface: getComputedStyle(el.querySelector('.feed-card__surface')).transform,
+          black: getComputedStyle(el.querySelector('.feed-card__type-icon img:first-child')).opacity,
+          red: getComputedStyle(el.querySelector('.feed-card__type-icon img:last-child')).opacity
+        })""")
+        self.assertEqual(before['slab'], 'rgb(10, 10, 10)')
+        self.assertNotEqual(after['slab'], before['slab'])
+        self.assertNotEqual(after['slabTransform'], before['slabTransform'])
+        self.assertNotEqual(after['surface'], before['surface'])
+        self.assertEqual((before['black'], before['red']), ('1', '0'))
+        self.assertEqual((after['black'], after['red']), ('0', '1'))
+        page.close()
+
+        page = self.open(self.context(reduced_motion='reduce'), 'feed/')
+        self.assertTrue(page.locator('.feed-card__surface, .feed-card__type-icon img').evaluate_all(
+            "els => els.every(el => getComputedStyle(el).transitionDuration.split(',').every(value => parseFloat(value) === 0))"))
+
+    def test_feed_filters_keep_twenty_item_source_and_follow_browser_history(self):
+        page = self.open(self.context(reduced_motion='reduce'), 'feed/')
+        self.assertTrue(page.locator('[data-feed-filters]').is_visible())
+        self.assertEqual(page.locator('[data-feed-card]:not([hidden])').count(), 20)
+        type_filter = page.locator('[data-filter="type"]')
+        type_filter.locator('summary').click()
+        type_filter.locator('[data-filter-value="prototypes"]').click()
+        self.assertEqual(page.locator('[data-feed-card]:not([hidden])').count(), 3)
+        industry_filter = page.locator('[data-filter="industry"]')
+        industry_filter.locator('summary').click()
+        industry_filter.locator('[data-filter-value="sports"]').click()
+        self.assertEqual(page.locator('[data-feed-card]:not([hidden])').count(), 2)
+        self.assertEqual(dict(item.split('=') for item in urlsplit(page.url).query.split('&')),
+                         {'type': 'prototypes', 'industry': 'sports'})
+        page.go_back()
+        self.settle(page)
+        self.assertEqual(page.locator('[data-feed-card]:not([hidden])').count(), 3)
+        self.assertEqual(page.locator('[data-filter="industry"] [data-filter-label]').text_content(), 'All')
+        page.go_back()
+        self.settle(page)
+        self.assertEqual(page.locator('[data-feed-card]:not([hidden])').count(), 20)
+        page.go_forward()
+        self.settle(page)
+        self.assertEqual(page.locator('[data-feed-card]:not([hidden])').count(), 3)
+        page.go_forward()
+        self.settle(page)
+        self.assertEqual(page.locator('[data-feed-card]:not([hidden])').count(), 2)
+        page.reload()
+        page.evaluate('document.fonts.ready')
+        self.settle(page)
+        self.assertEqual(page.locator('[data-feed-card]:not([hidden])').count(), 2)
+        self.assertEqual(page.locator('[data-filter="type"] [data-filter-label]').text_content(), 'Prototypes')
+
+    def test_feed_restores_scroll_after_leaving_and_returning(self):
+        page = self.open(self.context(reduced_motion='reduce'), 'feed/')
+        return_link = page.locator('.feed-endpaper__link')
+        return_link.evaluate("el => el.scrollIntoView({block: 'center'})")
+        expected = page.evaluate('scrollY')
+        self.assertGreater(expected, 300)
+        return_link.click()
+        page.wait_for_url(f'{ORIGIN}/index.html#work')
+        page.go_back()
+        page.wait_for_url(f'{ORIGIN}/feed/')
+        page.wait_for_function('expected => Math.abs(scrollY - expected) < 3', arg=expected)
+        self.assertAlmostEqual(page.evaluate('scrollY'), expected, delta=2)
+        self.assertEqual(page.errors, [])
+
+    def test_feed_viewer_uses_item_galleries_deep_links_and_restores_focus(self):
+        page = self.open(self.context(reduced_motion='reduce'), 'feed/')
+        opener = page.locator('[data-dialog-link="scouting-sentiment-search"]')
+        opener.focus()
+        opener.click()
+        dialog = page.locator('[data-feed-dialog]')
+        self.assertTrue(dialog.evaluate('el => el.open'))
+        self.assertTrue(page.locator('[data-feed-page]').evaluate('el => el.inert'))
+        self.assertEqual(dialog.locator('[data-dialog-title]').inner_text(), 'Scouting sentiment search')
+        self.assertTrue(page.url.endswith('#scouting-sentiment-search'))
+        self.assertEqual(dialog.locator('[data-dialog-count]').inner_text(), '01 / 01')
+        self.assertTrue(dialog.locator('[data-dialog-previous]').is_hidden())
+        page.keyboard.press('ArrowRight')
+        self.assertEqual(dialog.locator('[data-dialog-title]').inner_text(), 'Scouting sentiment search')
+        self.assertTrue(page.url.endswith('#scouting-sentiment-search'))
+        page.keyboard.press('Escape')
+        self.assertFalse(dialog.evaluate('el => el.open'))
+        self.assertFalse(page.locator('[data-feed-page]').evaluate('el => el.inert'))
+        self.assertEqual(page.evaluate('document.activeElement.dataset.dialogLink'), 'scouting-sentiment-search')
+        self.assertEqual(urlsplit(page.url).fragment, '')
+
+        gallery_opener = page.locator('[data-dialog-link="channel-impact-simulator"]')
+        gallery_opener.focus()
+        gallery_opener.click()
+        first_alt = dialog.locator('[data-dialog-media] img').get_attribute('alt')
+        self.assertEqual(dialog.locator('[data-dialog-count]').inner_text(), '01 / 04')
+        self.assertTrue(dialog.locator('[data-dialog-next]').is_visible())
+        page.keyboard.press('ArrowRight')
+        self.assertEqual(dialog.locator('[data-dialog-count]').inner_text(), '02 / 04')
+        self.assertNotEqual(dialog.locator('[data-dialog-media] img').get_attribute('alt'), first_alt)
+        self.assertTrue(page.url.endswith('#channel-impact-simulator'))
+        page.keyboard.press('Shift+Tab')
+        self.assertTrue(page.evaluate('document.activeElement.hasAttribute("data-dialog-next")'))
+        page.keyboard.press('Tab')
+        self.assertTrue(page.evaluate('document.activeElement.hasAttribute("data-dialog-close")'))
+        page.keyboard.press('Escape')
+        self.assertEqual(page.evaluate('document.activeElement.dataset.dialogLink'), 'channel-impact-simulator')
+
+        page.goto(f'{ORIGIN}/feed/#field-task-setup')
+        page.evaluate('document.fonts.ready')
+        self.settle(page)
+        self.assertTrue(dialog.evaluate('el => el.open'))
+        self.assertEqual(dialog.locator('[data-dialog-title]').inner_text(), 'Field task setup')
+        self.assertEqual(dialog.get_attribute('data-orientation'), 'standard')
+        self.assertEqual(page.errors, [])
+
+    def test_feed_without_javascript_keeps_all_items_and_hash_fallbacks_reachable(self):
+        page = self.open(self.context(java_script_enabled=False), 'feed/')
+        self.assertFalse(page.locator('[data-feed-filters]').is_visible())
+        cards = page.locator('[data-feed-card]')
+        self.assertEqual(cards.count(), 20)
+        self.assertTrue(cards.evaluate_all("els => els.every(el => !el.hidden && el.getBoundingClientRect().height > 0)"))
+        self.assertTrue(cards.locator('a[data-feed-action="viewer"]').evaluate_all(
+            "els => els.every(el => el.hash === `#${el.closest('[data-feed-card]').id}`)"))
+        page.locator('[data-dialog-link="field-task-setup"]').click()
+        self.assertEqual(urlsplit(page.url).fragment, 'field-task-setup')
+        target = page.locator('#field-task-setup')
+        self.assertEqual(target.evaluate('el => getComputedStyle(el).position'), 'fixed')
+        self.assertTrue(target.locator('.feed-card__media img').is_visible())
+        self.assertTrue(page.locator('.feed-fallback-close').is_visible())
+        page.locator('.feed-fallback-close').click()
+        self.assertEqual(urlsplit(page.url).fragment, 'feed-stream')
+        self.assertEqual(page.errors, [])
+
+    def test_feed_has_no_horizontal_overflow_at_all_review_sizes(self):
+        for width, height in [(1440, 900), (834, 1112), (390, 844), (320, 844), (1440, 400)]:
+            with self.subTest(viewport=(width, height)):
+                page = self.open(self.context(viewport={'width': width, 'height': height}), 'feed/')
+                self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
+                page.goto(f'{ORIGIN}/feed/#channel-impact-simulator')
+                self.settle(page)
+                self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
+                self.assertEqual(page.errors, [])
+                page.close()
+
     def test_case_endpapers_match_destinations_and_complete_the_cycle(self):
         expected = {'everag': 'vidscrip', 'vidscrip': 'conservis', 'conservis': 'plinth',
                     'plinth': 'expert-insights', 'expert-insights': 'campaign-sim', 'campaign-sim': 'everag'}
@@ -362,7 +551,7 @@ class BrowserRegressions(unittest.TestCase):
 
     def test_case_context_sticks_only_when_it_fits_and_stops_before_endpaper(self):
         context = self.context(reduced_motion='reduce')
-        for path in PAGES[1:]:
+        for path in CASE_PAGES:
             page = self.open(context, path)
             rail = page.locator('.case-context')
             self.assertEqual(rail.evaluate('el => getComputedStyle(el).position'), 'sticky')
@@ -387,7 +576,7 @@ class BrowserRegressions(unittest.TestCase):
 
     def test_case_proofs_fonts_and_keyboard_links(self):
         context = self.context(reduced_motion='reduce')
-        for path in PAGES[1:]:
+        for path in CASE_PAGES:
             page = self.open(context, path)
             count = page.locator('.case-proofs img').count()
             self.assertGreaterEqual(count, 4 if path == 'work/campaign-sim.html' else 5)
@@ -532,7 +721,7 @@ class BrowserRegressions(unittest.TestCase):
         context = self.context(reduced_motion='reduce')
         masthead_colors = {}
         endpaper_colors = []
-        for path in PAGES[1:]:
+        for path in CASE_PAGES:
             page = self.open(context, path)
             for selector in ['.case-masthead a', '.case-context__links a', '.case-endpaper__nav a']:
                 for link in page.locator(selector).all():
