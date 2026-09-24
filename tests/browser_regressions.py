@@ -3,7 +3,8 @@
 Run with Python Playwright and its installed Chromium headless shell:
   python3 tests/browser_regressions.py
 
-Resources are fulfilled from the checkout at a test origin. No preview server,
+Resources are fulfilled from the checkout at a test origin. Clean URLs such as
+/work/everag resolve to work/everag.html, as on Cloudflare Pages. No preview server,
 external service, installed Chrome profile, or system-clock change is needed.
 Set PLAYWRIGHT_CHROMIUM_EXECUTABLE to use another bundled Chromium binary.
 """
@@ -68,6 +69,9 @@ class BrowserRegressions(unittest.TestCase):
             path = (ROOT / unquote(url.path).lstrip('/')).resolve()
             if path.is_relative_to(ROOT) and path.is_dir():
                 path = path / 'index.html'
+            elif not path.exists() and not url.path.endswith('/'):
+                # Pages serves a clean URL such as /work/everag from work/everag.html.
+                path = path.with_name(f'{path.name}.html')
             if not path.is_relative_to(ROOT) or not path.is_file():
                 route.fulfill(status=404, body='Not found')
                 return
@@ -281,7 +285,7 @@ class BrowserRegressions(unittest.TestCase):
                 if path == 'work/expert-insights.html':
                     self.screenshot(page, 'b07-mobile-index')
                 link.tap()
-                page.wait_for_url('**/index.html')
+                page.wait_for_url(f'{ORIGIN}/')
                 self.assertIn('JASON', page.locator('h1').inner_text())
                 page.close()
 
@@ -558,13 +562,13 @@ class BrowserRegressions(unittest.TestCase):
             self.assertEqual(actual['paper'], themes[slug]['paper'])
             self.assertNotEqual(actual['bg'], themes[slug]['bg'])
             link = page.locator('.case-endpaper__next')
-            self.assertEqual(link.get_attribute('href'), f'{destination}.html')
+            self.assertEqual(link.get_attribute('href'), f'/work/{destination}')
             link.focus()
             self.assertEqual(link.evaluate('el => getComputedStyle(el).outlineStyle'), 'solid')
             page.keyboard.press('Enter')
-            page.wait_for_url(f'**/work/{destination}.html')
+            page.wait_for_url(f'{ORIGIN}/work/{destination}')
         self.assertEqual(set(visited), set(expected))
-        self.assertTrue(page.url.endswith('/work/everag.html'))
+        self.assertEqual(page.url, f'{ORIGIN}/work/everag')
 
     def test_case_context_sticks_only_when_it_fits_and_stops_before_endpaper(self):
         context = self.context(reduced_motion='reduce')
@@ -751,7 +755,7 @@ class BrowserRegressions(unittest.TestCase):
                     self.assertEqual(after['bg'], before['bg'])
                     self.assertEqual(after['decoration'], 'none')
                     if selector == '.case-masthead a':
-                        masthead_colors[Path(path).name] = after['color']
+                        masthead_colors[f'/work/{Path(path).stem}'] = after['color']
                     elif selector == '.case-endpaper__nav a':
                         destination = page.locator('.case-endpaper__next').get_attribute('href')
                         endpaper_colors.append((destination, after['color']))
@@ -768,7 +772,7 @@ class BrowserRegressions(unittest.TestCase):
 
     # ---- Homepage variant E: Featured, mode switch, feed door ----
 
-    FEATURED = [('Expert Insights', 'work/expert-insights.html', 'VIEW CASE STUDY'),
+    FEATURED = [('Expert Insights', '/work/expert-insights', 'VIEW CASE STUDY'),
                 ('Atomic Tools', 'https://tools.spidleweb.net', 'USE THE TOOLS'),
                 ('Two by Four', 'https://twobyfour.spidleweb.net', 'PLAY THE GAME')]
     VIEWPORTS = [(1440, 900), (834, 1112), (390, 844), (320, 844), (1440, 400)]
@@ -831,7 +835,7 @@ class BrowserRegressions(unittest.TestCase):
                 self.assertEqual(first.locator('.featured__headline').inner_text(), 'AI-powered dashboard for soccer scouts')
                 cta = first.locator('.featured__cta')
                 self.assertTrue(cta.is_visible())
-                self.assertEqual(cta.get_attribute('href'), 'work/expert-insights.html')
+                self.assertEqual(cta.get_attribute('href'), '/work/expert-insights')
                 self.assertFalse(page.locator('.featured__pager').is_visible())
                 self.assertFalse(page.locator('.featured__next').is_visible())
                 image = first.locator('img')
@@ -840,7 +844,8 @@ class BrowserRegressions(unittest.TestCase):
             page.close()
         page = self.open(self.context(java_script_enabled=False))
         page.locator('.featured__item .featured__cta').first.click()
-        page.wait_for_url('**/work/expert-insights.html')
+        page.wait_for_url(f'{ORIGIN}/work/expert-insights')
+        self.assertEqual(page.locator('h1').text_content(), 'Expert Insights')
 
     def test_featured_items_are_complete_and_external_links_use_the_subdomains(self):
         page = self.open(self.context(reduced_motion='reduce'))
@@ -938,7 +943,7 @@ class BrowserRegressions(unittest.TestCase):
     def test_work_list_still_lists_all_six_projects(self):
         page = self.open(self.context(reduced_motion='reduce'))
         self.assertEqual(page.locator('.index__row').evaluate_all('els => els.map(el => el.getAttribute("href"))'),
-                         [f'work/{slug}.html' for slug in ['expert-insights', 'campaign-sim', 'everag', 'vidscrip', 'conservis', 'plinth']])
+                         [f'/work/{slug}' for slug in ['expert-insights', 'campaign-sim', 'everag', 'vidscrip', 'conservis', 'plinth']])
         self.assertEqual(page.locator('.archive__nav a').first.inner_text(), 'WORK')
         self.assertEqual(page.locator('#work-title span').first.inner_text(), 'WORK')
         # Featured has no nav link, so it stays out of the scroll-spy's sections.
@@ -954,7 +959,7 @@ class BrowserRegressions(unittest.TestCase):
             self.assertIsNone(switch.get_attribute('role'))
             links = switch.locator('a.mode-switch__link')
             self.assertEqual(links.evaluate_all('els => els.map(el => [el.textContent, el.getAttribute("href"), el.getAttribute("aria-current")])'),
-                             [['Portfolio', 'index.html', 'page'], ['Feed', 'feed/', None]])
+                             [['Portfolio', '/', 'page'], ['Feed', 'feed/', None]])
             marks = links.evaluate_all("""els => els.map(el => ['::before', '::after'].map(pseudo => {
               const style = getComputedStyle(el, pseudo);
               return style.content === 'none' ? null : [style.width, style.backgroundColor];
