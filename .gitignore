@@ -15,6 +15,8 @@
 /.forge/
 /.pi/
 /skills-lock.json
+# Prototypes are their own private repo nested here; publish built demos elsewhere.
+/prototypes/
 /.impeccable/
 /.seo/
 /.well-known/
