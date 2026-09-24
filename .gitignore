@@ -12,6 +12,9 @@
 /.agents/
 /.claude/
 /.codex/
+/.forge/
+/.pi/
+/skills-lock.json
 /.impeccable/
 /.seo/
 /.well-known/
