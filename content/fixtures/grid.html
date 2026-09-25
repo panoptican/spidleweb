@@ -21,7 +21,8 @@
     @media (max-width: 1099px) { .stream-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
     @media (max-width: 599px) {
       .fixture__intro { padding: 0 16px 28px; }
-      .stream-grid { grid-template-columns: minmax(0, 1fr); padding: 0 16px; }
+      /* Two columns on phones, as the approved 390 boards draw Grid. */
+      .stream-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 14px; padding: 0 16px; }
     }
 
     .stream-card__link { display: flex; flex-direction: column; gap: 10px; text-decoration: none; }
