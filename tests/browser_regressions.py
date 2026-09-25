@@ -1584,5 +1584,112 @@ class BrowserRegressions(unittest.TestCase):
         page.wait_for_url(f'{ORIGIN}/work/conservis#fig-conservis-03')
         self.assertEqual(page.locator('.stream-panel').count(), 0)
 
+    # ---- Open in place on the real pages (Phase 2B integration) ----
+
+    def test_open_in_place_real_grid_deep_link_filters_and_show_more(self):
+        page = self.open(self.context(), 'index.html')
+        cards = '[data-stream] > article'
+        ids = self.item_ids(page, cards)
+        self.assertGreater(len(ids), 33)
+        deep = ids[33]
+        # A deep link past the first 30 reveals up to its card, then opens it.
+        page = self.open(self.context(), f'index.html#{deep}')
+        self.wait_for_panel(page, deep)
+        self.assertFalse(page.locator(f'#{deep}').evaluate('el => el.hidden'))
+        self.assertGreaterEqual(int(page.locator('[data-pager-shown]').text_content()), 34)
+        state = self.panel_state(page)
+        self.assertEqual(state['prev'], self.row_end(page, f'{cards}:not([hidden])', deep))
+        self.assertEqual((state['left'], state['width']), (0, state['viewport']))
+        # Filtering out the open card closes its panel and clears the address.
+        kind = page.locator(f'#{deep}').get_attribute('data-type')
+        other = next(v for v in page.eval_on_selector_all('[data-filter="type"] option', 'els => els.map(el => el.value)') if v and v != kind)
+        page.select_option('[data-filter="type"]', other)
+        page.wait_for_function("() => !document.querySelector('.stream-panel')")
+        self.assertEqual(urlsplit(page.url).fragment, '')
+        # A filter that keeps the card moves the panel under its new row.
+        page.select_option('[data-filter="type"]', '')
+        screen = page.eval_on_selector_all(f'{cards}[data-type="screen"]:not([hidden])', 'els => els.map(el => el.id)')[4]
+        self.open_item(page, screen)
+        page.select_option('[data-filter="type"]', 'screen')
+        page.wait_for_function("""id => {
+          const panel = document.getElementById('stream-panel');
+          const card = document.getElementById(id);
+          return panel && panel.previousElementSibling && !card.hidden &&
+            Math.abs(panel.previousElementSibling.getBoundingClientRect().top - card.getBoundingClientRect().top) < 2;
+        }""", arg=screen)
+        self.settle(page)
+        state = self.panel_state(page)
+        self.assertEqual(state['opener'], screen)
+        self.assertEqual(state['prev'], self.row_end(page, f'{cards}:not([hidden])', screen))
+        self.assertAlmostEqual(state['peak'], state['openerCentre'], delta=0.6)
+        # Show more with the panel open leaves it under the same row.
+        page.select_option('[data-filter="type"]', '')
+        page.wait_for_function('id => !document.getElementById(id).hidden', arg=screen)
+        self.settle(page)
+        before = self.panel_state(page)['prev']
+        page.locator('[data-pager-more]').click()
+        self.settle(page)
+        self.assertEqual(self.panel_state(page)['prev'], before)
+        self.assertEqual(page.errors, [])
+
+    def test_open_in_place_real_case_page_more_from_and_figure_anchors(self):
+        for width in (1440, 390):
+            with self.subTest(width=width):
+                page = self.open(self.context(viewport={'width': width, 'height': 900}), 'work/conservis')
+                link = page.locator('.more-from [data-open]').nth(2)
+                item_id = link.get_attribute('data-open')
+                link.scroll_into_view_if_needed()
+                link.click()
+                self.wait_for_panel(page, item_id)
+                state = self.panel_state(page)
+                # Full bleed, though More from's grid sits in the page's right column.
+                self.assertEqual((state['left'], state['width']), (0, state['viewport']))
+                self.assertEqual(state['tone'], 'band')
+                # On its own case page the band does not link to that page.
+                self.assertEqual(page.locator('#stream-panel .stream-panel__cta').count(), 0)
+                # A figure anchor followed meanwhile stays in the address.
+                page.evaluate("location.hash = '#fig-conservis-04'")
+                page.wait_for_function("() => location.hash === '#fig-conservis-04'")
+                page.keyboard.press('Escape')
+                page.wait_for_function("() => !document.querySelector('.stream-panel')")
+                self.assertEqual(urlsplit(page.url).fragment, 'fig-conservis-04')
+                self.assertEqual(page.errors, [])
+                page.close()
+                # A figure anchor on load lands on the figure and opens nothing.
+                page = self.open(self.context(viewport={'width': width, 'height': 900}), 'work/conservis#fig-conservis-04')
+                page.wait_for_load_state('load')
+                self.settle(page)
+                self.assertEqual(page.locator('.stream-panel').count(), 0)
+                self.assertLess(abs(page.locator('#fig-conservis-04').evaluate('el => el.getBoundingClientRect().top')), 80)
+                page.close()
+                # An item's id on load opens it in More from.
+                page = self.open(self.context(viewport={'width': width, 'height': 900}), 'work/conservis#filtering-fields')
+                self.wait_for_panel(page, 'filtering-fields')
+                self.assertTrue(page.locator('#stream-panel').evaluate("el => Boolean(el.closest('.more-from'))"))
+                self.assertEqual(page.errors, [])
+                page.close()
+
+    def test_open_in_place_real_about_opens_from_the_phone_menu_on_every_page(self):
+        pages = ['index.html', 'work/', 'writing/', 'work/conservis', 'writing/how-i-built-description-generator']
+        context = self.context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True)
+        for path in pages:
+            with self.subTest(path=path):
+                page = self.open(context, path)
+                page.locator('.masthead__trigger').click()
+                page.locator('.masthead__places a[href="#about"]').click()
+                page.wait_for_function("() => !document.getElementById('about').hidden")
+                self.settle(page)
+                self.assertEqual(page.evaluate('document.activeElement.id'), 'about-title')
+                peak = page.locator('#about').evaluate(
+                    "el => Number(el.previousElementSibling.querySelector('path').getAttribute('d').split('C')[1].trim().split(/\\s+/)[4])")
+                box = page.locator('.masthead__trigger').bounding_box()
+                self.assertAlmostEqual(peak, box['x'] + box['width'] / 2, delta=0.6)
+                page.locator('#about .about__close').click()
+                page.wait_for_function("() => document.getElementById('about').hidden")
+                self.assertTrue(page.locator('.masthead__trigger').evaluate('el => el === document.activeElement'))
+                self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), 390)
+                self.assertEqual(page.errors, [])
+                page.close()
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
