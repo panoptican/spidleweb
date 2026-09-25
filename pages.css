@@ -216,6 +216,66 @@ body.page > main { flex: 1 0 auto; }
   .entry__link:hover .entry__cta { text-decoration: underline; text-underline-offset: 4px; }
 }
 
+/* ---- The post page -------------------------------------------------------- */
+
+/* The post reads in the case study's wide column, so both kinds of page
+   share one measure. */
+.post {
+  display: grid;
+  grid-template-columns: minmax(0, 276px) minmax(0, 1fr);
+  column-gap: 56px;
+  padding: 72px var(--page-gutter) 96px;
+}
+@media (min-width: 1441px) {
+  .post { grid-template-columns: minmax(276px, 276fr) minmax(0, 1028fr); }
+}
+.post__article { grid-column: 2; min-width: 0; }
+
+.post__kicker { color: var(--ink-muted); }
+.post__title {
+  margin-top: 20px;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 42px;
+  line-height: 46px;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+.post__dek,
+.post__body {
+  max-width: 680px;
+  font-family: "EB Garamond", Georgia, serif;
+  font-weight: 400;
+  font-synthesis: none;
+}
+.post__dek { margin-top: 20px; font-size: 24px; line-height: 32px; text-wrap: pretty; }
+.post__facts { display: flex; flex-wrap: wrap; gap: 4px 44px; margin-top: 26px; }
+.post__facts div { display: flex; gap: 12px; }
+.post__facts dt { color: var(--ink-muted); }
+
+.post__cover { margin-top: 40px; background: #fff; }
+.post__cover img {
+  width: 100%;
+  outline: 1px solid var(--line);
+  outline-offset: -1px;
+}
+/* Wider screens trim the cover's empty top and bottom, as Paper frames it. */
+@media (min-width: 600px) {
+  .post__cover img { aspect-ratio: 1028 / 540; object-fit: cover; }
+}
+
+.post__body { margin-top: 54px; }
+.post__placeholder { color: var(--ink-muted); }
+.post__bars { display: grid; gap: 28px; margin-top: 24px; }
+.post__bars p { display: grid; gap: 14px; }
+.post__bars span { display: block; height: 12px; background: var(--placeholder-fill); }
+.post__bars p:first-child span:nth-child(2) { width: 97%; }
+.post__bars p:first-child span:nth-child(3) { width: 99%; }
+.post__bars p:first-child span:nth-child(4) { width: 62%; }
+.post__bars p:last-child span:nth-child(2) { width: 96%; }
+.post__bars p:last-child span:nth-child(3) { width: 79%; }
+
 /* ---- Footer line, provisional ---------------------------------------------
    Stands in for Phase 2A's thin footer line until its chrome contract lands,
    then goes. It keeps .footer so the shared year test still finds it. */
@@ -254,6 +314,8 @@ body.page > main { flex: 1 0 auto; }
     column-gap: 32px;
   }
   .entry__cta { margin-top: 20px; }
+  .post { grid-template-columns: minmax(0, 1fr); }
+  .post__article { grid-column: 1; }
 }
 
 @media (max-width: 599px) {
@@ -289,6 +351,16 @@ body.page > main { flex: 1 0 auto; }
   .entry__bars { margin-top: 16px; }
   .entry__cta { margin-top: 26px; }
 
+  .post { padding-top: 40px; padding-bottom: 64px; }
+  .post__title { margin-top: 18px; font-size: 28px; line-height: 32px; }
+  .post__dek { margin-top: 18px; font-size: 20px; line-height: 26px; }
+  .post__facts { display: grid; gap: 6px; margin-top: 18px; }
+  .post__facts div { display: grid; grid-template-columns: 72px 1fr; gap: 12px; }
+  .post__cover { margin-top: 28px; }
+  .post__body { margin-top: 36px; }
+  .post__bars { gap: 24px; margin-top: 20px; }
+  .post__bars p { gap: 12px; }
+  .post__bars span { height: 11px; }
 
   .footer.footer-line { display: grid; justify-content: start; gap: 0; padding: 10px var(--page-gutter) 16px; }
 }
