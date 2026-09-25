@@ -1751,5 +1751,39 @@ class BrowserRegressions(unittest.TestCase):
                 self.assertEqual(page.errors, [])
                 page.close()
 
+    # ---- Early QA pass (Phase 4, 2026-09-25) ----
+
+    def test_qa_card_names_keep_every_meta_word_apart(self):
+        # The separating dot is aria-hidden, so the spaces around it must sit
+        # outside it, or a card reads "PrototypeProductivity" or "Writing2026".
+        words = """el => {
+          const copy = el.cloneNode(true);
+          copy.querySelectorAll('[aria-hidden="true"]').forEach(hidden => hidden.replaceWith(' '));
+          return copy.textContent.trim().split(/\\s+/);
+        }"""
+        spoken = """el => {
+          const copy = el.cloneNode(true);
+          copy.querySelectorAll('[aria-hidden="true"]').forEach(hidden => hidden.remove());
+          return copy.textContent.trim().split(/\\s+/);
+        }"""
+        context = self.context()
+        for path, meta in [('index.html', '.stream-card__meta'), ('list/index.html', '.stream-row__kind'),
+                           ('work/conservis', '.stream-card__meta')]:
+            page = self.open(context, path)
+            for element in page.locator(meta).all():
+                with self.subTest(path=path, meta=element.evaluate('el => el.id || el.textContent.trim()')):
+                    self.assertEqual(element.evaluate(spoken), element.evaluate(words))
+            page.close()
+        # And the name Chromium computes for a card link, from the title and the meta line.
+        page = self.open(context, 'index.html')
+        for card_id, name in [('activity-central', 'Activity Central Prototype Productivity'),
+                              ('how-i-built-description-generator', 'How I built Description Generator Writing 2026'),
+                              ('expert-insights', 'Expert Insights Case study 7 screens'),
+                              ('fields-on-the-map', 'Fields on the map Screen from the Conservis case study')]:
+            with self.subTest(card=card_id):
+                snapshot = page.locator(f'#{card_id} .stream-card__link').aria_snapshot()
+                self.assertEqual(re.match(r'- link "(.*)"', snapshot).group(1), name)
+        self.assertEqual(page.errors, [])
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

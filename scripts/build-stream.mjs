@@ -614,7 +614,9 @@ function mediaLines(item, block, sizes, eager) {
  */
 function metaHtml(item, block) {
   const type = `<span class="${block}__type">${esc(item.typeLabel)}</span>`;
-  const dot = '<span aria-hidden="true"> · </span>';
+  // The spaces sit outside the hidden dot, so a screen reader still hears
+  // two words, "Prototype Productivity", rather than "PrototypeProductivity".
+  const dot = ' <span aria-hidden="true">·</span> ';
   const chip = `<span class="${block}__chip" aria-hidden="true"></span>`;
   if (item.type === 'case-study') {
     const count = `${item.caseStudy.total} screen${item.caseStudy.total === 1 ? '' : 's'}`;
