@@ -1,10 +1,12 @@
 /* spidleweb.net: site chrome behaviour.
 
    The phone menu, copying the email address, the docked Grid and List bar,
-   and the footer year. Every page with the site chrome loads this file with
+   and the footer year, plus the filters and pagination on the Craft pages.
+   Every page with the site chrome loads this file with
    <script src="/site.js" defer>. Each part is progressive enhancement: without
-   this file the menu is a row of links, the address is a mailto link, and the
-   dock never appears. The markup is in specs/redesign.md, "Chrome contract". */
+   this file the menu is a row of links, the address is a mailto link, the
+   dock never appears, and every card shows. The markup is in
+   specs/redesign.md, "Chrome contract". */
 
 (() => {
   const root = document.documentElement;
@@ -21,8 +23,9 @@
 
   // ---- Phone menu ----
   // A disclosure: the trigger names the current place and toggles the list.
-  // Picking a row, tapping the trigger, tapping outside, or Esc closes it,
-  // and focus goes back to the trigger.
+  // Picking a row, tapping the trigger, tapping outside, or Esc closes it.
+  // Esc and a tap outside send focus back to the trigger. A picked row leaves
+  // focus to where it leads, since About opens in place and takes focus.
 
   function setupMenu() {
     const nav = document.querySelector('.masthead__nav');
@@ -40,7 +43,7 @@
     trigger.addEventListener('click', () => setOpen(!isOpen()));
 
     places.addEventListener('click', (event) => {
-      if (isOpen() && event.target.closest('a')) setOpen(false, true);
+      if (isOpen() && event.target.closest('a')) setOpen(false);
     });
 
     document.addEventListener('click', (event) => {
@@ -193,7 +196,193 @@
     dock.addEventListener('focusout', () => requestAnimationFrame(update));
   }
 
+  // ---- Craft: filters and pagination ----
+  // Every item is already in the page, so pagination only reveals cards, 30
+  // at a time, and the filters narrow the same list. The count, the bar, and
+  // "Show 30 more" always describe the filtered set. Hidden cards carry the
+  // hidden attribute. A deep link reveals everything up to its card, whether
+  // it arrives as the page's own #id or as a stream:reveal event from
+  // stream.js, which opens items in place.
+
+  const PAGE_SIZE = 30;
+  const TYPE_LABELS = {
+    'case-study': 'Case studies',
+    screen: 'Screens',
+    prototype: 'Prototypes',
+    tool: 'Tools',
+    video: 'Videos',
+    reel: 'Reels',
+    post: 'Writing',
+  };
+
+  // data-industry is kebab case, and its label is that with spaces.
+  const industryLabel = (value) => {
+    const words = value.replace(/-/g, ' ');
+    return words.charAt(0).toUpperCase() + words.slice(1);
+  };
+
+  function hashId() {
+    try {
+      return decodeURIComponent(location.hash.slice(1));
+    } catch {
+      return '';
+    }
+  }
+
+  function setupStream() {
+    const stream = document.querySelector('[data-stream]');
+    if (!stream) return;
+    const cards = [...stream.children].filter((el) => el.matches('article[data-type]'));
+    if (!cards.length) return;
+
+    const pager = document.querySelector('[data-pager]');
+    const empty = document.querySelector('[data-stream-empty]');
+    const selects = [...document.querySelectorAll('[data-filters] select[data-filter]')];
+    // Each select's data-filter names the card attribute it reads.
+    const fields = selects.map((select) => select.dataset.filter);
+
+    const filters = {};
+    const params = new URLSearchParams(location.search);
+    for (const field of fields) {
+      const value = params.get(field) ?? '';
+      filters[field] = cards.some((card) => card.dataset[field] === value) ? value : '';
+    }
+    let limit = Math.max(PAGE_SIZE, Number(history.state?.shown) || 0);
+
+    const matches = (card, except) => fields.every((field) =>
+      field === except || !filters[field] || card.dataset[field] === filters[field]);
+    const matching = () => cards.filter((card) => matches(card));
+
+    // Options come from the cards on the page, each with a count that
+    // respects the other filter.
+    function renderOptions() {
+      for (const select of selects) {
+        const field = select.dataset.filter;
+        const counts = new Map();
+        for (const card of cards) {
+          if (!matches(card, field)) continue;
+          const value = card.dataset[field];
+          counts.set(value, (counts.get(value) ?? 0) + 1);
+        }
+        const values = field === 'type'
+          ? Object.keys(TYPE_LABELS).filter((value) => cards.some((card) => card.dataset.type === value))
+          : [...new Set(cards.map((card) => card.dataset.industry))].sort();
+        const label = (value) => (field === 'type' ? TYPE_LABELS[value] : industryLabel(value));
+        const total = [...counts.values()].reduce((sum, n) => sum + n, 0);
+        const options = [new Option(`All (${total})`, '')];
+        for (const value of values) {
+          const n = counts.get(value) ?? 0;
+          const option = new Option(`${label(value)} (${n})`, value);
+          option.disabled = n === 0 && filters[field] !== value;
+          options.push(option);
+        }
+        select.replaceChildren(...options);
+        select.value = filters[field];
+        const shown = document.querySelector(`[data-filter-label="${field}"]`);
+        if (shown) shown.textContent = filters[field] ? label(filters[field]) : 'All';
+      }
+    }
+
+    function render() {
+      const list = matching();
+      const visible = new Set(list.slice(0, limit));
+      for (const card of cards) card.hidden = !visible.has(card);
+
+      const shown = Math.min(limit, list.length);
+      if (empty) empty.hidden = list.length > 0;
+      if (pager) {
+        pager.hidden = list.length === 0;
+        pager.querySelector('[data-pager-shown]').textContent = shown;
+        pager.querySelector('[data-pager-total]').textContent = list.length;
+        pager.querySelector('[data-pager-fill]').style.width = `${list.length ? (shown / list.length) * 100 : 0}%`;
+        const more = pager.querySelector('[data-pager-more]');
+        const next = Math.min(PAGE_SIZE, list.length - shown);
+        more.hidden = next <= 0;
+        pager.querySelector('[data-pager-next]').textContent = next;
+      }
+      // The rows may have moved, so an open panel re-anchors (stream.js).
+      document.dispatchEvent(new CustomEvent('stream:layout'));
+    }
+
+    function remember() {
+      history.replaceState({ ...(history.state ?? {}), shown: limit }, '');
+    }
+
+    function writeQuery() {
+      const url = new URL(location.href);
+      for (const field of fields) {
+        if (filters[field]) url.searchParams.set(field, filters[field]);
+        else url.searchParams.delete(field);
+      }
+      history.replaceState({ ...(history.state ?? {}), shown: limit }, '', url);
+    }
+
+    function setFilters(next) {
+      Object.assign(filters, next);
+      limit = PAGE_SIZE;
+      renderOptions();
+      render();
+      writeQuery();
+    }
+
+    // Reveals every card up to this one. Returns the card, or null.
+    function reveal(id) {
+      const card = id ? cards.find((el) => el.id === id) : null;
+      if (!card) return null;
+      if (!matches(card)) {
+        for (const field of fields) filters[field] = '';
+        renderOptions();
+        writeQuery();
+      }
+      const index = matching().indexOf(card);
+      if (index >= limit) limit = index + 1;
+      render();
+      remember();
+      return card;
+    }
+
+    for (const select of selects) {
+      select.addEventListener('change', () => setFilters({ [select.dataset.filter]: select.value }));
+    }
+
+    document.querySelector('[data-filters-clear]')?.addEventListener('click', () => {
+      setFilters(Object.fromEntries(fields.map((field) => [field, ''])));
+      selects[0]?.focus();
+    });
+
+    pager?.querySelector('[data-pager-more]').addEventListener('click', () => {
+      const list = matching();
+      const first = list[limit];
+      limit += PAGE_SIZE;
+      render();
+      remember();
+      // Carry keyboard focus to the first card just revealed.
+      const link = first?.querySelector('a[data-open], a');
+      if (link) {
+        link.focus({ preventScroll: true });
+        if (link.getBoundingClientRect().top > innerHeight) link.scrollIntoView({ block: 'nearest' });
+      }
+    });
+
+    document.addEventListener('stream:reveal', (event) => reveal(event.detail?.id));
+
+    // A same-page link to a hidden card: the browser's jump found nothing
+    // to scroll to, so scroll once the card is shown.
+    addEventListener('hashchange', () => {
+      const id = hashId();
+      const wasHidden = cards.find((el) => el.id === id)?.hidden;
+      const card = reveal(id);
+      if (card && wasHidden) card.scrollIntoView();
+    });
+
+    // On load only cards after the target are hidden, so the browser's own
+    // jump to the fragment stays where it landed.
+    renderOptions();
+    if (!reveal(hashId())) render();
+  }
+
   setupMenu();
   setupEmail();
+  setupStream();
   setupDock();
 })();

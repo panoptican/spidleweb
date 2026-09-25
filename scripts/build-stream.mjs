@@ -48,6 +48,7 @@ const STREAM_FILE = 'content/stream.json';
 
 // Pages with generated regions. Add a page here when it gains one.
 const PAGES = [
+  'index.html',
   'content/fixtures/grid.html',
   'content/fixtures/list.html',
   'content/fixtures/more-from.html',
@@ -88,9 +89,11 @@ const ITEM_KEYS = [
 const MEDIA_KEYS = ['src', 'width', 'height', 'video', 'duration', 'tile'];
 
 // Image `sizes` hints. Keep them in step with the Grid columns in stream.css
-// (Phase 2A) and the List image column (Phase 2D).
+// (Phase 2A) and the List image column (Phase 2D). Grid runs two columns on
+// phones, three from 600px, four from 900px, and five from 1200px, inside
+// gutters of 16, 24, 40, and 40px with gaps of 14px and then 20px.
 const SIZES = {
-  grid: '(max-width: 599px) calc(100vw - 32px), (max-width: 1099px) calc((100vw - 120px) / 3), calc((100vw - 160px) / 5)',
+  grid: '(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)',
   list: '(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)',
 };
 
