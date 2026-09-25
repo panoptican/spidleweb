@@ -193,9 +193,13 @@ html:not(.js) .filters { display: none; }
   background: var(--case-dark);
 }
 
+/* The middle leaf keeps the project's hue, 0.16 lighter and a touch more
+   saturated, as Paper draws Expert Insights (#191E2F behind #3F475E). The
+   mix is the fallback where relative colour is not supported. */
 .stream-card[data-type="case-study"] .stream-card__media::after {
   inset: var(--stack-step);
   background: color-mix(in oklch, var(--case-dark) 78%, var(--site-paper));
+  background: oklch(from var(--case-dark) calc(l + 0.16) calc(c * 1.2) h);
 }
 
 .stream-card[data-type="case-study"] .stream-card__media img {
