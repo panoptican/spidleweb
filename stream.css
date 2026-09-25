@@ -449,4 +449,12 @@ html:not(.js) .filters { display: none; }
   .stream-card__media--tile { padding: 12px; }
   .stream-card__badge { bottom: 8px; left: 8px; padding: 4px 7px; }
   .pager__more { padding: 15px 16px; }
+
+  /* A phone runs only a Mobile prototype live, so any other prototype drops
+     its Try it badge, by the same test stream.js applies when one opens.
+     Jason's ruling of 2026-09-24. data-platform is on the card and the List
+     row (the card contract). */
+  :is(.stream-card, .stream-row)[data-type="prototype"]:not([data-platform="mobile"]) :is(.stream-card__badge, .stream-row__badge) {
+    display: none;
+  }
 }

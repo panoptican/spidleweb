@@ -564,6 +564,9 @@ function articleOpen(item, block) {
     ['data-project', item.projectKey],
     ['data-industry', slugify(item.industry)],
   ];
+  // Where the item runs. On a phone, a prototype that is not Mobile drops its
+  // Try it badge, since it is not offered live there (stream.css).
+  if (item.platform) attrs.push(['data-platform', item.platform.toLowerCase()]);
   if (item.caseStudy) attrs.push(['data-case-study', item.caseStudy.slug]);
   if (item.placeholder) attrs.push(['data-placeholder', null]);
   return `<article${attrs.map(([k, v]) => (v === null ? ` ${k}` : ` ${k}="${esc(v)}"`)).join('')}>`;
@@ -936,6 +939,7 @@ function checkContract(html, list, view, file) {
     if (a.id !== item.id) fail(item, 'the article id is the item id');
     for (const name of ['data-type', 'data-project', 'data-industry']) if (!a[name]) fail(item, `the article has ${name}`);
     if (('data-case-study' in a) !== Boolean(item.caseStudy)) fail(item, 'data-case-study is present only for case-study items');
+    if ((a['data-platform'] ?? null) !== (item.platform ? item.platform.toLowerCase() : null)) fail(item, 'data-platform is the lowercase platform, present only when the item has one');
 
     const links = [...body.matchAll(new RegExp(`<a class="${block}__link"([^>]*)>`, 'g'))];
     if (links.length !== 1) fail(item, `there is exactly one ${block}__link`);
