@@ -8,19 +8,26 @@ Resources are fulfilled from the checkout at a test origin. Clean URLs such as
 external service, installed Chrome profile, or system-clock change is needed.
 Set PLAYWRIGHT_CHROMIUM_EXECUTABLE to use another bundled Chromium binary.
 """
+import json
 import mimetypes
 import os
+import re
 from pathlib import Path
 import time
 import unittest
-from urllib.parse import unquote, urlsplit
+from urllib.parse import unquote, urljoin, urlsplit
 
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(os.environ.get('SPIDLEWEB_TEST_ROOT', Path(__file__).resolve().parents[1]))
 ORIGIN = 'https://portfolio.test'
-CASE_PAGES = [str(p.relative_to(ROOT)) for p in sorted((ROOT / 'work').glob('*.html'))]
-PAGES = ['index.html', 'feed/index.html', *CASE_PAGES]
+CASE_PAGES = [str(p.relative_to(ROOT)) for p in sorted((ROOT / 'work').glob('*.html')) if p.name != 'index.html']
+# The Work and Writing indexes and the posts (Phase 2C).
+READING_PAGES = ['work/index.html', 'writing/index.html',
+                 *[str(p.relative_to(ROOT)) for p in sorted((ROOT / 'writing').glob('*.html')) if p.name != 'index.html']]
+PAGES = ['index.html', 'feed/index.html', *CASE_PAGES, *READING_PAGES]
+# /work/ lists the case studies newest first, and the next-story band follows it.
+WORK_ORDER = ['expert-insights', 'campaign-sim', 'everag', 'vidscrip', 'conservis', 'plinth']
 SCREENSHOTS = os.environ.get('SPIDLEWEB_TEST_SCREENSHOTS')
 
 
@@ -533,44 +540,56 @@ class BrowserRegressions(unittest.TestCase):
                 self.assertEqual(page.errors, [])
                 page.close()
 
-    def test_case_endpapers_match_destinations_and_complete_the_cycle(self):
-        expected = {'everag': 'vidscrip', 'vidscrip': 'conservis', 'conservis': 'plinth',
-                    'plinth': 'expert-insights', 'expert-insights': 'campaign-sim', 'campaign-sim': 'everag'}
+    def test_next_story_band_moves_forward_and_wraps_in_work_order(self):
+        # Replaces the endpaper cycle test: the band is forward only, follows
+        # /work/ order, and wraps from the last case study to the first.
         context = self.context(reduced_motion='reduce')
         themes = {}
-        for slug in expected:
-            page = self.open(context, f'work/{slug}.html')
+        for slug in WORK_ORDER:
+            page = self.open(context, f'work/{slug}')
             themes[slug] = page.evaluate("""() => ({
-              bg: getComputedStyle(document.querySelector('.case-masthead'), '::before').backgroundColor,
-              fg: getComputedStyle(document.querySelector('.case-masthead')).color,
+              dark: getComputedStyle(document.querySelector('.case-context__title')).color,
               paper: getComputedStyle(document.body).backgroundColor
             })""")
             page.close()
-        page = self.open(context, 'work/everag.html')
+        page = self.open(context, 'work/')
+        self.assertEqual(page.locator('.entry__link').evaluate_all('els => els.map(el => el.getAttribute("href"))'),
+                         [f'/work/{slug}' for slug in WORK_ORDER])
+        page.locator('.entry__link').first.click()
         visited = []
-        for _ in expected:
-            slug = Path(urlsplit(page.url).path).stem
+        for i, slug in enumerate(WORK_ORDER):
+            page.wait_for_url(f'{ORIGIN}/work/{slug}')
             visited.append(slug)
-            destination = expected[slug]
-            actual = page.evaluate("""() => ({
-              bg: getComputedStyle(document.querySelector('.case-endpaper'), '::before').backgroundColor,
-              fg: getComputedStyle(document.querySelector('.case-endpaper')).color,
-              paper: getComputedStyle(document.body).backgroundColor
+            destination = WORK_ORDER[(i + 1) % len(WORK_ORDER)]
+            band = page.locator('.next-story')
+            self.assertEqual(band.count(), 1)
+            self.assertEqual(band.get_attribute('aria-label'), 'Next case study')
+            # One link and nothing else: no way back to /work/ or home.
+            self.assertEqual(band.locator('a').count(), 1)
+            self.assertEqual(page.locator('.case-endpaper, a:text-is("Back to all work")').count(), 0)
+            actual = band.evaluate("""el => ({
+              bg: getComputedStyle(el, '::before').backgroundColor,
+              fg: getComputedStyle(el).color,
+              paper: getComputedStyle(document.body).backgroundColor,
+              slope: getComputedStyle(el, '::before').clipPath
             })""")
-            self.assertEqual(actual['bg'], themes[destination]['bg'])
-            self.assertEqual(actual['fg'], themes[destination]['fg'])
+            self.assertEqual(actual['bg'], themes[destination]['dark'])
+            self.assertEqual(actual['fg'], themes[destination]['paper'])
             self.assertEqual(actual['paper'], themes[slug]['paper'])
-            self.assertNotEqual(actual['bg'], themes[slug]['bg'])
-            link = page.locator('.case-endpaper__next')
+            self.assertIn('48px', actual['slope'])
+            link = band.locator('.next-story__link')
             self.assertEqual(link.get_attribute('href'), f'/work/{destination}')
+            self.assertGreaterEqual(link.bounding_box()['height'], 44)
             link.focus()
             self.assertEqual(link.evaluate('el => getComputedStyle(el).outlineStyle'), 'solid')
             page.keyboard.press('Enter')
-            page.wait_for_url(f'{ORIGIN}/work/{destination}')
-        self.assertEqual(set(visited), set(expected))
-        self.assertEqual(page.url, f'{ORIGIN}/work/everag')
+        page.wait_for_url(f'{ORIGIN}/work/{WORK_ORDER[0]}')
+        self.assertEqual(visited, WORK_ORDER)
+        self.assertEqual(page.errors, [])
 
-    def test_case_context_sticks_only_when_it_fits_and_stops_before_endpaper(self):
+    def test_case_context_sticks_only_when_it_fits_and_stops_before_the_ending(self):
+        # The ending is now More from, when a case study shares anything, then
+        # the next-story band; the rail stops at the end of the case layout.
         context = self.context(reduced_motion='reduce')
         for path in CASE_PAGES:
             page = self.open(context, path)
@@ -579,11 +598,14 @@ class BrowserRegressions(unittest.TestCase):
             page.evaluate('scrollTo(0, 1000)')
             self.settle(page)
             self.assertAlmostEqual(rail.bounding_box()['y'], 24, delta=1)
-            page.locator('.case-endpaper').scroll_into_view_if_needed()
+            page.locator('.next-story').scroll_into_view_if_needed()
             self.settle(page)
             bounds = rail.bounding_box()
-            end = page.locator('.case-endpaper').bounding_box()
-            self.assertLessEqual(bounds['y'] + bounds['height'], end['y'])
+            end = page.evaluate("""() => {
+              const next = [...document.querySelectorAll('main ~ *')].find(el => el.getClientRects().length);
+              return next.getBoundingClientRect().top;
+            }""")
+            self.assertLessEqual(bounds['y'] + bounds['height'], end)
             for width, height in [(1440, 400), (834, 1112), (390, 844), (320, 844)]:
                 page.set_viewport_size({'width': width, 'height': height})
                 self.settle(page)
@@ -635,7 +657,8 @@ class BrowserRegressions(unittest.TestCase):
             page.keyboard.press('Tab')
             self.assertEqual(page.locator(':focus').get_attribute('class'), 'case-masthead__index')
             self.assertEqual(page.locator('.case-proofs a[href*="assets/"]').count(), 0)
-            self.assertEqual(page.locator('a:has(img)').count(), 0)
+            # Case imagery is never a link. More from cards are, by the card contract.
+            self.assertEqual(page.locator('main a:has(img)').count(), 0)
             # Desktop captures are full-height; phone captures retain every edge inside native overflow.
             self.assertTrue(page.locator('.proof__frame').evaluate_all("""els => els.every(el => {
               const image = el.querySelector('img');
@@ -740,11 +763,17 @@ class BrowserRegressions(unittest.TestCase):
 
     def test_case_navigation_links_change_only_color_and_follow_destination_palette(self):
         context = self.context(reduced_motion='reduce')
-        masthead_colors = {}
-        endpaper_colors = []
+        hover_colors = {}
+        band_colors = []
         for path in CASE_PAGES:
             page = self.open(context, path)
-            for selector in ['.case-masthead a', '.case-context__links a', '.case-endpaper__nav a']:
+            # The page's own hover tint, resolved to a computed colour.
+            hover_colors[f'/work/{Path(path).stem}'] = page.evaluate("""() => {
+              const probe = document.body.appendChild(document.createElement('span'));
+              probe.style.color = 'var(--case-hover)';
+              const color = getComputedStyle(probe).color; probe.remove(); return color;
+            }""")
+            for selector in ['.case-masthead a', '.case-context__links a', '.next-story a']:
                 for link in page.locator(selector).all():
                     page.mouse.move(0, 0)
                     before = link.evaluate('el => ({color: getComputedStyle(el).color, bg: getComputedStyle(el).backgroundColor})')
@@ -754,15 +783,13 @@ class BrowserRegressions(unittest.TestCase):
                     self.assertNotEqual(after['color'], 'rgb(250, 25, 0)')
                     self.assertEqual(after['bg'], before['bg'])
                     self.assertEqual(after['decoration'], 'none')
-                    if selector == '.case-masthead a':
-                        masthead_colors[f'/work/{Path(path).stem}'] = after['color']
-                    elif selector == '.case-endpaper__nav a':
-                        destination = page.locator('.case-endpaper__next').get_attribute('href')
-                        endpaper_colors.append((destination, after['color']))
+                    if selector == '.next-story a':
+                        band_colors.append((link.get_attribute('href'), after['color']))
             page.close()
-        self.assertEqual(len(set(masthead_colors.values())), 6)
-        for destination, color in endpaper_colors:
-            self.assertEqual(color, masthead_colors[destination])
+        self.assertEqual(len(set(hover_colors.values())), 6)
+        self.assertEqual(len(band_colors), 6)
+        for destination, color in band_colors:
+            self.assertEqual(color, hover_colors[destination])
         page = self.open(self.context(reduced_motion='reduce'), 'work/expert-insights.html')
         for i in [5, 6, 7]:
             image = page.locator(f'img[src$="expert-insights-0{i}-full.png"]')
@@ -1018,6 +1045,209 @@ class BrowserRegressions(unittest.TestCase):
                 # The thumbnails fold away on phones and short panels; the link itself never does.
                 self.assertEqual(thumbs.is_visible(), width > 768 and height > 560)
                 self.assertTrue(door.is_visible())
+            page.close()
+
+    # ---- Work and Writing pages (Phase 2C) ----
+
+    def case_facts(self, slug):
+        """The first figure's image and the role and dates on a case-study page."""
+        html = (ROOT / f'work/{slug}.html').read_text(encoding='utf-8')
+        first = re.search(r'<figure[^>]*>[\s\S]*?<img src="\.\./([^"]+)"', html).group(1)
+        facts = [re.sub(r'<[^>]+>', '', dd) for dd in re.findall(r'<dd>([\s\S]*?)</dd>', html)]
+        return {'cover': f'/{first}', 'role': facts[0], 'dates': facts[1]}
+
+    def test_work_index_lists_case_studies_newest_first_as_whole_row_links(self):
+        for width in [1440, 390]:
+            page = self.open(self.context(viewport={'width': width, 'height': 900}, reduced_motion='reduce'), 'work/')
+            with self.subTest(width=width):
+                # The head is the title and its rule: no intro line, no numbering.
+                self.assertEqual(page.locator('h1').text_content(), 'Work')
+                self.assertEqual(page.locator('.page-head > *').count(), 1)
+                self.assertIsNone(re.search(r'\b0[1-6]\b', page.locator('main').inner_text()))
+                headings = page.evaluate("() => [...document.querySelectorAll('h1,h2,h3,h4,h5,h6')].map(el => Number(el.tagName[1]))")
+                self.assertEqual(headings, [1, 2, 2, 2, 2, 2, 2])
+                entries = page.locator('.entry')
+                self.assertEqual(entries.count(), len(WORK_ORDER))
+                colors = set()
+                for i, slug in enumerate(WORK_ORDER):
+                    entry = entries.nth(i)
+                    facts = self.case_facts(slug)
+                    # The whole row is one link, named by its title.
+                    self.assertEqual(entry.locator('a').count(), 1)
+                    link = entry.locator('.entry__link')
+                    self.assertEqual(link.get_attribute('href'), f'/work/{slug}')
+                    title = link.locator('.entry__title').text_content()
+                    self.assertEqual(page.get_by_role('link', name=title, exact=True).count(), 1)
+                    for part in ['.entry__cover', '.entry__title', '.entry__dek', '.entry__meta', '.entry__cta']:
+                        self.assertEqual(link.locator(part).count(), 1, (slug, part))
+                    self.assertEqual(link.locator('.entry__cta').text_content().strip(), 'Read the case study →')
+                    self.assertEqual(link.locator('.entry__dateline').text_content(), facts['dates'])
+                    self.assertEqual(link.locator('.entry__detail').text_content(), facts['role'])
+                    # The cover is the page's first figure, on a slab of the project colour.
+                    cover = link.locator('.entry__cover img')
+                    self.assertEqual(cover.get_attribute('src'), facts['cover'])
+                    self.assertEqual(cover.get_attribute('alt'), '')
+                    self.assertTrue(cover.evaluate('async img => { img.loading = "eager"; await img.decode(); return img.naturalWidth > 0; }'))
+                    look = link.evaluate("""el => ({
+                      title: getComputedStyle(el.querySelector('.entry__title')).color,
+                      slab: getComputedStyle(el.querySelector('.entry__cover'), '::before').backgroundColor,
+                      dek: getComputedStyle(el.querySelector('.entry__dek')).color
+                    })""")
+                    self.assertEqual(look['title'], look['slab'])
+                    self.assertEqual(look['dek'], 'rgb(10, 10, 10)')
+                    colors.add(look['title'])
+                    box, cover_box, title_box = link.bounding_box(), cover.bounding_box(), link.locator('.entry__title').bounding_box()
+                    self.assertGreaterEqual(box['height'], 44)
+                    if width == 1440:
+                        self.assertLess(cover_box['x'] + cover_box['width'], title_box['x'])
+                        cta = link.locator('.entry__cta').bounding_box()
+                        self.assertAlmostEqual(cta['x'] + cta['width'], box['x'] + box['width'], delta=1)
+                    else:
+                        self.assertLessEqual(cover_box['y'] + cover_box['height'], title_box['y'])
+                        self.assertGreater(cover_box['width'], width - 60)
+                self.assertEqual(len(colors), len(WORK_ORDER))
+                self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
+                page.locator('.skip-link').focus()
+                page.keyboard.press('Tab')
+                focused = page.locator(':focus')
+                self.assertEqual(focused.get_attribute('href'), f'/work/{WORK_ORDER[0]}')
+                self.assertEqual(focused.evaluate('el => getComputedStyle(el).outlineStyle'), 'solid')
+                self.assertEqual(page.errors, [])
+            page.close()
+
+    def test_figure_anchors_follow_image_names_and_land_on_their_figure(self):
+        for path in CASE_PAGES:
+            html = (ROOT / path).read_text(encoding='utf-8')
+            ids = []
+            for figure in re.findall(r'<figure[^>]*>[\s\S]*?</figure>', html):
+                anchor = re.match(r'<figure[^>]*\sid="([^"]+)"', figure)
+                image = re.search(r'<img src="([^"]+)"', figure).group(1)
+                self.assertIsNotNone(anchor, (path, image))
+                self.assertEqual(anchor.group(1), f'fig-{Path(image).stem}', path)
+                ids.append(anchor.group(1))
+            self.assertGreater(len(ids), 0)
+            self.assertEqual(len(ids), len(set(ids)), path)
+        # Every stream item that names a figure lands on it, with room above.
+        stream = json.loads((ROOT / 'content/stream.json').read_text(encoding='utf-8'))
+        linked = [item['caseStudy'] for item in stream if item.get('caseStudy', {}).get('figure')]
+        self.assertGreater(len(linked), 0)
+        context = self.context(reduced_motion='reduce')
+        for case in linked:
+            with self.subTest(figure=case['figure']):
+                page = self.open(context, f'work/{case["slug"]}#fig-{case["figure"]}')
+                target = page.locator(f'#fig-{case["figure"]}')
+                self.assertEqual(target.evaluate('el => el.tagName'), 'FIGURE')
+                self.assertAlmostEqual(target.bounding_box()['y'], 24, delta=2)
+                page.close()
+
+    def test_more_from_gathers_what_each_case_study_shares(self):
+        stream = json.loads((ROOT / 'content/stream.json').read_text(encoding='utf-8'))
+        for width in [1440, 390]:
+            context = self.context(viewport={'width': width, 'height': 900}, reduced_motion='reduce')
+            for path in CASE_PAGES:
+                slug = Path(path).stem
+                expected = [item['id'] for item in stream if item.get('caseStudy', {}).get('slug') == slug
+                            and item['type'] != 'case-study' and not item['caseStudy'].get('figure')]
+                with self.subTest(width=width, slug=slug):
+                    page = self.open(context, f'work/{slug}')
+                    section = page.locator('.more-from')
+                    self.assertEqual(section.locator('article.stream-card').evaluate_all('els => els.map(el => el.id)'), expected)
+                    # An empty section hides, heading and all.
+                    self.assertEqual(section.is_visible(), bool(expected))
+                    self.assertEqual(page.get_by_role('heading', name=re.compile('^More from')).count(), 1 if expected else 0)
+                    headings = page.evaluate("""() => [...document.querySelectorAll('h1,h2,h3,h4,h5,h6')]
+                      .filter(el => el.getClientRects().length).map(el => Number(el.tagName[1]))""")
+                    self.assertEqual(headings, [1] + ([2] + [3] * len(expected) if expected else []))
+                    island = json.loads(page.locator('#stream-data').text_content())
+                    self.assertTrue(set(expected) <= set(island['items']))
+                    # The page's gutter matches the site's: 16px on a phone.
+                    self.assertEqual(page.locator('h1').bounding_box()['x'], 40 if width == 1440 else 16)
+                    if expected:
+                        cards = section.locator('article.stream-card')
+                        boxes = [cards.nth(i).bounding_box() for i in range(min(cards.count(), 3))]
+                        per_row = 3 if width == 1440 else 2
+                        first_row = [b for b in boxes if abs(b['y'] - boxes[0]['y']) < 1]
+                        self.assertEqual(len(first_row), min(per_row, len(expected)))
+                        if width == 1440:
+                            self.assertAlmostEqual(boxes[0]['width'], (1440 - 160) / 5, delta=1)
+                        for link in section.locator('.stream-card__link').all():
+                            self.assertNotRegex(link.get_attribute('href'), f'^/work/{slug}#')
+                    self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
+                    self.assertEqual(page.errors, [])
+                    page.close()
+
+    def test_writing_index_marks_its_placeholder_and_hides_it_with_one_attribute(self):
+        page = self.open(self.context(reduced_motion='reduce'), 'writing/')
+        self.assertEqual(page.locator('h1').text_content(), 'Writing')
+        entries = page.locator('.entry')
+        self.assertEqual(entries.count(), 2)
+        first, placeholder = entries.nth(0), entries.nth(1)
+        self.assertEqual(first.locator('a').get_attribute('href'), '/writing/how-i-built-description-generator')
+        self.assertIsNone(first.get_attribute('data-placeholder'))
+        self.assertEqual(placeholder.get_attribute('data-placeholder'), '')
+        self.assertEqual(placeholder.locator('.entry__title').text_content(), 'Building 500+ manufacturing careers')
+        for entry in [first, placeholder]:
+            self.assertEqual(entry.locator('a').count(), 1)
+            self.assertEqual(entry.locator('.entry__cta').text_content().strip(), 'Read the post →')
+        self.assertTrue(placeholder.is_visible())
+        page.locator('.entry-list').evaluate('el => el.dataset.placeholders = "hide"')
+        self.assertFalse(placeholder.is_visible())
+        self.assertTrue(first.is_visible())
+        self.assertEqual(page.errors, [])
+
+    def test_post_page_has_its_canonical_article_data_and_a_marked_placeholder_body(self):
+        path = 'writing/how-i-built-description-generator'
+        for width in [1440, 390]:
+            page = self.open(self.context(viewport={'width': width, 'height': 900}, reduced_motion='reduce'), path)
+            canonical = f'https://spidleweb.net/{path}'
+            self.assertEqual(page.locator('link[rel="canonical"]').get_attribute('href'), canonical)
+            self.assertEqual(page.locator('meta[property="og:url"]').get_attribute('content'), canonical)
+            self.assertEqual(page.locator('meta[property="og:type"]').get_attribute('content'), 'article')
+            data = json.loads(page.locator('script[type="application/ld+json"]').text_content())
+            self.assertEqual(data['@type'], 'Article')
+            self.assertEqual(data['headline'], page.locator('h1').text_content())
+            self.assertEqual(data['mainEntityOfPage']['@id'], canonical)
+            self.assertEqual(data['description'], page.locator('.post__dek').text_content())
+            image = urlsplit(data['image'][0]).path.lstrip('/')
+            self.assertTrue((ROOT / image).is_file(), image)
+            self.assertEqual(page.locator('h1').count(), 1)
+            self.assertEqual(page.locator('.post__kicker time').get_attribute('datetime'), '2026-09')
+            self.assertTrue(page.locator('.post__cover img').evaluate('async img => { await img.decode(); return img.naturalWidth > 0 && img.alt.length > 0; }'))
+            body = page.locator('.post__body')
+            self.assertEqual(body.get_attribute('data-placeholder'), '')
+            self.assertEqual(body.locator('.post__bars').get_attribute('aria-hidden'), 'true')
+            # A post ends with the footer line, never a next-story band.
+            self.assertEqual(page.locator('.next-story').count(), 0)
+            self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
+            self.assertEqual(page.errors, [])
+            page.close()
+
+    def test_work_and_writing_image_and_asset_paths_all_resolve(self):
+        pattern = re.compile(r'(?:src|href|content)="([^"]+)"|srcset="([^"]+)"')
+        for path in [*CASE_PAGES, *READING_PAGES]:
+            html = (ROOT / path).read_text(encoding='utf-8')
+            # The URL each page is served at, so relative paths resolve as they do live.
+            base = f'https://spidleweb.net/{path.removesuffix("index.html").removesuffix(".html")}'
+            checked = 0
+            for single, srcset in pattern.findall(html):
+                for ref in ([single] if single else [entry.split()[0] for entry in srcset.split(',')]):
+                    url = urlsplit(urljoin(base, ref))
+                    if url.netloc != 'spidleweb.net' or not re.search(r'\.(png|jpe?g|webp|avif|svg|woff2?|css|js)$', url.path):
+                        continue
+                    local = (ROOT / url.path.lstrip('/')).resolve()
+                    self.assertTrue(local.is_file(), (path, ref))
+                    checked += 1
+            self.assertGreater(checked, 3, path)
+
+    def test_work_pages_cross_fade_only_when_motion_is_allowed(self):
+        for motion, expected in [('no-preference', True), ('reduce', False)]:
+            context = self.context(reduced_motion=motion)
+            context.add_init_script("addEventListener('pagereveal', event => { window.revealedWithTransition = Boolean(event.viewTransition); })")
+            page = self.open(context, 'work/conservis')
+            page.locator('.next-story__link').click()
+            page.wait_for_url(f'{ORIGIN}/work/plinth')
+            page.wait_for_function('window.revealedWithTransition !== undefined')
+            self.assertEqual(page.evaluate('window.revealedWithTransition'), expected, motion)
             page.close()
 
 
