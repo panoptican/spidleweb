@@ -69,8 +69,11 @@
   color: var(--case-dark);
 }
 
-/* Cards keep the Grid's width, a fifth of the stream, three to a row. */
+/* Cards keep the Grid's width, a fifth of the stream, three to a row. The
+   card spacing token lives on .stream-grid in stream.css, so this grid sets
+   it too, or the title and meta line would sit flush under the image. */
 .more-from__grid {
+  --card-gap: 10px;
   display: grid;
   grid-template-columns: repeat(3, calc((100vw - 160px) / 5));
   gap: 40px 20px;
@@ -343,7 +346,7 @@ body.page > main { flex: 1 0 auto; }
 @media (max-width: 599px) {
   .more-from { padding: 28px 0 64px; }
   .more-from__title { font-size: 20px; line-height: 25px; }
-  .more-from__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 14px; }
+  .more-from__grid { --card-gap: 8px; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 14px; }
 
   .next-story { padding-top: 64px; padding-bottom: 28px; }
   .next-story::before { clip-path: polygon(0 20px, 100% 0, 100% 100%, 0 100%); }

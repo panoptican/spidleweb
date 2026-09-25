@@ -1822,6 +1822,31 @@ class BrowserRegressions(unittest.TestCase):
                                     page.locator('.more-from').evaluate("el => getComputedStyle(el).getPropertyValue('--accent')"))
                 page.close()
 
+    def test_qa_more_from_cards_keep_the_grid_card_spacing(self):
+        # --card-gap lived on .stream-grid only, so More from's cards set
+        # their title and meta line flush under the image.
+        spacing = """el => {
+          const media = el.querySelector('.stream-card__media').getBoundingClientRect();
+          const title = el.querySelector('.stream-card__title').getBoundingClientRect();
+          const meta = el.querySelector('.stream-card__meta').getBoundingClientRect();
+          return [Math.round(title.top - media.bottom), Math.round(meta.top - title.bottom)];
+        }"""
+        for width in [1440, 390]:
+            options = {'viewport': {'width': width, 'height': 900}}
+            if width < 600:
+                options.update(is_mobile=True, has_touch=True)
+            context = self.context(**options)
+            page = self.open(context, 'index.html')
+            grid = page.locator('#direct-expense-planning').evaluate(spacing)
+            self.assertGreater(min(grid), 0)
+            page.close()
+            for path in ['work/conservis', 'work/campaign-sim', 'work/everag', 'work/vidscrip']:
+                with self.subTest(width=width, path=path):
+                    page = self.open(context, path)
+                    for card in page.locator('.more-from .stream-card').all():
+                        self.assertEqual(card.evaluate(spacing), grid)
+                    page.close()
+
     def test_qa_list_marks_its_first_image_as_the_high_priority_lcp(self):
         # The List's first image is its largest paint, where the Grid's is its
         # headline, so only the List asks for fetchpriority.
