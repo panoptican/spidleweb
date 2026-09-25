@@ -279,12 +279,15 @@ class BrowserRegressions(unittest.TestCase):
                 self.assertEqual(rail.evaluate('el => el.scrollHeight'), rail.evaluate('el => el.clientHeight'))
                 page.close()
 
-    def test_b07_mobile_top_index_link_returns_home_on_every_case(self):
+    def test_b07_mobile_masthead_name_returns_home_on_every_case(self):
+        # The site masthead replaces the case masthead's Index link: on a phone
+        # the name leads home, and the menu trigger names Work.
         context = self.context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True)
         for path in CASE_PAGES:
             with self.subTest(path=path):
                 page = self.open(context, path)
-                link = page.locator('.case-masthead__index')
+                self.assertEqual(page.locator('.masthead__trigger').text_content(), 'Menu, Work')
+                link = page.locator('.masthead__name a')
                 self.assertTrue(link.is_visible())
                 bounds = link.bounding_box()
                 self.assertGreaterEqual(bounds['y'], 0)
@@ -307,12 +310,12 @@ class BrowserRegressions(unittest.TestCase):
         }''')
         for path in PAGES:
             page = self.open(context, path)
-            self.assertIn('© 2027 JASON SPIDLE', page.locator('.footer').inner_text())
+            self.assertIn('© 2027 JASON SPIDLE', page.locator('.footer, .footline').first.inner_text())
             page.close()
         context = self.context(java_script_enabled=False)
         for path in PAGES:
             page = self.open(context, path)
-            self.assertIn('© 2026 JASON SPIDLE', page.locator('.footer').inner_text())
+            self.assertIn('© 2026 JASON SPIDLE', page.locator('.footer, .footline').first.inner_text())
             page.close()
 
     def test_b10_external_links_use_this_tab_and_preserve_back_navigation(self):
@@ -320,11 +323,13 @@ class BrowserRegressions(unittest.TestCase):
         count = 0
         for path in PAGES:
             page = self.open(context, path)
-            links = page.locator('a[href^="https://"]').evaluate_all('els => els.map(el => ({href: el.getAttribute("href"), url: el.href}))')
+            links = page.locator('a[href^="https://"]').evaluate_all('''els => [...new Map(els
+              .filter(el => el.getClientRects().length || el.closest('.featured__item'))
+              .map(el => [el.getAttribute("href"), {href: el.getAttribute("href"), url: el.href}])).values()]''')
             for link_info in links:
                 href = link_info['href']
                 with self.subTest(path=path, href=href):
-                    link = page.locator(f'a[href="{href}"]')
+                    link = page.locator(f'a[href="{href}"]:not(.about a)').first
                     self.assertIn(link.get_attribute('target'), [None, '_self'])
                     self.show_featured_link(page, link)
                     link.click()
@@ -653,9 +658,9 @@ class BrowserRegressions(unittest.TestCase):
             }"""), path)
             page.locator('.skip-link').focus()
             page.keyboard.press('Tab')
-            self.assertEqual(page.locator(':focus').get_attribute('class'), 'case-masthead__identity')
+            self.assertEqual(page.locator(':focus').evaluate('el => el.closest(".masthead__name") !== null'), True)
             page.keyboard.press('Tab')
-            self.assertEqual(page.locator(':focus').get_attribute('class'), 'case-masthead__index')
+            self.assertEqual(page.locator(':focus').text_content(), 'Craft')
             self.assertEqual(page.locator('.case-proofs a[href*="assets/"]').count(), 0)
             # Case imagery is never a link. More from cards are, by the card contract.
             self.assertEqual(page.locator('main a:has(img)').count(), 0)
@@ -773,7 +778,7 @@ class BrowserRegressions(unittest.TestCase):
               probe.style.color = 'var(--case-hover)';
               const color = getComputedStyle(probe).color; probe.remove(); return color;
             }""")
-            for selector in ['.case-masthead a', '.case-context__links a', '.next-story a']:
+            for selector in ['.case-context__links a', '.next-story a']:
                 for link in page.locator(selector).all():
                     page.mouse.move(0, 0)
                     before = link.evaluate('el => ({color: getComputedStyle(el).color, bg: getComputedStyle(el).backgroundColor})')
@@ -1056,6 +1061,42 @@ class BrowserRegressions(unittest.TestCase):
         facts = [re.sub(r'<[^>]+>', '', dd) for dd in re.findall(r'<dd>([\s\S]*?)</dd>', html)]
         return {'cover': f'/{first}', 'role': facts[0], 'dates': facts[1]}
 
+    def test_work_and_writing_pages_carry_the_chrome_and_mark_their_place(self):
+        places = {**{path: 'Work' for path in [*CASE_PAGES, 'work/index.html']},
+                  **{path: 'Writing' for path in READING_PAGES if path.startswith('writing/')}}
+        for width in [1440, 390]:
+            context = self.context(viewport={'width': width, 'height': 900}, reduced_motion='reduce')
+            for path, place in places.items():
+                with self.subTest(width=width, path=path):
+                    page = self.open(context, path)
+                    # The page keeps its own h1; the name is a plain link home.
+                    self.assertEqual(page.locator('.masthead h1').count(), 0)
+                    self.assertEqual(page.locator('.masthead__name a').get_attribute('href'), '/')
+                    current = page.locator('.masthead__places [aria-current="page"]')
+                    self.assertEqual(current.count(), 1)
+                    self.assertEqual(current.text_content(), place)
+                    self.assertEqual(page.locator('.masthead__trigger').text_content(), f'Menu, {place}')
+                    # Body order: masthead, About, then main, and the thin line ends the page.
+                    order = page.evaluate("""() => [...document.body.children].map(el => el.matches('.masthead') ? 'masthead'
+                      : el.matches('.about') ? 'about' : el.matches('main') ? 'main' : el.matches('.site-footer') ? 'footer' : null).filter(Boolean)""")
+                    self.assertEqual(order, ['masthead', 'about', 'main', 'footer'])
+                    self.assertEqual(page.locator('.legend, .view-switch, .case-masthead, .case-endpaper').count(), 0)
+                    self.assertTrue(page.locator('.footline').is_visible())
+                    self.assertEqual(page.evaluate("document.documentElement.classList.contains('js')"), True)
+                    # The page's first line sits where Paper puts it.
+                    first = page.locator('.page-head__title, .post__kicker, .case-context__title').first.bounding_box()
+                    masthead = page.locator('.masthead').bounding_box()
+                    self.assertGreater(first['y'], masthead['y'] + masthead['height'])
+                    if width == 390:
+                        page.locator('.masthead__trigger').click()
+                        self.assertTrue(current.is_visible())
+                        dot = current.evaluate("el => getComputedStyle(el, '::before').backgroundColor")
+                        self.assertEqual(dot, 'rgb(250, 25, 0)')
+                        page.keyboard.press('Escape')
+                    self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
+                    self.assertEqual(page.errors, [])
+                    page.close()
+
     def test_work_index_lists_case_studies_newest_first_as_whole_row_links(self):
         for width in [1440, 390]:
             page = self.open(self.context(viewport={'width': width, 'height': 900}, reduced_motion='reduce'), 'work/')
@@ -1064,7 +1105,8 @@ class BrowserRegressions(unittest.TestCase):
                 self.assertEqual(page.locator('h1').text_content(), 'Work')
                 self.assertEqual(page.locator('.page-head > *').count(), 1)
                 self.assertIsNone(re.search(r'\b0[1-6]\b', page.locator('main').inner_text()))
-                headings = page.evaluate("() => [...document.querySelectorAll('h1,h2,h3,h4,h5,h6')].map(el => Number(el.tagName[1]))")
+                headings = page.evaluate("""() => [...document.querySelectorAll('h1,h2,h3,h4,h5,h6')]
+                  .filter(el => el.getClientRects().length).map(el => Number(el.tagName[1]))""")
                 self.assertEqual(headings, [1, 2, 2, 2, 2, 2, 2])
                 entries = page.locator('.entry')
                 self.assertEqual(entries.count(), len(WORK_ORDER))
@@ -1107,8 +1149,7 @@ class BrowserRegressions(unittest.TestCase):
                         self.assertGreater(cover_box['width'], width - 60)
                 self.assertEqual(len(colors), len(WORK_ORDER))
                 self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
-                page.locator('.skip-link').focus()
-                page.keyboard.press('Tab')
+                page.locator('.entry__link').first.focus()
                 focused = page.locator(':focus')
                 self.assertEqual(focused.get_attribute('href'), f'/work/{WORK_ORDER[0]}')
                 self.assertEqual(focused.evaluate('el => getComputedStyle(el).outlineStyle'), 'solid')
