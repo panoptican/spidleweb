@@ -949,8 +949,10 @@ html.panels .about {
     display: none;
   }
 
+  /* Room under the strip's controls before the story resumes, near the
+     28px row 03's phone board leaves. */
   .stream-panel__media {
-    margin-block: 4px;
+    margin-block: 4px 12px;
   }
 
   .stream-panel__aside {
