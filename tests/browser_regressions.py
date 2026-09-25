@@ -16,6 +16,7 @@ from pathlib import Path
 import time
 import unittest
 from urllib.parse import unquote, urljoin, urlsplit
+from xml.etree import ElementTree
 
 from playwright.sync_api import sync_playwright
 
@@ -25,7 +26,7 @@ CASE_PAGES = [str(p.relative_to(ROOT)) for p in sorted((ROOT / 'work').glob('*.h
 # The Work and Writing indexes and the posts (Phase 2C).
 READING_PAGES = ['work/index.html', 'writing/index.html',
                  *[str(p.relative_to(ROOT)) for p in sorted((ROOT / 'writing').glob('*.html')) if p.name != 'index.html']]
-PAGES = ['index.html', 'feed/index.html', *CASE_PAGES, *READING_PAGES]
+PAGES = ['index.html', 'list/index.html', *CASE_PAGES, *READING_PAGES, '404.html']
 # /work/ lists the case studies newest first, and the next-story band follows it.
 WORK_ORDER = ['expert-insights', 'campaign-sim', 'everag', 'vidscrip', 'conservis', 'plinth']
 SCREENSHOTS = os.environ.get('SPIDLEWEB_TEST_SCREENSHOTS')
@@ -70,7 +71,7 @@ class BrowserRegressions(unittest.TestCase):
                 else:
                     route.abort()
                 return
-            if block_script and url.path in ['/script.js', '/feed/feed.js']:
+            if block_script and url.path == '/script.js':
                 route.abort()
                 return
             path = (ROOT / unquote(url.path).lstrip('/')).resolve()
@@ -119,13 +120,6 @@ class BrowserRegressions(unittest.TestCase):
             page.wait_for_function('el => getComputedStyle(el).opacity === "1"', arg=target.element_handle())
         self.assert_visible(page)
 
-    def show_featured_link(self, page, link):
-        """Page Featured forward until the item holding this link is the current one."""
-        for _ in range(page.locator('.featured__item').count()):
-            if link.is_visible():
-                return
-            page.locator('.featured__next').click()
-
     def screenshot(self, page, name):
         if SCREENSHOTS:
             directory = Path(SCREENSHOTS)
@@ -140,11 +134,7 @@ class BrowserRegressions(unittest.TestCase):
                 with self.subTest(path=path, options=options):
                     page = self.open(context, path)
                     self.assert_visible(page, motionless=True)
-                    if path == 'feed/index.html':
-                        self.assertEqual(page.locator('h1').count(), 1)
-                        self.assertTrue(page.locator('[data-feed-card]').first.is_visible())
-                    else:
-                        self.assertTrue(page.locator('h1').is_visible())
+                    self.assertTrue(page.locator('h1').is_visible())
                     self.assertEqual(page.errors, [])
                     if path == 'index.html' and options == {'block_script': True}:
                         self.screenshot(page, 'b01-blocked-script')
@@ -247,14 +237,13 @@ class BrowserRegressions(unittest.TestCase):
         for path in PAGES:
             page = self.open(context, path)
             links = page.locator('a[href^="https://"]').evaluate_all('''els => [...new Map(els
-              .filter(el => el.getClientRects().length || el.closest('.featured__item'))
+              .filter(el => el.getClientRects().length)
               .map(el => [el.getAttribute("href"), {href: el.getAttribute("href"), url: el.href}])).values()]''')
             for link_info in links:
                 href = link_info['href']
                 with self.subTest(path=path, href=href):
                     link = page.locator(f'a[href="{href}"]:not(.about a)').first
                     self.assertIn(link.get_attribute('target'), [None, '_self'])
-                    self.show_featured_link(page, link)
                     link.click()
                     page.wait_for_url(link_info['url'])
                     self.assertEqual(len(context.pages), 1)
@@ -578,186 +567,257 @@ class BrowserRegressions(unittest.TestCase):
             self.assertEqual(page.errors, [])
             page.close()
 
-    def test_feed_monolith_layout_titles_icons_and_type_mix(self):
-        page = self.open(self.context(viewport={'width': 1440, 'height': 900}), 'feed/')
-        cards = page.locator('[data-feed-card]')
-        self.assertEqual(cards.count(), 20)
-        self.assertEqual(cards.evaluate_all("els => els.reduce((counts, el) => { counts[el.dataset.type] = (counts[el.dataset.type] || 0) + 1; return counts; }, {})"),
-                         {'screens': 13, 'prototypes': 3, 'posts': 1, 'websites': 2, 'tools': 1})
-        self.assertEqual(page.locator('.feed-stream').evaluate('el => getComputedStyle(el).columnCount'), '3')
-        self.assertTrue(cards.evaluate_all("""els => els.every(card => {
-          const footer = card.querySelector('.feed-card__footer').getBoundingClientRect();
-          const title = card.querySelector('h2').getBoundingClientRect();
-          const icons = card.querySelectorAll('.feed-card__type-icon img');
-          const link = card.querySelector('[data-feed-action]');
-          return card.id && link.dataset.feedAction === 'viewer' && link.hash === `#${card.id}` &&
-            card.querySelector('h2').textContent.trim().length > 8 &&
-            title.width <= footer.width * 0.62 && icons.length === 2;
-        })"""))
-        self.assertTrue(page.locator('.feed-card__media img').evaluate_all("""async images => {
-          await Promise.all(images.map(image => image.decode()));
-          return images.every(image => {
-            const declaredRatio = Number(image.getAttribute('width')) / Number(image.getAttribute('height'));
-            const loadedRatio = image.naturalWidth / image.naturalHeight;
-            return image.complete && image.naturalWidth > 0 && Math.abs(declaredRatio - loadedRatio) < 0.01 &&
-              image.alt.trim() && image.currentSrc.endsWith('.avif');
-          });
-        }"""))
-        self.assertEqual(page.locator('.feed-card__media picture source[type="image/avif"]').count(), 20)
-        self.assertTrue(page.locator('.feed-card__media picture source').evaluate_all(
-            "els => els.every(el => el.srcset.includes(' 480w') && el.sizes.trim())"))
-        self.assertEqual(page.locator('[data-status="placeholder"]').count(), 7)
+    # ---- Craft in List (Phase 2D) ----
+
+    def list_rows(self, page):
+        return page.locator('.stream-row').evaluate_all("""els => els.map(el => ({id: el.id,
+          type: el.dataset.type, industry: el.dataset.industry}))""")
+
+    def page_part(self, path, pattern):
+        """One block of a page's source, found by a regular expression."""
+        match = re.search(pattern, (ROOT / path).read_text(), re.S)
+        self.assertIsNotNone(match, f'{pattern} in {path}')
+        return match.group(0)
+
+    def test_list_carries_the_craft_chrome_with_list_current(self):
+        # The same masthead, About, head, filters, pagination, and footer line
+        # as the Grid, word for word, and the same styles and scripts.
+        for pattern in [r'<header class="masthead".*?</header>', r'<section class="about".*?</section>',
+                        r'<div class="craft-head">.*?\n    </div>\n', r'<div class="stream-foot">.*?</main>',
+                        r'<div class="footline micro">.*?</footer>',
+                        r'<script>document\.documentElement.*?<script defer src="https://analytics']:
+            with self.subTest(pattern=pattern):
+                self.assertEqual(self.page_part('list/index.html', pattern), self.page_part('index.html', pattern))
+        self.assertIn('<script src="/site.js" defer onerror="document.documentElement.classList.remove(\'js\')"></script>',
+                      (ROOT / 'list/index.html').read_text())
+
+        page = self.open(self.context(reduced_motion='reduce'), 'list/')
+        self.assertEqual(page.locator('h1').count(), 1)
+        self.assertEqual(page.locator('.masthead__name').evaluate('el => el.tagName'), 'H1')
+        self.assertEqual(page.locator('link[rel="canonical"]').get_attribute('href'), 'https://spidleweb.net/list/')
+        self.assertEqual(page.locator('.masthead__places a[aria-current="page"]').text_content(), 'Craft')
+        current = 'els => els.map(el => [el.getAttribute("href"), el.getAttribute("aria-current")])'
+        self.assertEqual(page.locator('.view-switch a').evaluate_all(current), [['/', None], ['/list/', 'page']])
+        self.assertEqual(page.locator('.view-dock a').evaluate_all(current), [['/', None], ['/list/', 'page']])
+        self.assertEqual(page.locator('.legend__item').evaluate_all(current),
+                         [['/', None], ['/list/', 'page'], ['/work/', None]])
+        switch = page.locator('.view-switch').bounding_box()
+        self.assertAlmostEqual(switch['x'] + switch['width'] / 2, 720, delta=1)
+        self.assertTrue(page.locator('.craft-head__line').is_visible())
+        self.assertTrue(page.locator('[data-filters]').is_visible())
+        # Grid in the switcher goes back to the Grid.
+        page.locator('.view-switch a[href="/"]').click()
+        page.wait_for_url(f'{ORIGIN}/')
+        self.assertEqual(page.locator('.view-switch a[aria-current="page"]').get_attribute('href'), '/')
         self.assertEqual(page.errors, [])
+        page = self.open(self.context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True), 'list/')
+        self.assertEqual(page.locator('.masthead__trigger').text_content(), 'Menu, Craft')
+        self.assertEqual(page.locator('.view-switch').bounding_box()['width'], 358)
 
-    def test_feed_hover_reveals_color_lift_and_red_icon_with_reduced_motion_fallback(self):
-        page = self.open(self.context(), 'feed/')
-        link = page.locator('[data-dialog-link="scouting-sentiment-search"]')
-        before = link.evaluate("""el => ({
-          slab: getComputedStyle(el, '::before').backgroundColor,
-          slabTransform: getComputedStyle(el, '::before').transform,
-          surface: getComputedStyle(el.querySelector('.feed-card__surface')).transform,
-          black: getComputedStyle(el.querySelector('.feed-card__type-icon img:first-child')).opacity,
-          red: getComputedStyle(el.querySelector('.feed-card__type-icon img:last-child')).opacity
-        })""")
-        link.hover()
-        page.wait_for_timeout(180)
-        after = link.evaluate("""el => ({
-          slab: getComputedStyle(el, '::before').backgroundColor,
-          slabTransform: getComputedStyle(el, '::before').transform,
-          surface: getComputedStyle(el.querySelector('.feed-card__surface')).transform,
-          black: getComputedStyle(el.querySelector('.feed-card__type-icon img:first-child')).opacity,
-          red: getComputedStyle(el.querySelector('.feed-card__type-icon img:last-child')).opacity
-        })""")
-        self.assertEqual(before['slab'], 'rgb(10, 10, 10)')
-        self.assertNotEqual(after['slab'], before['slab'])
-        self.assertNotEqual(after['slabTransform'], before['slabTransform'])
-        self.assertNotEqual(after['surface'], before['surface'])
-        self.assertEqual((before['black'], before['red']), ('1', '0'))
-        self.assertEqual((after['black'], after['red']), ('0', '1'))
-        page.close()
-
-        page = self.open(self.context(reduced_motion='reduce'), 'feed/')
-        self.assertTrue(page.locator('.feed-card__surface, .feed-card__type-icon img').evaluate_all(
-            "els => els.every(el => getComputedStyle(el).transitionDuration.split(',').every(value => parseFloat(value) === 0))"))
-
-    def test_feed_filters_keep_twenty_item_source_and_follow_browser_history(self):
-        page = self.open(self.context(reduced_motion='reduce'), 'feed/')
-        self.assertTrue(page.locator('[data-feed-filters]').is_visible())
-        self.assertEqual(page.locator('[data-feed-card]:not([hidden])').count(), 20)
-        type_filter = page.locator('[data-filter="type"]')
-        type_filter.locator('summary').click()
-        type_filter.locator('[data-filter-value="prototypes"]').click()
-        self.assertEqual(page.locator('[data-feed-card]:not([hidden])').count(), 3)
-        industry_filter = page.locator('[data-filter="industry"]')
-        industry_filter.locator('summary').click()
-        industry_filter.locator('[data-filter-value="sports"]').click()
-        self.assertEqual(page.locator('[data-feed-card]:not([hidden])').count(), 2)
-        self.assertEqual(dict(item.split('=') for item in urlsplit(page.url).query.split('&')),
-                         {'type': 'prototypes', 'industry': 'sports'})
-        page.go_back()
-        self.settle(page)
-        self.assertEqual(page.locator('[data-feed-card]:not([hidden])').count(), 3)
-        self.assertEqual(page.locator('[data-filter="industry"] [data-filter-label]').text_content(), 'All')
-        page.go_back()
-        self.settle(page)
-        self.assertEqual(page.locator('[data-feed-card]:not([hidden])').count(), 20)
-        page.go_forward()
-        self.settle(page)
-        self.assertEqual(page.locator('[data-feed-card]:not([hidden])').count(), 3)
-        page.go_forward()
-        self.settle(page)
-        self.assertEqual(page.locator('[data-feed-card]:not([hidden])').count(), 2)
-        page.reload()
-        page.evaluate('document.fonts.ready')
-        self.settle(page)
-        self.assertEqual(page.locator('[data-feed-card]:not([hidden])').count(), 2)
-        self.assertEqual(page.locator('[data-filter="type"] [data-filter-label]').text_content(), 'Prototypes')
-
-    def test_feed_restores_scroll_after_leaving_and_returning(self):
-        page = self.open(self.context(reduced_motion='reduce'), 'feed/')
-        return_link = page.locator('.feed-endpaper__link')
-        return_link.evaluate("el => el.scrollIntoView({block: 'center'})")
-        expected = page.evaluate('scrollY')
-        self.assertGreater(expected, 300)
-        return_link.click()
-        page.wait_for_url(f'{ORIGIN}/index.html#work')
-        page.go_back()
-        page.wait_for_url(f'{ORIGIN}/feed/')
-        page.wait_for_function('expected => Math.abs(scrollY - expected) < 3', arg=expected)
-        self.assertAlmostEqual(page.evaluate('scrollY'), expected, delta=2)
-        self.assertEqual(page.errors, [])
-
-    def test_feed_viewer_uses_item_galleries_deep_links_and_restores_focus(self):
-        page = self.open(self.context(reduced_motion='reduce'), 'feed/')
-        opener = page.locator('[data-dialog-link="scouting-sentiment-search"]')
-        opener.focus()
-        opener.click()
-        dialog = page.locator('[data-feed-dialog]')
-        self.assertTrue(dialog.evaluate('el => el.open'))
-        self.assertTrue(page.locator('[data-feed-page]').evaluate('el => el.inert'))
-        self.assertEqual(dialog.locator('[data-dialog-title]').inner_text(), 'Scouting sentiment search')
-        self.assertTrue(page.url.endswith('#scouting-sentiment-search'))
-        self.assertEqual(dialog.locator('[data-dialog-count]').inner_text(), '01 / 01')
-        self.assertTrue(dialog.locator('[data-dialog-previous]').is_hidden())
-        page.keyboard.press('ArrowRight')
-        self.assertEqual(dialog.locator('[data-dialog-title]').inner_text(), 'Scouting sentiment search')
-        self.assertTrue(page.url.endswith('#scouting-sentiment-search'))
-        page.keyboard.press('Escape')
-        self.assertFalse(dialog.evaluate('el => el.open'))
-        self.assertFalse(page.locator('[data-feed-page]').evaluate('el => el.inert'))
-        self.assertEqual(page.evaluate('document.activeElement.dataset.dialogLink'), 'scouting-sentiment-search')
-        self.assertEqual(urlsplit(page.url).fragment, '')
-
-        gallery_opener = page.locator('[data-dialog-link="channel-impact-simulator"]')
-        gallery_opener.focus()
-        gallery_opener.click()
-        first_alt = dialog.locator('[data-dialog-media] img').get_attribute('alt')
-        self.assertEqual(dialog.locator('[data-dialog-count]').inner_text(), '01 / 04')
-        self.assertTrue(dialog.locator('[data-dialog-next]').is_visible())
-        page.keyboard.press('ArrowRight')
-        self.assertEqual(dialog.locator('[data-dialog-count]').inner_text(), '02 / 04')
-        self.assertNotEqual(dialog.locator('[data-dialog-media] img').get_attribute('alt'), first_alt)
-        self.assertTrue(page.url.endswith('#channel-impact-simulator'))
-        page.keyboard.press('Shift+Tab')
-        self.assertTrue(page.evaluate('document.activeElement.hasAttribute("data-dialog-next")'))
-        page.keyboard.press('Tab')
-        self.assertTrue(page.evaluate('document.activeElement.hasAttribute("data-dialog-close")'))
-        page.keyboard.press('Escape')
-        self.assertEqual(page.evaluate('document.activeElement.dataset.dialogLink'), 'channel-impact-simulator')
-
-        page.goto(f'{ORIGIN}/feed/#field-task-setup')
-        page.evaluate('document.fonts.ready')
-        self.settle(page)
-        self.assertTrue(dialog.evaluate('el => el.open'))
-        self.assertEqual(dialog.locator('[data-dialog-title]').inner_text(), 'Field task setup')
-        self.assertEqual(dialog.get_attribute('data-orientation'), 'standard')
-        self.assertEqual(page.errors, [])
-
-    def test_feed_without_javascript_keeps_all_items_and_hash_fallbacks_reachable(self):
-        page = self.open(self.context(java_script_enabled=False), 'feed/')
-        self.assertFalse(page.locator('[data-feed-filters]').is_visible())
-        cards = page.locator('[data-feed-card]')
-        self.assertEqual(cards.count(), 20)
-        self.assertTrue(cards.evaluate_all("els => els.every(el => !el.hidden && el.getBoundingClientRect().height > 0)"))
-        self.assertTrue(cards.locator('a[data-feed-action="viewer"]').evaluate_all(
-            "els => els.every(el => el.hash === `#${el.closest('[data-feed-card]').id}`)"))
-        page.locator('[data-dialog-link="field-task-setup"]').click()
-        self.assertEqual(urlsplit(page.url).fragment, 'field-task-setup')
-        target = page.locator('#field-task-setup')
-        self.assertEqual(target.evaluate('el => getComputedStyle(el).position'), 'fixed')
-        self.assertTrue(target.locator('.feed-card__media img').is_visible())
-        self.assertTrue(page.locator('.feed-fallback-close').is_visible())
-        page.locator('.feed-fallback-close').click()
-        self.assertEqual(urlsplit(page.url).fragment, 'feed-stream')
-        self.assertEqual(page.errors, [])
-
-    def test_feed_has_no_horizontal_overflow_at_all_review_sizes(self):
-        for width, height in [(1440, 900), (834, 1112), (390, 844), (320, 844), (1440, 400)]:
-            with self.subTest(viewport=(width, height)):
-                page = self.open(self.context(viewport={'width': width, 'height': height}), 'feed/')
+    def test_list_runs_two_columns_on_desktop_and_one_on_phones(self):
+        # Row 09: 660 by 400 frames in two columns at 1440, and 358 by 254 in
+        # one column at 390, each image above its rule, title, and note.
+        for width, columns, frame in [(1440, 2, (660, 400)), (1024, 2, None), (768, 2, None),
+                                      (390, 1, (358, 254)), (320, 1, None)]:
+            with self.subTest(width=width):
+                page = self.open(self.context(viewport={'width': width, 'height': 900}, reduced_motion='reduce'), 'list/')
+                rows = page.evaluate("""() => [...document.querySelectorAll('.stream-row:not([hidden])')].map(el => {
+                  const media = el.querySelector('.stream-row__media').getBoundingClientRect();
+                  const body = el.querySelector('.stream-row__body');
+                  return {id: el.id, left: Math.round(el.getBoundingClientRect().left),
+                          top: Math.round(el.getBoundingClientRect().top + scrollY),
+                          frame: [Math.round(media.width), Math.round(media.height)],
+                          stacked: media.bottom <= body.getBoundingClientRect().top,
+                          rule: parseFloat(getComputedStyle(body).borderTopWidth)};
+                })""")
+                self.assertEqual(len({row['left'] for row in rows}), columns)
+                for i in range(0, len(rows) - len(rows) % columns, columns):
+                    self.assertEqual(len({row['top'] for row in rows[i:i + columns]}), 1, rows[i]['id'])
+                self.assertTrue(all(row['stacked'] and row['rule'] == 3 for row in rows))
+                if frame:
+                    self.assertEqual(tuple(rows[0]['frame']), frame)
                 self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
-                page.goto(f'{ORIGIN}/feed/#channel-impact-simulator')
-                self.settle(page)
+                if width == 1440:
+                    # The title's link covers the row, and the row's own links sit above it.
+                    hit = """([x, y]) => { const a = document.elementFromPoint(x, y).closest('a');
+                      return a && (a.dataset.open || a.getAttribute('href')); }"""
+                    media = page.locator('#expert-insights .stream-row__media').bounding_box()
+                    self.assertEqual(page.evaluate(hit, [media['x'] + media['width'] / 2, media['y'] + media['height'] / 2]),
+                                     'expert-insights')
+                    action = page.locator('#expert-insights .stream-row__action').bounding_box()
+                    self.assertEqual(page.evaluate(hit, [action['x'] + action['width'] / 2, action['y'] + action['height'] / 2]),
+                                     '/work/expert-insights')
+                self.assertEqual(page.errors, [])
+                page.close()
+
+    def test_list_opens_an_item_under_its_pair(self):
+        # Either item of a pair opens under the pair, with the rise under the
+        # item itself. On a phone the row is the pair, and it drops its hairline.
+        for width, index, end in [(1440, 4, 5), (1440, 5, 5), (390, 5, 5)]:
+            with self.subTest(width=width, index=index):
+                context = self.context(viewport={'width': width, 'height': 900}, is_mobile=width < 600,
+                                       has_touch=width < 600)
+                page = self.open(context, 'list/')
+                ids = self.item_ids(page, '.stream-list > .stream-row')
+                self.open_item(page, ids[index])
+                state = self.panel_state(page)
+                self.assertEqual((state['prev'], state['next'], state['opener']), (ids[end], ids[end + 1], ids[index]))
+                self.assertEqual((state['left'], state['width']), (0, state['viewport']))
+                self.assertAlmostEqual(state['peak'], state['openerCentre'], delta=0.6)
+                self.assertEqual(page.locator(f'#{ids[index]} .stream-row__link').get_attribute('aria-expanded'), 'true')
+                if width < 600:
+                    self.assertEqual(page.locator(f'#{ids[index]}').evaluate('el => getComputedStyle(el).borderBottomWidth'), '0px')
+                self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
+                page.keyboard.press('Escape')
+                page.wait_for_function("() => !document.querySelector('.stream-panel')")
+                self.assertEqual(page.evaluate('document.activeElement.dataset.open'), ids[index])
+                self.assertEqual(page.errors, [])
+                page.close()
+        # The image opens the item too, and a row's own link leaves for its page.
+        def click_image(page, item_id):
+            box = page.locator(f'#{item_id} .stream-row__media').bounding_box()
+            page.mouse.click(box['x'] + box['width'] / 2, box['y'] + box['height'] / 2)
+
+        page = self.open(self.context(), 'list/')
+        click_image(page, 'expert-insights')
+        self.wait_for_panel(page, 'expert-insights')
+        page.keyboard.press('Escape')
+        page.locator('#expert-insights .stream-row__action').click()
+        page.wait_for_url(f'{ORIGIN}/work/expert-insights')
+        # Without JavaScript the title's link goes to the item's page.
+        page = self.open(self.context(java_script_enabled=False), 'list/')
+        self.assertTrue(page.locator('.stream-row').first.is_visible())
+        page.locator('#fields-on-the-map').scroll_into_view_if_needed()
+        click_image(page, 'fields-on-the-map')
+        page.wait_for_url(f'{ORIGIN}/work/conservis#fig-conservis-03')
+
+    def test_list_filters_pagination_and_deep_links_follow_the_grid(self):
+        context = self.context(reduced_motion='reduce')
+        grid = self.open(context)
+        order = [card['id'] for card in self.craft_cards(grid)]
+        grid.close()
+        page = self.open(context, 'list/')
+        rows = self.list_rows(page)
+        self.assertEqual([row['id'] for row in rows], order)
+        total = len(rows)
+        shown = min(30, total)
+        self.assertEqual(page.locator('.stream-row:not([hidden])').count(), shown)
+        self.assertEqual(page.locator('.pager__count').text_content(), f'{shown} of {total} items')
+        # Right-aligned at the edge of the last column.
+        pager = page.locator('[data-pager]').bounding_box()
+        last = page.locator('.stream-row').nth(1).bounding_box()
+        self.assertAlmostEqual(pager['x'] + pager['width'], last['x'] + last['width'], delta=1)
+        page.locator('.pager__more').click()
+        self.assertEqual(page.locator('.stream-row:not([hidden])').count(), min(60, total))
+        self.assertEqual(page.evaluate('document.activeElement.closest("article")?.id'), rows[shown]['id'])
+        page.reload()
+        self.settle(page)
+        self.assertEqual(page.locator('.stream-row:not([hidden])').count(), min(60, total))
+
+        page = self.open(context, 'list/')
+        page.locator('select[data-filter="type"]').select_option('prototype')
+        prototypes = [row for row in rows if row['type'] == 'prototype']
+        self.assertEqual(page.locator('.stream-row:not([hidden])').count(), min(30, len(prototypes)))
+        self.assertTrue(page.url.endswith('/list/?type=prototype'))
+        industry = prototypes[0]['industry']
+        page.locator('select[data-filter="industry"]').select_option(industry)
+        self.assertEqual(page.locator('.stream-row:not([hidden])').count(),
+                         sum(row['industry'] == industry for row in prototypes))
+        page.goto(f'{ORIGIN}/list/?type=reel&industry=finance')
+        self.settle(page)
+        self.assertTrue(page.locator('[data-stream-empty]').is_visible())
+        page.locator('[data-filters-clear]').click()
+        self.assertEqual(page.locator('.stream-row:not([hidden])').count(), shown)
+
+        # A link deep into the List reveals everything up to its row and opens it.
+        page = self.open(context, f'list/#{order[-1]}')
+        self.wait_for_panel(page, order[-1])
+        self.assertEqual(page.locator('.stream-row:not([hidden])').count(), total)
+        self.assertEqual(self.panel_state(page)['opener'], order[-1])
+        self.assertEqual(page.errors, [])
+
+    def test_phones_drop_try_it_for_prototypes_that_are_not_mobile(self):
+        # Jason's ruling of 2026-09-24: a phone offers only a Mobile prototype
+        # live, so the rest drop Try it, in the Grid and in the List.
+        for path, block in [('index.html', 'stream-card'), ('list/', 'stream-row')]:
+            for width in [1440, 390]:
+                with self.subTest(path=path, width=width):
+                    page = self.open(self.context(viewport={'width': width, 'height': 900}), path)
+                    island = page.evaluate("JSON.parse(document.getElementById('stream-data').textContent).items")
+                    platforms = page.locator(f'.{block}').evaluate_all('els => els.map(el => [el.id, el.dataset.platform || null])')
+                    for item_id, platform in platforms:
+                        expected = island[item_id].get('platform')
+                        self.assertEqual(platform, expected.lower() if expected else None, item_id)
+                    badges = page.locator(f'.{block}[data-type="prototype"]').evaluate_all(f"""els => els.map(el =>
+                      [el.dataset.platform, getComputedStyle(el.querySelector('.{block}__badge')).display !== 'none'])""")
+                    self.assertTrue({platform for platform, _ in badges} >= {'mobile', 'web'})
+                    for platform, shown in badges:
+                        self.assertEqual(shown, width >= 600 or platform == 'mobile', platform)
+                    if block == 'stream-row':
+                        hints = page.locator('.stream-row[data-type="prototype"]').evaluate_all("""els => els.map(el => {
+                          const hint = el.querySelector('.stream-row__hint');
+                          const shown = parseFloat(getComputedStyle(hint).fontSize) ? hint.textContent
+                            : getComputedStyle(hint, '::before').content;
+                          return [el.dataset.platform, shown];
+                        })""")
+                        for platform, hint in hints:
+                            self.assertIn('Try it here' if width >= 600 or platform == 'mobile' else 'Open', hint)
+                    page.close()
+
+    def test_redirects_and_sitemap_carry_the_new_routes(self):
+        # The test origin does not apply _redirects, so this reads the files.
+        # Pages takes one rule a line: source, destination, status.
+        rules = [line.split() for line in (ROOT / '_redirects').read_text().splitlines()
+                 if line.strip() and not line.lstrip().startswith('#')]
+        self.assertTrue(all(len(rule) == 3 for rule in rules), rules)
+        self.assertIn(['/feed/', '/', '301'], rules)
+        self.assertIn(['/feed', '/', '301'], rules)
+        self.assertFalse((ROOT / 'feed').exists())
+
+        namespace = {'s': 'http://www.sitemaps.org/schemas/sitemap/0.9'}
+        urls = ElementTree.parse(ROOT / 'sitemap.xml').getroot().findall('s:url', namespace)
+        locs = [url.find('s:loc', namespace).text for url in urls]
+        expected = ['/', '/list/', '/work/', *[f'/work/{slug}' for slug in WORK_ORDER],
+                    '/writing/', '/writing/how-i-built-description-generator']
+        self.assertEqual(sorted(locs), sorted(f'https://spidleweb.net{path}' for path in expected))
+        for url in urls:
+            self.assertRegex(url.find('s:lastmod', namespace).text, r'^\d{4}-\d{2}-\d{2}$')
+        # Every page listed is served, and names itself as the canonical URL.
+        context = self.context(java_script_enabled=False)
+        for loc in locs:
+            with self.subTest(loc=loc):
+                page = context.new_page()
+                response = page.goto(loc.replace('https://spidleweb.net', ORIGIN))
+                self.assertEqual(response.status, 200)
+                self.assertEqual(page.locator('link[rel="canonical"]').get_attribute('href'), loc)
+                page.close()
+
+    def test_not_found_page_carries_the_chrome_with_no_place_current(self):
+        # Pages serves 404.html at whatever address was missing, so every link
+        # and asset must be root-relative.
+        for target in re.findall(r'(?:href|src)="([^"]+)"', (ROOT / '404.html').read_text()):
+            self.assertRegex(target, r'^(/|#|https://|mailto:)', target)
+        # About and the thin footer line are the site's, word for word.
+        for pattern in [r'<section class="about".*?</section>', r'<footer class="site-footer">.*?</footer>']:
+            self.assertEqual(self.page_part('404.html', pattern), self.page_part('work/index.html', pattern))
+        for width in [1440, 390]:
+            with self.subTest(width=width):
+                phone = width < 600
+                page = self.open(self.context(viewport={'width': width, 'height': 900}, is_mobile=phone,
+                                              has_touch=phone, reduced_motion='reduce'), '404.html')
+                self.assertEqual(page.locator('h1').inner_text().lower(), 'page not found')
+                self.assertIn('That page is not here.', page.locator('main').inner_text())
+                self.assertEqual(page.locator('[aria-current]').count(), 0)
+                self.assertEqual(page.locator('.legend, .view-switch').count(), 0)
+                self.assertTrue(page.locator('.footline .email').is_visible())
+                if phone:
+                    self.assertEqual(page.locator('.masthead__trigger').text_content(), 'Menu')
+                    page.locator('.masthead__trigger').tap()
+                    self.assertEqual(page.locator('#site-places a:visible').count(), 4)
+                # About opens in place, as on every page.
+                page.locator('.masthead__places a[href="#about"]').click()
+                page.wait_for_function("() => !document.getElementById('about').hidden")
+                self.assertTrue(page.locator('#about').is_visible())
                 self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
                 self.assertEqual(page.errors, [])
                 page.close()

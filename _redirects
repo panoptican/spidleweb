@@ -1,0 +1,6 @@
+# Cloudflare Pages redirects: source, destination, status.
+# The feed is now Craft. A fragment survives the redirect, so /feed/#<id>
+# opens the same item at /#<id>, apart from field-performance-explorer, which
+# became conservis-dashboard and lands at the top of Craft.
+/feed/ / 301
+/feed / 301

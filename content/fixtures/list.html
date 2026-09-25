@@ -8,54 +8,16 @@
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <script>document.documentElement.classList.add('js')</script>
   <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/stream.css">
   <link rel="stylesheet" href="/panel.css">
   <script src="/stream.js" defer></script>
   <style>
-    /* Fixture-only styles, so the generated rows can be looked at before
-       Phase 2D builds the List page. Nothing here ships. */
+    /* Fixture-only styles for the intro. The rows take the List's styles
+       from stream.css, as /list/ does. Nothing here ships. */
     .fixture { padding: 40px 0 96px; }
-    .fixture__intro { max-width: 720px; padding: 0 40px 36px; }
+    .fixture__intro { max-width: 720px; padding: 0 var(--gutter) 36px; }
     .fixture__intro h1 { margin: 10px 0 12px; font: 400 31px/38px var(--display); }
-    .fixture__intro p:last-child { color: var(--ink-muted); font-size: 15px; line-height: 22px; }
-
-    /* Two columns on desktop and one on phones, per Jason's ruling of
-       2026-09-24, so a panel can be seen opening under a pair. */
-    .stream-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 56px 40px; padding: 36px 40px 0; }
-    .stream-row { position: relative; display: flex; flex-direction: column; gap: 20px; }
-    .stream-row__media { position: relative; aspect-ratio: 660 / 400; overflow: hidden; border: 1px solid var(--line); background: #e4e4df; }
-    .stream-row__media img { width: 100%; height: 100%; object-fit: cover; object-position: left top; background: #fff; }
-    .stream-row__media[data-shape="tall"] img { width: 30%; height: auto; margin: 5% auto 0; border: 1px solid var(--line); }
-    .stream-row__media--empty { background: repeating-linear-gradient(135deg, transparent 0 10px, var(--line) 10px 11px), #e4e4df; }
-    .stream-row__media--tile { display: flex; flex-direction: column; justify-content: space-between; padding: 24px; border: 0; background: var(--ink); color: var(--paper); }
-    .stream-row__kicker { font: 400 11px/14px var(--mono); letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.6; }
-    .stream-row__tile-title { font: 400 34px/38px var(--display); text-transform: uppercase; }
-    .stream-row__badge,
-    .stream-row__time { position: absolute; bottom: 12px; padding: 5px 8px; background: var(--ink); color: var(--paper); font: 400 11px/14px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
-    .stream-row__badge { left: 12px; }
-    .stream-row__time { right: 12px; }
-
-    .stream-row__body { display: flex; flex-direction: column; gap: 16px; padding-top: 14px; border-top: 3px solid var(--case-dark, var(--ink)); }
-    .stream-row__meta { display: flex; justify-content: space-between; gap: 16px; color: var(--ink-muted); }
-    .stream-row__case { color: var(--case-dark); }
-    .stream-row__chip { display: inline-block; width: 8px; height: 8px; margin: 0 7px 0 2px; background: var(--case-dark); }
-    .stream-row[data-type="case-study"] .stream-row__chip { margin-left: 0; }
-    .stream-row__title { font: 500 18px/24px var(--body); }
-    .stream-row[data-type="case-study"] .stream-row__title { font: 400 26px/30px var(--display); text-transform: uppercase; }
-    .stream-row[data-type="post"] .stream-row__title { font: 400 30px/34px "EB Garamond", Georgia, serif; }
-    .stream-row__link { text-decoration: none; }
-    .stream-row__link::after { content: ""; position: absolute; inset: 0; }
-    .stream-row__link:focus-visible { outline: none; }
-    .stream-row:has(.stream-row__link:focus-visible) { outline: 2px solid var(--ink); outline-offset: -6px; }
-    .stream-row__note { font: 400 26px/33px "EB Garamond", Georgia, serif; }
-    .stream-row__actions { display: flex; flex-wrap: wrap; gap: 28px; }
-    .stream-row__action { position: relative; z-index: 1; text-decoration: none; color: var(--ink-muted); }
-    .stream-row[data-placeholder] .stream-row__dateline::after { content: "Placeholder"; margin-left: 8px; color: var(--accent); }
-
-    @media (max-width: 767px) {
-      .fixture__intro { padding: 0 16px 28px; }
-      .stream-list { grid-template-columns: minmax(0, 1fr); gap: 40px; padding: 28px 16px 0; }
-      .stream-row__note { font-size: 21px; line-height: 28px; }
-    }
+    .fixture__intro p:last-child { color: var(--ink-soft); font-size: 15px; line-height: 22px; }
   </style>
 </head>
 <body>
@@ -70,7 +32,7 @@
       <article class="stream-row theme-insights" id="expert-insights" data-type="case-study" data-project="expert-insights" data-industry="sports" data-case-study="expert-insights">
         <div class="stream-row__media" data-shape="wide">
           <picture>
-            <source type="image/avif" srcset="/assets/expert-insights-01-240.avif 240w, /assets/expert-insights-01-850.avif 850w, /assets/expert-insights-01-1250.avif 1250w, /assets/expert-insights-01-1700.avif 1700w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/expert-insights-01-240.avif 240w, /assets/expert-insights-01-850.avif 850w, /assets/expert-insights-01-1250.avif 1250w, /assets/expert-insights-01-1700.avif 1700w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/expert-insights-01.png" width="2880" height="2048" alt="Scout insights dashboard: discussion totals, auto-generated highlights, and a roster sentiment table split into my players and rival players" loading="eager" decoding="async">
           </picture>
         </div>
@@ -92,7 +54,7 @@
         </div>
       </article>
 
-      <article class="stream-row" id="activity-central" data-type="prototype" data-project="activity-central" data-industry="productivity" data-placeholder>
+      <article class="stream-row" id="activity-central" data-type="prototype" data-project="activity-central" data-industry="productivity" data-platform="mobile" data-placeholder>
         <div class="stream-row__media stream-row__media--empty" data-shape="wide">
           <span class="stream-row__badge" aria-hidden="true">Try it</span>
         </div>
@@ -104,10 +66,10 @@
         </div>
       </article>
 
-      <article class="stream-row" id="weekly-activity-calendar" data-type="screen" data-project="activity-central" data-industry="productivity">
+      <article class="stream-row" id="weekly-activity-calendar" data-type="screen" data-project="activity-central" data-industry="productivity" data-platform="mobile">
         <div class="stream-row__media" data-shape="tall">
           <picture>
-            <source type="image/avif" srcset="/assets/feed/responsive/weekly-activity-calendar-480.avif 480w, /assets/feed/responsive/weekly-activity-calendar-750.avif 750w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/feed/responsive/weekly-activity-calendar-480.avif 480w, /assets/feed/responsive/weekly-activity-calendar-750.avif 750w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/feed/weekly-activity-calendar.webp" width="750" height="1624" alt="Mobile monthly calendar with the selected day expanded into a timed activity schedule" loading="lazy" decoding="async">
           </picture>
         </div>
@@ -119,7 +81,7 @@
         </div>
       </article>
 
-      <article class="stream-row" id="description-generator" data-type="tool" data-project="description-generator" data-industry="design-systems" data-placeholder>
+      <article class="stream-row" id="description-generator" data-type="tool" data-project="description-generator" data-industry="design-systems" data-platform="figma" data-placeholder>
         <div class="stream-row__media stream-row__media--tile" aria-hidden="true">
           <span class="stream-row__kicker">Figma plugin</span>
           <span class="stream-row__tile-title">Description Generator</span>
@@ -132,40 +94,40 @@
         </div>
       </article>
 
-      <article class="stream-row theme-conservis" id="fields-on-the-map" data-type="screen" data-project="conservis" data-industry="agriculture" data-case-study="conservis">
+      <article class="stream-row theme-conservis" id="fields-on-the-map" data-type="screen" data-project="conservis" data-industry="agriculture" data-platform="web" data-case-study="conservis">
         <div class="stream-row__media" data-shape="wide">
           <picture>
-            <source type="image/avif" srcset="/assets/conservis-03-240.avif 240w, /assets/conservis-03-850.avif 850w, /assets/conservis-03-1250.avif 1250w, /assets/conservis-03-1700.avif 1700w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/conservis-03-240.avif 240w, /assets/conservis-03-850.avif 850w, /assets/conservis-03-1250.avif 1250w, /assets/conservis-03-1700.avif 1700w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/conservis-03.png" width="2880" height="2048" alt="Conservis fields view: a satellite map with crop-coded field shapes beside a filterable field list" loading="lazy" decoding="async">
           </picture>
         </div>
         <div class="stream-row__body">
-          <p class="stream-row__meta micro"><span class="stream-row__kind"><span class="stream-row__type">Screen</span> <span class="stream-row__case"><span class="stream-row__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Conservis<span class="visually-hidden"> case study</span></span></span><span class="stream-row__dateline">2016–21</span></p>
+          <p class="stream-row__meta micro"><span class="stream-row__kind"><span class="stream-row__type">Screen</span> <span class="stream-row__case"><span class="stream-row__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Conservis<span class="visually-hidden"> case study</span><span aria-hidden="true"> · </span>01 of 08</span></span><span class="stream-row__dateline">2016–21</span></p>
           <h2 class="stream-row__title"><a class="stream-row__link" href="/work/conservis#fig-conservis-03" data-open="fields-on-the-map">Fields on the map</a></h2>
           <p class="stream-row__note">Growers think field by field. A map connects each crop and record to a real place across the operation.</p>
           <p class="stream-row__actions micro"><span class="stream-row__hint" aria-hidden="true">Open the case study here ↓</span></p>
         </div>
       </article>
 
-      <article class="stream-row theme-everag" id="ground-corn-overview" data-type="screen" data-project="everag" data-industry="agriculture" data-case-study="everag">
+      <article class="stream-row theme-everag" id="ground-corn-overview" data-type="screen" data-project="everag" data-industry="agriculture" data-platform="web" data-case-study="everag">
         <div class="stream-row__media" data-shape="square">
           <picture>
-            <source type="image/avif" srcset="/assets/everag-feed-overview-850.avif 850w, /assets/everag-feed-overview-1250.avif 1250w, /assets/everag-feed-overview-1700.avif 1700w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/everag-feed-overview-850.avif 850w, /assets/everag-feed-overview-1250.avif 1250w, /assets/everag-feed-overview-1700.avif 1700w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/everag-feed-overview.png" width="2904" height="3244" alt="Feed overview with stacked monthly coverage charts for corn-based, soybean-meal-based, and other ingredients" loading="lazy" decoding="async">
           </picture>
         </div>
         <div class="stream-row__body">
-          <p class="stream-row__meta micro"><span class="stream-row__kind"><span class="stream-row__type">Screen</span> <span class="stream-row__case"><span class="stream-row__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Ever.Ag<span class="visually-hidden"> case study</span></span></span><span class="stream-row__dateline">2022–24</span></p>
+          <p class="stream-row__meta micro"><span class="stream-row__kind"><span class="stream-row__type">Screen</span> <span class="stream-row__case"><span class="stream-row__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Ever.Ag<span class="visually-hidden"> case study</span><span aria-hidden="true"> · </span>01 of 09</span></span><span class="stream-row__dateline">2022–24</span></p>
           <h2 class="stream-row__title"><a class="stream-row__link" href="/work/everag#fig-everag-feed-overview" data-open="ground-corn-overview">Ground corn overview</a></h2>
           <p class="stream-row__note">A consistent chart grammar shows feed coverage across ingredients and months. The same components support the rest of the financial suite.</p>
           <p class="stream-row__actions micro"><span class="stream-row__hint" aria-hidden="true">Open the case study here ↓</span></p>
         </div>
       </article>
 
-      <article class="stream-row" id="lawn-assessment-recommendation" data-type="screen" data-project="trugreen" data-industry="home-services">
+      <article class="stream-row" id="lawn-assessment-recommendation" data-type="screen" data-project="trugreen" data-industry="home-services" data-platform="mobile">
         <div class="stream-row__media" data-shape="tall">
           <picture>
-            <source type="image/avif" srcset="/assets/feed/responsive/lawn-assessment-recommendation-480.avif 480w, /assets/feed/responsive/lawn-assessment-recommendation-750.avif 750w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/feed/responsive/lawn-assessment-recommendation-480.avif 480w, /assets/feed/responsive/lawn-assessment-recommendation-750.avif 750w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/feed/lawn-assessment-recommendation.webp" width="750" height="1624" alt="Mobile lawn assessment recommendation explaining a tailored TruComplete service plan" loading="lazy" decoding="async">
           </picture>
         </div>
@@ -176,7 +138,7 @@
         </div>
       </article>
 
-      <article class="stream-row" id="text-diff" data-type="tool" data-project="atomic-tools" data-industry="writing" data-placeholder>
+      <article class="stream-row" id="text-diff" data-type="tool" data-project="atomic-tools" data-industry="writing" data-platform="web" data-placeholder>
         <div class="stream-row__media stream-row__media--tile" aria-hidden="true">
           <span class="stream-row__kicker">Atomic Tools</span>
           <span class="stream-row__tile-title">Text diff</span>
@@ -188,10 +150,10 @@
         </div>
       </article>
 
-      <article class="stream-row theme-sim" id="channel-impact-simulator" data-type="prototype" data-project="campaign-sim" data-industry="sports" data-case-study="campaign-sim" data-placeholder>
+      <article class="stream-row theme-sim" id="channel-impact-simulator" data-type="prototype" data-project="campaign-sim" data-industry="sports" data-platform="web" data-case-study="campaign-sim" data-placeholder>
         <div class="stream-row__media" data-shape="wide">
           <picture>
-            <source type="image/avif" srcset="/assets/feed/responsive/channel-impact-simulator-480.avif 480w, /assets/feed/responsive/channel-impact-simulator-850.avif 850w, /assets/feed/responsive/channel-impact-simulator-1250.avif 1250w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/feed/responsive/channel-impact-simulator-480.avif 480w, /assets/feed/responsive/channel-impact-simulator-850.avif 850w, /assets/feed/responsive/channel-impact-simulator-1250.avif 1250w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/feed/channel-impact-simulator.webp" width="1250" height="889" alt="Campaign simulation table comparing channels by reach, expected impact, waste, and cost" loading="lazy" decoding="async">
           </picture>
           <span class="stream-row__badge" aria-hidden="true">Try it</span>
@@ -203,7 +165,7 @@
         </div>
       </article>
 
-      <article class="stream-row theme-conservis" id="filtering-fields" data-type="video" data-project="conservis" data-industry="agriculture" data-case-study="conservis" data-placeholder>
+      <article class="stream-row theme-conservis" id="filtering-fields" data-type="video" data-project="conservis" data-industry="agriculture" data-platform="web" data-case-study="conservis" data-placeholder>
         <div class="stream-row__media stream-row__media--empty" data-shape="wide">
           <span class="stream-row__time" id="filtering-fields-time"><span class="visually-hidden">Running time </span>2:02</span>
         </div>
@@ -214,7 +176,7 @@
         </div>
       </article>
 
-      <article class="stream-row" id="family-week" data-type="reel" data-project="activity-central" data-industry="productivity" data-placeholder>
+      <article class="stream-row" id="family-week" data-type="reel" data-project="activity-central" data-industry="productivity" data-platform="mobile" data-placeholder>
         <div class="stream-row__media stream-row__media--empty" data-shape="tall">
           <span class="stream-row__badge" aria-hidden="true">Reel</span>
           <span class="stream-row__time" id="family-week-time"><span class="visually-hidden">Running time </span>2:01</span>
@@ -226,7 +188,7 @@
         </div>
       </article>
 
-      <article class="stream-row" id="markdown-to-rich-text" data-type="video" data-project="atomic-tools" data-industry="writing" data-placeholder>
+      <article class="stream-row" id="markdown-to-rich-text" data-type="video" data-project="atomic-tools" data-industry="writing" data-platform="web" data-placeholder>
         <div class="stream-row__media stream-row__media--empty" data-shape="wide">
           <span class="stream-row__time" id="markdown-to-rich-text-time"><span class="visually-hidden">Running time </span>0:44</span>
         </div>
@@ -237,10 +199,10 @@
         </div>
       </article>
 
-      <article class="stream-row theme-vidscrip" id="patient-enrollment-form" data-type="screen" data-project="vidscrip" data-industry="healthcare" data-case-study="vidscrip">
+      <article class="stream-row theme-vidscrip" id="patient-enrollment-form" data-type="screen" data-project="vidscrip" data-industry="healthcare" data-platform="mobile" data-case-study="vidscrip">
         <div class="stream-row__media" data-shape="tall">
           <picture>
-            <source type="image/avif" srcset="/assets/feed/responsive/patient-enrollment-form-480.avif 480w, /assets/feed/responsive/patient-enrollment-form-758.avif 758w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/feed/responsive/patient-enrollment-form-480.avif 480w, /assets/feed/responsive/patient-enrollment-form-758.avif 758w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/feed/patient-enrollment-form.webp" width="758" height="2332" alt="Mobile patient enrollment form with introduction, progress steps, and a date question" loading="lazy" decoding="async">
           </picture>
         </div>
@@ -251,10 +213,10 @@
         </div>
       </article>
 
-      <article class="stream-row theme-everag" id="population-forecast-matrix" data-type="screen" data-project="everag" data-industry="agriculture" data-case-study="everag">
+      <article class="stream-row theme-everag" id="population-forecast-matrix" data-type="screen" data-project="everag" data-industry="agriculture" data-platform="web" data-case-study="everag">
         <div class="stream-row__media" data-shape="square">
           <picture>
-            <source type="image/avif" srcset="/assets/feed/responsive/population-forecast-matrix-480.avif 480w, /assets/feed/responsive/population-forecast-matrix-850.avif 850w, /assets/feed/responsive/population-forecast-matrix-1250.avif 1250w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/feed/responsive/population-forecast-matrix-480.avif 480w, /assets/feed/responsive/population-forecast-matrix-850.avif 850w, /assets/feed/responsive/population-forecast-matrix-1250.avif 1250w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/feed/population-forecast-matrix.webp" width="1250" height="1150" alt="Livestock population forecast matrix organized by week and age in a dense planning grid" loading="lazy" decoding="async">
           </picture>
         </div>
@@ -265,15 +227,15 @@
         </div>
       </article>
 
-      <article class="stream-row theme-insights" id="scouting-sentiment-search" data-type="screen" data-project="expert-insights" data-industry="sports" data-case-study="expert-insights">
+      <article class="stream-row theme-insights" id="scouting-sentiment-search" data-type="screen" data-project="expert-insights" data-industry="sports" data-platform="web" data-case-study="expert-insights">
         <div class="stream-row__media" data-shape="wide">
           <picture>
-            <source type="image/avif" srcset="/assets/feed/responsive/scouting-sentiment-search-480.avif 480w, /assets/feed/responsive/scouting-sentiment-search-850.avif 850w, /assets/feed/responsive/scouting-sentiment-search-1250.avif 1250w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/feed/responsive/scouting-sentiment-search-480.avif 480w, /assets/feed/responsive/scouting-sentiment-search-850.avif 850w, /assets/feed/responsive/scouting-sentiment-search-1250.avif 1250w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/feed/scouting-sentiment-search.webp" width="1250" height="889" alt="Search results with an insight summary, sentiment bar, and a feed of scouting comments" loading="lazy" decoding="async">
           </picture>
         </div>
         <div class="stream-row__body">
-          <p class="stream-row__meta micro"><span class="stream-row__kind"><span class="stream-row__type">Screen</span> <span class="stream-row__case"><span class="stream-row__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Expert Insights<span class="visually-hidden"> case study</span></span></span><span class="stream-row__dateline">2025</span></p>
+          <p class="stream-row__meta micro"><span class="stream-row__kind"><span class="stream-row__type">Screen</span> <span class="stream-row__case"><span class="stream-row__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Expert Insights<span class="visually-hidden"> case study</span><span aria-hidden="true"> · </span>02 of 07</span></span><span class="stream-row__dateline">2025</span></p>
           <h2 class="stream-row__title"><a class="stream-row__link" href="/work/expert-insights#fig-expert-insights-02" data-open="scouting-sentiment-search">Scouting sentiment search</a></h2>
           <p class="stream-row__note">Search puts an explicitly labeled, auto-generated summary above the discussions that support it. Outputs still require independent review.</p>
           <p class="stream-row__actions micro"><span class="stream-row__hint" aria-hidden="true">Open the case study here ↓</span></p>
@@ -283,7 +245,7 @@
       <article class="stream-row theme-conservis" id="conservis" data-type="case-study" data-project="conservis" data-industry="agriculture" data-case-study="conservis">
         <div class="stream-row__media" data-shape="wide">
           <picture>
-            <source type="image/avif" srcset="/assets/conservis-02-850.avif 850w, /assets/conservis-02-1250.avif 1250w, /assets/conservis-02-1700.avif 1700w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/conservis-02-850.avif 850w, /assets/conservis-02-1250.avif 1250w, /assets/conservis-02-1700.avif 1700w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/conservis-02.png" width="2880" height="2048" alt="Field activity log showing an irrigation ticket with equipment, operator, and input details" loading="lazy" decoding="async">
           </picture>
         </div>
@@ -295,10 +257,10 @@
         </div>
       </article>
 
-      <article class="stream-row" id="daily-activity-schedule" data-type="screen" data-project="activity-central" data-industry="productivity">
+      <article class="stream-row" id="daily-activity-schedule" data-type="screen" data-project="activity-central" data-industry="productivity" data-platform="mobile">
         <div class="stream-row__media" data-shape="tall">
           <picture>
-            <source type="image/avif" srcset="/assets/feed/responsive/daily-activity-schedule-480.avif 480w, /assets/feed/responsive/daily-activity-schedule-750.avif 750w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/feed/responsive/daily-activity-schedule-480.avif 480w, /assets/feed/responsive/daily-activity-schedule-750.avif 750w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/feed/daily-activity-schedule.webp" width="750" height="1624" alt="Mobile daily schedule with swimming practice, fishing camp, and reminders arranged by time" loading="lazy" decoding="async">
           </picture>
         </div>
@@ -309,10 +271,10 @@
         </div>
       </article>
 
-      <article class="stream-row" id="specialist-profile" data-type="screen" data-project="sophconnect" data-industry="healthcare">
+      <article class="stream-row" id="specialist-profile" data-type="screen" data-project="sophconnect" data-industry="healthcare" data-platform="mobile">
         <div class="stream-row__media" data-shape="tall">
           <picture>
-            <source type="image/avif" srcset="/assets/feed/responsive/specialist-profile-480.avif 480w, /assets/feed/responsive/specialist-profile-750.avif 750w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/feed/responsive/specialist-profile-480.avif 480w, /assets/feed/responsive/specialist-profile-750.avif 750w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/feed/specialist-profile.webp" width="750" height="1624" alt="Mobile specialist profile with portrait, biography, and message and call actions" loading="lazy" decoding="async">
           </picture>
         </div>
@@ -326,7 +288,7 @@
       <article class="stream-row theme-sim" id="campaign-sim" data-type="case-study" data-project="campaign-sim" data-industry="sports" data-case-study="campaign-sim">
         <div class="stream-row__media" data-shape="wide">
           <picture>
-            <source type="image/avif" srcset="/assets/campaign-sim-01-240.avif 240w, /assets/campaign-sim-01-850.avif 850w, /assets/campaign-sim-01-1250.avif 1250w, /assets/campaign-sim-01-1700.avif 1700w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/campaign-sim-01-240.avif 240w, /assets/campaign-sim-01-850.avif 850w, /assets/campaign-sim-01-1250.avif 1250w, /assets/campaign-sim-01-1700.avif 1700w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/campaign-sim-01.png" width="2880" height="2048" alt="Select Channels screen: a scout profile panel beside a grid of channel cards like international showcase, scout visit, and remote film session" loading="lazy" decoding="async">
           </picture>
         </div>
@@ -338,10 +300,10 @@
         </div>
       </article>
 
-      <article class="stream-row theme-conservis" id="direct-expense-planning" data-type="screen" data-project="conservis" data-industry="agriculture" data-case-study="conservis">
+      <article class="stream-row theme-conservis" id="direct-expense-planning" data-type="screen" data-project="conservis" data-industry="agriculture" data-platform="web" data-case-study="conservis">
         <div class="stream-row__media" data-shape="wide">
           <picture>
-            <source type="image/avif" srcset="/assets/feed/responsive/direct-expense-planning-480.avif 480w, /assets/feed/responsive/direct-expense-planning-850.avif 850w, /assets/feed/responsive/direct-expense-planning-1250.avif 1250w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/feed/responsive/direct-expense-planning-480.avif 480w, /assets/feed/responsive/direct-expense-planning-850.avif 850w, /assets/feed/responsive/direct-expense-planning-1250.avif 1250w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/feed/direct-expense-planning.webp" width="1250" height="781" alt="Crop-plan wizard for entering direct expenses, acres, rates, costs, and totals by seed and fertilizer" loading="lazy" decoding="async">
           </picture>
         </div>
@@ -352,10 +314,10 @@
         </div>
       </article>
 
-      <article class="stream-row" id="application-confirmation" data-type="screen" data-project="patriot" data-industry="finance">
+      <article class="stream-row" id="application-confirmation" data-type="screen" data-project="patriot" data-industry="finance" data-platform="web">
         <div class="stream-row__media" data-shape="square">
           <picture>
-            <source type="image/avif" srcset="/assets/feed/responsive/application-confirmation-480.avif 480w, /assets/feed/responsive/application-confirmation-850.avif 850w, /assets/feed/responsive/application-confirmation-1250.avif 1250w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/feed/responsive/application-confirmation-480.avif 480w, /assets/feed/responsive/application-confirmation-850.avif 850w, /assets/feed/responsive/application-confirmation-1250.avif 1250w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/feed/application-confirmation.webp" width="1250" height="1143" alt="Financial application workflow showing a confirmation message and completed section navigation" loading="lazy" decoding="async">
           </picture>
         </div>
@@ -369,7 +331,7 @@
       <article class="stream-row theme-everag" id="everag" data-type="case-study" data-project="everag" data-industry="agriculture" data-case-study="everag">
         <div class="stream-row__media" data-shape="wide">
           <picture>
-            <source type="image/avif" srcset="/assets/everag-01-240.avif 240w, /assets/everag-01-850.avif 850w, /assets/everag-01-1250.avif 1250w, /assets/everag-01-1440.avif 1440w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/everag-01-240.avif 240w, /assets/everag-01-850.avif 850w, /assets/everag-01-1250.avif 1250w, /assets/everag-01-1440.avif 1440w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/everag-01.png" width="1440" height="1024" alt="Dashboard template assembled from design system parts: KPI cards with sparklines and warnings, a news feed, and stat tiles" loading="lazy" decoding="async">
           </picture>
         </div>
@@ -381,10 +343,10 @@
         </div>
       </article>
 
-      <article class="stream-row" id="household-task-builder" data-type="screen" data-project="motivated-moms" data-industry="productivity">
+      <article class="stream-row" id="household-task-builder" data-type="screen" data-project="motivated-moms" data-industry="productivity" data-platform="mobile">
         <div class="stream-row__media" data-shape="tall">
           <picture>
-            <source type="image/avif" srcset="/assets/feed/responsive/household-task-builder-480.avif 480w, /assets/feed/responsive/household-task-builder-850.avif 850w, /assets/feed/responsive/household-task-builder-1125.avif 1125w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/feed/responsive/household-task-builder-480.avif 480w, /assets/feed/responsive/household-task-builder-850.avif 850w, /assets/feed/responsive/household-task-builder-1125.avif 1125w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/feed/household-task-builder.webp" width="1125" height="3741" alt="Long mobile task form with schedule, assignee, room, supplies, instructions, and notes" loading="lazy" decoding="async">
           </picture>
         </div>
@@ -395,10 +357,10 @@
         </div>
       </article>
 
-      <article class="stream-row theme-conservis" id="one-field-in-detail" data-type="screen" data-project="conservis" data-industry="agriculture" data-case-study="conservis">
+      <article class="stream-row theme-conservis" id="one-field-in-detail" data-type="screen" data-project="conservis" data-industry="agriculture" data-platform="web" data-case-study="conservis">
         <div class="stream-row__media" data-shape="wide">
           <picture>
-            <source type="image/avif" srcset="/assets/conservis-01-850.avif 850w, /assets/conservis-01-1250.avif 1250w, /assets/conservis-01-1700.avif 1700w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/conservis-01-850.avif 850w, /assets/conservis-01-1250.avif 1250w, /assets/conservis-01-1700.avif 1700w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/conservis-01.png" width="2880" height="2048" alt="Conservis field detail for AG Burnstton, with crop plantings and ownership sections beside a satellite map outlining the field" loading="lazy" decoding="async">
           </picture>
         </div>
@@ -409,10 +371,10 @@
         </div>
       </article>
 
-      <article class="stream-row" id="advisor-insights-hub" data-type="screen" data-project="ascensus" data-industry="finance" data-placeholder>
+      <article class="stream-row" id="advisor-insights-hub" data-type="screen" data-project="ascensus" data-industry="finance" data-platform="web" data-placeholder>
         <div class="stream-row__media" data-shape="tall">
           <picture>
-            <source type="image/avif" srcset="/assets/feed/responsive/advisor-insights-hub-480.avif 480w, /assets/feed/responsive/advisor-insights-hub-850.avif 850w, /assets/feed/responsive/advisor-insights-hub-1250.avif 1250w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/feed/responsive/advisor-insights-hub-480.avif 480w, /assets/feed/responsive/advisor-insights-hub-850.avif 850w, /assets/feed/responsive/advisor-insights-hub-1250.avif 1250w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/feed/advisor-insights-hub.webp" width="1250" height="5378" alt="Long-form advisor insights website with articles, video, research, and green editorial feature panels" loading="lazy" decoding="async">
           </picture>
         </div>
@@ -426,7 +388,7 @@
       <article class="stream-row theme-vidscrip" id="vidscrip" data-type="case-study" data-project="vidscrip" data-industry="healthcare" data-case-study="vidscrip">
         <div class="stream-row__media" data-shape="wide">
           <picture>
-            <source type="image/avif" srcset="/assets/vidscrip-desktop-journey-850.avif 850w, /assets/vidscrip-desktop-journey-1250.avif 1250w, /assets/vidscrip-desktop-journey-1700.avif 1700w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/vidscrip-desktop-journey-850.avif 850w, /assets/vidscrip-desktop-journey-1250.avif 1250w, /assets/vidscrip-desktop-journey-1700.avif 1700w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/vidscrip-desktop-journey.png" width="2880" height="2048" alt="Vidscrip desktop journey with three procedure phases and a physician video expanded in the preparation column" loading="lazy" decoding="async">
           </picture>
         </div>
@@ -438,10 +400,10 @@
         </div>
       </article>
 
-      <article class="stream-row" id="competency-video-assessment" data-type="prototype" data-project="patriot" data-industry="finance" data-placeholder>
+      <article class="stream-row" id="competency-video-assessment" data-type="prototype" data-project="patriot" data-industry="finance" data-platform="web" data-placeholder>
         <div class="stream-row__media" data-shape="square">
           <picture>
-            <source type="image/avif" srcset="/assets/feed/responsive/competency-video-assessment-480.avif 480w, /assets/feed/responsive/competency-video-assessment-850.avif 850w, /assets/feed/responsive/competency-video-assessment-1250.avif 1250w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/feed/responsive/competency-video-assessment-480.avif 480w, /assets/feed/responsive/competency-video-assessment-850.avif 850w, /assets/feed/responsive/competency-video-assessment-1250.avif 1250w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/feed/competency-video-assessment.webp" width="1250" height="1667" alt="Prototype competency step with a video player, progress timeline, and continue action" loading="lazy" decoding="async">
           </picture>
           <span class="stream-row__badge" aria-hidden="true">Try it</span>
@@ -453,15 +415,15 @@
         </div>
       </article>
 
-      <article class="stream-row theme-everag" id="feed-ingredient-defaults" data-type="screen" data-project="everag" data-industry="agriculture" data-case-study="everag">
+      <article class="stream-row theme-everag" id="feed-ingredient-defaults" data-type="screen" data-project="everag" data-industry="agriculture" data-platform="web" data-case-study="everag">
         <div class="stream-row__media" data-shape="wide">
           <picture>
-            <source type="image/avif" srcset="/assets/feed/responsive/feed-ingredient-defaults-480.avif 480w, /assets/feed/responsive/feed-ingredient-defaults-850.avif 850w, /assets/feed/responsive/feed-ingredient-defaults-1250.avif 1250w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/feed/responsive/feed-ingredient-defaults-480.avif 480w, /assets/feed/responsive/feed-ingredient-defaults-850.avif 850w, /assets/feed/responsive/feed-ingredient-defaults-1250.avif 1250w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/feed/feed-ingredient-defaults.webp" width="1250" height="887" alt="Feed ingredient settings table with inclusion percentages, prices, costs, and editable defaults" loading="lazy" decoding="async">
           </picture>
         </div>
         <div class="stream-row__body">
-          <p class="stream-row__meta micro"><span class="stream-row__kind"><span class="stream-row__type">Screen</span> <span class="stream-row__case"><span class="stream-row__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Ever.Ag<span class="visually-hidden"> case study</span></span></span><span class="stream-row__dateline">2022–24</span></p>
+          <p class="stream-row__meta micro"><span class="stream-row__kind"><span class="stream-row__type">Screen</span> <span class="stream-row__case"><span class="stream-row__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Ever.Ag<span class="visually-hidden"> case study</span><span aria-hidden="true"> · </span>02 of 09</span></span><span class="stream-row__dateline">2022–24</span></p>
           <h2 class="stream-row__title"><a class="stream-row__link" href="/work/everag#fig-everag-feed-ingredients" data-open="feed-ingredient-defaults">Feed ingredient defaults</a></h2>
           <p class="stream-row__note">The ingredient table aligns price types and basis costs for comparison, with actions held in fixed columns.</p>
           <p class="stream-row__actions micro"><span class="stream-row__hint" aria-hidden="true">Open the case study here ↓</span></p>
@@ -471,7 +433,7 @@
       <article class="stream-row theme-plinth" id="plinth" data-type="case-study" data-project="plinth" data-industry="publishing" data-case-study="plinth">
         <div class="stream-row__media" data-shape="wide">
           <picture>
-            <source type="image/avif" srcset="/assets/plinth-06-240.avif 240w, /assets/plinth-06-850.avif 850w, /assets/plinth-06-1250.avif 1250w, /assets/plinth-06-1440.avif 1440w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/plinth-06-240.avif 240w, /assets/plinth-06-850.avif 850w, /assets/plinth-06-1250.avif 1250w, /assets/plinth-06-1440.avif 1440w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/plinth-06.jpg" width="1440" height="1000" alt="PLINTH issue 06 contents page: a white serif wordmark over a mirrored, inkblot-like graphic on black, with the contents listed in two flanking columns" loading="lazy" decoding="async">
           </picture>
         </div>
@@ -483,10 +445,10 @@
         </div>
       </article>
 
-      <article class="stream-row theme-conservis" id="field-task-setup" data-type="screen" data-project="conservis" data-industry="agriculture" data-case-study="conservis">
+      <article class="stream-row theme-conservis" id="field-task-setup" data-type="screen" data-project="conservis" data-industry="agriculture" data-platform="mobile" data-case-study="conservis">
         <div class="stream-row__media" data-shape="tall">
           <picture>
-            <source type="image/avif" srcset="/assets/feed/responsive/field-task-setup-480.avif 480w, /assets/feed/responsive/field-task-setup-850.avif 850w, /assets/feed/responsive/field-task-setup-1250.avif 1250w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/feed/responsive/field-task-setup-480.avif 480w, /assets/feed/responsive/field-task-setup-850.avif 850w, /assets/feed/responsive/field-task-setup-1250.avif 1250w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/feed/field-task-setup.webp" width="1250" height="2295" alt="Mobile field-task setup with crop, equipment, inputs, operators, and notes in an expandable form" loading="lazy" decoding="async">
           </picture>
         </div>
@@ -500,7 +462,7 @@
       <article class="stream-row" id="manufacturing-careers-story" data-type="post" data-project="third-wave" data-industry="manufacturing" data-placeholder>
         <div class="stream-row__media" data-shape="tall">
           <picture>
-            <source type="image/avif" srcset="/assets/feed/responsive/manufacturing-careers-story-480.avif 480w, /assets/feed/responsive/manufacturing-careers-story-850.avif 850w, /assets/feed/responsive/manufacturing-careers-story-1250.avif 1250w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/feed/responsive/manufacturing-careers-story-480.avif 480w, /assets/feed/responsive/manufacturing-careers-story-850.avif 850w, /assets/feed/responsive/manufacturing-careers-story-1250.avif 1250w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/feed/manufacturing-careers-story.webp" width="1250" height="1869" alt="Third Wave story page about developing more than five hundred next-generation manufacturing careers" loading="lazy" decoding="async">
           </picture>
         </div>
@@ -511,24 +473,24 @@
         </div>
       </article>
 
-      <article class="stream-row theme-everag" id="position-detail-transactions" data-type="screen" data-project="everag" data-industry="agriculture" data-case-study="everag">
+      <article class="stream-row theme-everag" id="position-detail-transactions" data-type="screen" data-project="everag" data-industry="agriculture" data-platform="mobile" data-case-study="everag">
         <div class="stream-row__media" data-shape="tall">
           <picture>
-            <source type="image/avif" srcset="/assets/feed/responsive/position-detail-transactions-480.avif 480w, /assets/feed/responsive/position-detail-transactions-780.avif 780w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/feed/responsive/position-detail-transactions-480.avif 480w, /assets/feed/responsive/position-detail-transactions-780.avif 780w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/feed/position-detail-transactions.webp" width="780" height="1688" alt="Mobile grain position detail with profit and loss totals and an expandable transaction history" loading="lazy" decoding="async">
           </picture>
         </div>
         <div class="stream-row__body">
-          <p class="stream-row__meta micro"><span class="stream-row__kind"><span class="stream-row__type">Screen</span> <span class="stream-row__case"><span class="stream-row__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Ever.Ag<span class="visually-hidden"> case study</span></span></span><span class="stream-row__dateline">2022–24</span></p>
+          <p class="stream-row__meta micro"><span class="stream-row__kind"><span class="stream-row__type">Screen</span> <span class="stream-row__case"><span class="stream-row__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Ever.Ag<span class="visually-hidden"> case study</span><span aria-hidden="true"> · </span>05 of 09</span></span><span class="stream-row__dateline">2022–24</span></p>
           <h2 class="stream-row__title"><a class="stream-row__link" href="/work/everag#fig-everag-position" data-open="position-detail-transactions">Position detail and transactions</a></h2>
           <p class="stream-row__actions micro"><span class="stream-row__hint" aria-hidden="true">Open the case study here ↓</span></p>
         </div>
       </article>
 
-      <article class="stream-row theme-sim" id="campaign-investment-review" data-type="prototype" data-project="campaign-sim" data-industry="sports" data-case-study="campaign-sim" data-placeholder>
+      <article class="stream-row theme-sim" id="campaign-investment-review" data-type="prototype" data-project="campaign-sim" data-industry="sports" data-platform="web" data-case-study="campaign-sim" data-placeholder>
         <div class="stream-row__media" data-shape="wide">
           <picture>
-            <source type="image/avif" srcset="/assets/feed/responsive/campaign-investment-review-480.avif 480w, /assets/feed/responsive/campaign-investment-review-850.avif 850w, /assets/feed/responsive/campaign-investment-review-1250.avif 1250w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/feed/responsive/campaign-investment-review-480.avif 480w, /assets/feed/responsive/campaign-investment-review-850.avif 850w, /assets/feed/responsive/campaign-investment-review-1250.avif 1250w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/feed/campaign-investment-review.webp" width="1250" height="889" alt="Campaign review prototype with player investment rows, resource totals, and channel mix breakdowns" loading="lazy" decoding="async">
           </picture>
           <span class="stream-row__badge" aria-hidden="true">Try it</span>
@@ -540,10 +502,10 @@
         </div>
       </article>
 
-      <article class="stream-row theme-conservis" id="conservis-dashboard" data-type="prototype" data-project="conservis" data-industry="agriculture" data-case-study="conservis" data-placeholder>
+      <article class="stream-row theme-conservis" id="conservis-dashboard" data-type="prototype" data-project="conservis" data-industry="agriculture" data-platform="web" data-case-study="conservis" data-placeholder>
         <div class="stream-row__media" data-shape="wide">
           <picture>
-            <source type="image/avif" srcset="/assets/feed/responsive/field-performance-explorer-480.avif 480w, /assets/feed/responsive/field-performance-explorer-850.avif 850w, /assets/feed/responsive/field-performance-explorer-1250.avif 1250w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/feed/responsive/field-performance-explorer-480.avif 480w, /assets/feed/responsive/field-performance-explorer-850.avif 850w, /assets/feed/responsive/field-performance-explorer-1250.avif 1250w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/feed/field-performance-explorer.webp" width="1250" height="889" alt="Fertilizer metrics dashboard with projected yield scatter plot and planned-versus-actual input cost bars" loading="lazy" decoding="async">
           </picture>
           <span class="stream-row__badge" aria-hidden="true">Try it</span>
@@ -555,10 +517,10 @@
         </div>
       </article>
 
-      <article class="stream-row" id="retirement-education-library" data-type="screen" data-project="ascensus" data-industry="finance" data-placeholder>
+      <article class="stream-row" id="retirement-education-library" data-type="screen" data-project="ascensus" data-industry="finance" data-platform="web" data-placeholder>
         <div class="stream-row__media" data-shape="tall">
           <picture>
-            <source type="image/avif" srcset="/assets/feed/responsive/retirement-education-library-480.avif 480w, /assets/feed/responsive/retirement-education-library-850.avif 850w, /assets/feed/responsive/retirement-education-library-1250.avif 1250w" sizes="(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)">
+            <source type="image/avif" srcset="/assets/feed/responsive/retirement-education-library-480.avif 480w, /assets/feed/responsive/retirement-education-library-850.avif 850w, /assets/feed/responsive/retirement-education-library-1250.avif 1250w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
             <img src="/assets/feed/retirement-education-library.webp" width="1250" height="5236" alt="Long retirement education website with product explanations, video, tools, and editorial resource cards" loading="lazy" decoding="async">
           </picture>
         </div>
