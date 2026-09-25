@@ -21,8 +21,9 @@
 
   // ---- Phone menu ----
   // A disclosure: the trigger names the current place and toggles the list.
-  // Picking a row, tapping the trigger, tapping outside, or Esc closes it,
-  // and focus goes back to the trigger.
+  // Picking a row, tapping the trigger, tapping outside, or Esc closes it.
+  // Esc and a tap outside send focus back to the trigger. A picked row leaves
+  // focus to where it leads, since About opens in place and takes focus.
 
   function setupMenu() {
     const nav = document.querySelector('.masthead__nav');
@@ -40,7 +41,7 @@
     trigger.addEventListener('click', () => setOpen(!isOpen()));
 
     places.addEventListener('click', (event) => {
-      if (isOpen() && event.target.closest('a')) setOpen(false, true);
+      if (isOpen() && event.target.closest('a')) setOpen(false);
     });
 
     document.addEventListener('click', (event) => {
