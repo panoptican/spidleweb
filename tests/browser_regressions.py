@@ -1847,6 +1847,36 @@ class BrowserRegressions(unittest.TestCase):
                         self.assertEqual(card.evaluate(spacing), grid)
                     page.close()
 
+    def test_qa_about_heading_takes_focus_without_the_browser_ring(self):
+        # The heading is not a control, like the panel's heading, so the
+        # browser's own ring must not show when a key or #about opens About.
+        ring = "() => { const el = document.getElementById('about-title'); return [el === document.activeElement, getComputedStyle(el).outlineStyle]; }"
+        for width in [1440, 390]:
+            options = {'viewport': {'width': width, 'height': 900}}
+            if width < 600:
+                options.update(is_mobile=True, has_touch=True)
+            with self.subTest(width=width, opened='hash'):
+                page = self.open(self.context(**options), 'index.html#about')
+                page.wait_for_function("() => document.activeElement && document.activeElement.id === 'about-title'")
+                self.assertEqual(page.evaluate(ring), [True, 'none'])
+                page.close()
+            with self.subTest(width=width, opened='keyboard'):
+                page = self.open(self.context(**options), 'index.html')
+                if width < 800:
+                    page.locator('.masthead__trigger').focus()
+                    page.keyboard.press('Enter')
+                page.locator('.masthead__places a[href="#about"]').focus()
+                page.keyboard.press('Enter')
+                page.wait_for_function("() => !document.getElementById('about').hidden")
+                self.assertEqual(page.evaluate(ring), [True, 'none'])
+                # The panel heading follows the same rule.
+                page.keyboard.press('Escape')
+                page.locator('#fields-on-the-map .stream-card__link').focus()
+                page.keyboard.press('Enter')
+                self.wait_for_panel(page, 'fields-on-the-map')
+                self.assertEqual(page.locator('#stream-panel-title').evaluate('el => getComputedStyle(el).outlineStyle'), 'none')
+                page.close()
+
     def test_qa_index_calls_to_action_keep_the_space_before_the_arrow_on_phones(self):
         # On phones the call to action is a 44px flex row, which dropped the
         # space in "Read the case study →". Its width now matches the desktop's.

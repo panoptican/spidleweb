@@ -92,9 +92,11 @@
   outline-offset: 3px;
 }
 
-/* Focus lands on the heading when the panel opens. It is not a control, so
-   it draws no ring. */
-.stream-panel__title:focus {
+/* Focus lands on the heading when the panel or About opens. It is not a
+   control, so it draws no ring, where the browser's own would otherwise
+   show after a key press or a link to #about. */
+.stream-panel__title:focus,
+.about__title:focus {
   outline: none;
 }
 
