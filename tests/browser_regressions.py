@@ -1785,6 +1785,25 @@ class BrowserRegressions(unittest.TestCase):
                 self.assertEqual(re.match(r'- link "(.*)"', snapshot).group(1), name)
         self.assertEqual(page.errors, [])
 
+    def test_qa_case_study_strips_take_keyboard_focus_in_every_browser(self):
+        # Chrome and Firefox make a scroller a tab stop on their own, and
+        # Safari only does it for one that can take focus.
+        for width in [1440, 390]:
+            page = self.open(self.context(viewport={'width': width, 'height': 900}), 'index.html#expert-insights')
+            self.wait_for_panel(page, 'expert-insights')
+            track = page.locator('#stream-panel [data-strip-track]')
+            self.assertEqual(track.get_attribute('tabindex'), '0')
+            page.locator('#stream-panel-title').focus()
+            page.keyboard.press('Tab')
+            self.assertTrue(track.evaluate('el => el === document.activeElement'))
+            count = page.locator('#stream-panel [data-strip-count]')
+            first = count.text_content()
+            page.keyboard.press('ArrowRight')
+            page.wait_for_function('([el, text]) => el.textContent !== text', arg=[count.element_handle(), first])
+            self.assertTrue(track.evaluate('el => el === document.activeElement'))
+            self.assertEqual(page.errors, [])
+            page.close()
+
     def test_qa_list_marks_its_first_image_as_the_high_priority_lcp(self):
         # The List's first image is its largest paint, where the Grid's is its
         # headline, so only the List asks for fetchpriority.

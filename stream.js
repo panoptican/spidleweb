@@ -445,9 +445,14 @@
     return `<div class="stream-strip__frame" data-shape="${frame.shape}" data-index="${index}"${ratio}>${inner}</div>`;
   }
 
+  /**
+   * The track is a scroller, so it takes focus itself: Safari only lets the
+   * keyboard scroll a region that can be focused, where Chrome and Firefox
+   * make it a stop on their own.
+   */
   function strip(frames, start, label) {
     return `<div class="stream-panel__media stream-strip" data-strip>
-      <div class="stream-strip__track" data-strip-track role="group" aria-label="${esc(label)}">${frames.map((f, i) => frameMarkup(f, i, start)).join('')}</div>
+      <div class="stream-strip__track" data-strip-track role="group" aria-label="${esc(label)}" tabindex="0">${frames.map((f, i) => frameMarkup(f, i, start)).join('')}</div>
       <div class="stream-strip__caption">
         <span class="stream-strip__number micro" data-strip-number aria-hidden="true"></span>
         <p class="stream-strip__text" data-strip-caption></p>
