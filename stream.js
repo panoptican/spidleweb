@@ -113,8 +113,15 @@
   function setHash(id) {
     history.replaceState(history.state, '', `${location.pathname}${location.search}#${encodeURIComponent(id)}`);
   }
-  function clearHash() {
-    if (location.hash) history.replaceState(history.state, '', `${location.pathname}${location.search}`);
+  /**
+   * Clears the fragment. Given an id, it clears it only while the fragment
+   * is still that id, so an anchor followed while a panel was open, such as
+   * a figure on a case-study page, stays in the address.
+   */
+  function clearHash(owner) {
+    if (!location.hash) return;
+    if (owner && location.hash !== `#${encodeURIComponent(owner)}`) return;
+    history.replaceState(history.state, '', `${location.pathname}${location.search}`);
   }
 
   function setExpanded(control, open, controls) {
@@ -1002,14 +1009,14 @@
 
   function closeItem({ animate = true, focus = true } = {}) {
     if (open.kind !== 'item') return;
-    const { panel, link } = open;
+    const { panel, link, id } = open;
     token++;
     open.strip?.destroy();
     unwatchContainer();
     for (const key of Object.keys(open)) delete open[key];
     open.kind = null;
     setExpanded(link, false);
-    clearHash();
+    clearHash(id);
     stopMedia(panel);
     retire(panel);
     if (focus) link.focus();
@@ -1191,7 +1198,7 @@
     open.kind = null;
     riseWatcher.unobserve(rise);
     document.querySelectorAll(ABOUT_LINKS).forEach((link) => setExpanded(link, false));
-    clearHash();
+    clearHash('about');
     stopMedia(section);
     const done = () => {
       section.hidden = true;
