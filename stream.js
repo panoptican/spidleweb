@@ -1188,7 +1188,8 @@
       leaveFullscreen();
       return;
     }
-    const close = target.closest('[data-panel-close]');
+    // About's Close is a link to #top, so it works without this script.
+    const close = target.closest('[data-panel-close], #about .about__close');
     if (close) {
       event.preventDefault();
       if (close.closest('#about')) closeAbout();
@@ -1311,6 +1312,8 @@
       });
     }
     if (aboutSection()) {
+      // Taking over About switches off style.css's :target fallback.
+      document.documentElement.classList.add('panels');
       document.querySelectorAll(ABOUT_LINKS).forEach((link) => setExpanded(link, false, 'about'));
     }
     openFromHash();

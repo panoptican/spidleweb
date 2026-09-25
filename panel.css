@@ -127,12 +127,30 @@
   stroke: none;
 }
 
-/* About's rise sits just before the #about section, full bleed. */
+/* About's rise sits just before the #about section, full bleed, and takes
+   the place of style.css's top rule, as the chrome contract allows. Row 10
+   puts the column 32px under the rise on desktop. */
 .stream-about-rise {
   position: relative;
   width: calc(100% + var(--stream-bleed-start, 0px) + var(--stream-bleed-end, 0px));
   margin-inline-start: calc(-1 * var(--stream-bleed-start, 0px));
   margin-top: 4px;
+}
+
+html.panels .about {
+  border-top: 0;
+  padding-top: 32px;
+}
+
+@media (max-width: 799px) {
+  .stream-about-rise {
+    margin-top: 8px;
+  }
+
+  html.panels .about {
+    margin-top: 0;
+    padding-top: 8px;
+  }
 }
 
 /* ---- The body: one column, in reading order ------------------------------ */
@@ -1110,9 +1128,6 @@
     width: min(300px, 100%);
   }
 
-  .stream-about-rise {
-    margin-top: 0;
-  }
 }
 
 /* ---- The open card ---------------------------------------------------------- */
