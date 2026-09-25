@@ -92,9 +92,11 @@
   outline-offset: 3px;
 }
 
-/* Focus lands on the heading when the panel opens. It is not a control, so
-   it draws no ring. */
-.stream-panel__title:focus {
+/* Focus lands on the heading when the panel or About opens. It is not a
+   control, so it draws no ring, where the browser's own would otherwise
+   show after a key press or a link to #about. */
+.stream-panel__title:focus,
+.about__title:focus {
   outline: none;
 }
 
@@ -300,6 +302,17 @@ html.panels .about {
 .stream-panel__jump {
   color: inherit;
   text-decoration: none;
+}
+
+/* A mono line is 13px tall, so the link's hit area grows to 44px, over the
+   whole value, without moving the fact rows or the focus ring. It hangs off
+   the value rather than the link, since a link that wraps would give it the
+   width of its last line only. */
+.stream-panel__facts dd { position: relative; }
+.stream-panel__jump::before {
+  content: "";
+  position: absolute;
+  inset: -15.5px 0;
 }
 
 .stream-panel__cta {

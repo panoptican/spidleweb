@@ -1751,5 +1751,215 @@ class BrowserRegressions(unittest.TestCase):
                 self.assertEqual(page.errors, [])
                 page.close()
 
+    # ---- Early QA pass (Phase 4, 2026-09-25) ----
+
+    def test_qa_card_names_keep_every_meta_word_apart(self):
+        # The separating dot is aria-hidden, so the spaces around it must sit
+        # outside it, or a card reads "PrototypeProductivity" or "Writing2026".
+        words = """el => {
+          const copy = el.cloneNode(true);
+          copy.querySelectorAll('[aria-hidden="true"]').forEach(hidden => hidden.replaceWith(' '));
+          return copy.textContent.trim().split(/\\s+/);
+        }"""
+        spoken = """el => {
+          const copy = el.cloneNode(true);
+          copy.querySelectorAll('[aria-hidden="true"]').forEach(hidden => hidden.remove());
+          return copy.textContent.trim().split(/\\s+/);
+        }"""
+        context = self.context()
+        for path, meta in [('index.html', '.stream-card__meta'), ('list/index.html', '.stream-row__kind'),
+                           ('work/conservis', '.stream-card__meta')]:
+            page = self.open(context, path)
+            for element in page.locator(meta).all():
+                with self.subTest(path=path, meta=element.evaluate('el => el.id || el.textContent.trim()')):
+                    self.assertEqual(element.evaluate(spoken), element.evaluate(words))
+            page.close()
+        # And the name Chromium computes for a card link, from the title and the meta line.
+        page = self.open(context, 'index.html')
+        for card_id, name in [('activity-central', 'Activity Central Prototype Productivity'),
+                              ('how-i-built-description-generator', 'How I built Description Generator Writing 2026'),
+                              ('expert-insights', 'Expert Insights Case study 7 screens'),
+                              ('fields-on-the-map', 'Fields on the map Screen from the Conservis case study')]:
+            with self.subTest(card=card_id):
+                snapshot = page.locator(f'#{card_id} .stream-card__link').aria_snapshot()
+                self.assertEqual(re.match(r'- link "(.*)"', snapshot).group(1), name)
+        self.assertEqual(page.errors, [])
+
+    def test_qa_case_study_strips_take_keyboard_focus_in_every_browser(self):
+        # Chrome and Firefox make a scroller a tab stop on their own, and
+        # Safari only does it for one that can take focus.
+        for width in [1440, 390]:
+            page = self.open(self.context(viewport={'width': width, 'height': 900}), 'index.html#expert-insights')
+            self.wait_for_panel(page, 'expert-insights')
+            track = page.locator('#stream-panel [data-strip-track]')
+            self.assertEqual(track.get_attribute('tabindex'), '0')
+            page.locator('#stream-panel-title').focus()
+            page.keyboard.press('Tab')
+            self.assertTrue(track.evaluate('el => el === document.activeElement'))
+            count = page.locator('#stream-panel [data-strip-count]')
+            first = count.text_content()
+            page.keyboard.press('ArrowRight')
+            page.wait_for_function('([el, text]) => el.textContent !== text', arg=[count.element_handle(), first])
+            self.assertTrue(track.evaluate('el => el === document.activeElement'))
+            self.assertEqual(page.errors, [])
+            page.close()
+
+    def test_qa_more_from_badges_keep_the_red_marker_of_the_grid(self):
+        # A case study turns --accent into the project colour, which on the
+        # badge's ink hid the Try it ▶. More from matches the Grid instead.
+        marker = "el => getComputedStyle(el, '::before').color"
+        context = self.context()
+        page = self.open(context, 'index.html')
+        red = page.locator('#activity-central .stream-card__badge').evaluate(marker)
+        self.assertEqual(red, 'rgb(250, 25, 0)')
+        page.close()
+        for path, card_id in [('work/conservis', 'conservis-dashboard'), ('work/campaign-sim', 'channel-impact-simulator')]:
+            with self.subTest(path=path):
+                page = self.open(context, path)
+                self.assertEqual(page.locator(f'.more-from #{card_id} .stream-card__badge').evaluate(marker), red)
+                # The case study's own markers keep the project colour.
+                self.assertNotEqual(page.locator('.case-study').evaluate("el => getComputedStyle(el).getPropertyValue('--accent')"),
+                                    page.locator('.more-from').evaluate("el => getComputedStyle(el).getPropertyValue('--accent')"))
+                page.close()
+
+    def test_qa_more_from_cards_keep_the_grid_card_spacing(self):
+        # --card-gap lived on .stream-grid only, so More from's cards set
+        # their title and meta line flush under the image.
+        spacing = """el => {
+          const media = el.querySelector('.stream-card__media').getBoundingClientRect();
+          const title = el.querySelector('.stream-card__title').getBoundingClientRect();
+          const meta = el.querySelector('.stream-card__meta').getBoundingClientRect();
+          return [Math.round(title.top - media.bottom), Math.round(meta.top - title.bottom)];
+        }"""
+        for width in [1440, 390]:
+            options = {'viewport': {'width': width, 'height': 900}}
+            if width < 600:
+                options.update(is_mobile=True, has_touch=True)
+            context = self.context(**options)
+            page = self.open(context, 'index.html')
+            grid = page.locator('#direct-expense-planning').evaluate(spacing)
+            self.assertGreater(min(grid), 0)
+            page.close()
+            for path in ['work/conservis', 'work/campaign-sim', 'work/everag', 'work/vidscrip']:
+                with self.subTest(width=width, path=path):
+                    page = self.open(context, path)
+                    for card in page.locator('.more-from .stream-card').all():
+                        self.assertEqual(card.evaluate(spacing), grid)
+                    page.close()
+
+    def test_qa_about_heading_takes_focus_without_the_browser_ring(self):
+        # The heading is not a control, like the panel's heading, so the
+        # browser's own ring must not show when a key or #about opens About.
+        ring = "() => { const el = document.getElementById('about-title'); return [el === document.activeElement, getComputedStyle(el).outlineStyle]; }"
+        for width in [1440, 390]:
+            options = {'viewport': {'width': width, 'height': 900}}
+            if width < 600:
+                options.update(is_mobile=True, has_touch=True)
+            with self.subTest(width=width, opened='hash'):
+                page = self.open(self.context(**options), 'index.html#about')
+                page.wait_for_function("() => document.activeElement && document.activeElement.id === 'about-title'")
+                self.assertEqual(page.evaluate(ring), [True, 'none'])
+                page.close()
+            with self.subTest(width=width, opened='keyboard'):
+                page = self.open(self.context(**options), 'index.html')
+                if width < 800:
+                    page.locator('.masthead__trigger').focus()
+                    page.keyboard.press('Enter')
+                page.locator('.masthead__places a[href="#about"]').focus()
+                page.keyboard.press('Enter')
+                page.wait_for_function("() => !document.getElementById('about').hidden")
+                self.assertEqual(page.evaluate(ring), [True, 'none'])
+                # The panel heading follows the same rule.
+                page.keyboard.press('Escape')
+                page.locator('#fields-on-the-map .stream-card__link').focus()
+                page.keyboard.press('Enter')
+                self.wait_for_panel(page, 'fields-on-the-map')
+                self.assertEqual(page.locator('#stream-panel-title').evaluate('el => getComputedStyle(el).outlineStyle'), 'none')
+                page.close()
+
+    def test_qa_small_links_get_44px_hit_areas_on_phones_without_moving(self):
+        # The hit area is measured by hit-testing a column through the link
+        # every half pixel, since whole pixels round a 42.6px link up to 44,
+        # and nothing else interactive may sit under it.
+        hit = """el => {
+          const box = el.closest('dd, .case-context__links').getBoundingClientRect();
+          const own = el.getBoundingClientRect();
+          const column = x => {
+            let first = null, last = null;
+            for (let y = Math.floor(own.top) - 30; y < own.bottom + 30; y += 0.5) {
+              const target = document.elementFromPoint(x, y);
+              if (target && (target === el || el.contains(target))) { first ??= y; last = y; }
+            }
+            return first === null ? 0 : last - first + 0.5;
+          };
+          const others = [];
+          for (let y = own.top - 16; y < own.bottom + 16; y += 2)
+            for (let x = box.left; x < Math.min(box.right, own.right); x += 6) {
+              const target = document.elementFromPoint(x, y)?.closest('a, button');
+              if (target && target !== el) others.push(target.className);
+            }
+          return { left: column(own.left + 3), middle: column(own.left + own.width / 2), height: own.height, others };
+        }"""
+        context = self.context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True, reduced_motion='reduce')
+        for path, selector in [('work/everag', '.case-context__links a'), ('work/plinth', '.case-context__links a'),
+                               ('index.html#how-i-built-description-generator', '#stream-panel .stream-panel__jump'),
+                               ('index.html#description-generator', '#stream-panel .stream-panel__jump')]:
+            with self.subTest(path=path):
+                page = self.open(context, path)
+                if '#' in path:
+                    self.wait_for_panel(page, path.split('#')[1])
+                page.locator(selector).evaluate("el => el.scrollIntoView({block: 'center'})")
+                self.settle(page)
+                result = page.locator(selector).evaluate(hit)
+                self.assertGreaterEqual(result['left'], 44, result)
+                self.assertGreaterEqual(result['middle'], 44, result)
+                self.assertEqual(result['others'], [])
+                # The link's own box, and so its focus ring and the lines around it, is unchanged.
+                self.assertLess(result['height'], 44)
+                page.close()
+
+    def test_qa_index_calls_to_action_keep_the_space_before_the_arrow_on_phones(self):
+        # On phones the call to action is a 44px flex row, which dropped the
+        # space in "Read the case study →". Its width now matches the desktop's.
+        measure = """el => {
+          const text = document.createRange();
+          text.selectNodeContents(el.firstChild);
+          return { width: el.getBoundingClientRect().width, height: el.getBoundingClientRect().height,
+                   arrow: el.querySelector('span').getBoundingClientRect().left - text.getBoundingClientRect().left };
+        }"""
+        for path in ['work/', 'writing/']:
+            with self.subTest(path=path):
+                desk = self.open(self.context(), path)
+                wide = desk.locator('.entry__cta').first.evaluate(measure)
+                desk.close()
+                phone = self.open(self.context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True), path)
+                ctas = phone.locator('.entry__cta')
+                for i in range(ctas.count()):
+                    narrow = ctas.nth(i).evaluate(measure)
+                    self.assertAlmostEqual(narrow['arrow'], wide['arrow'], delta=0.5)
+                    self.assertGreaterEqual(narrow['height'], 44)
+                phone.close()
+
+    def test_qa_list_marks_its_first_image_as_the_high_priority_lcp(self):
+        # The List's first image is its largest paint, where the Grid's is its
+        # headline, so only the List asks for fetchpriority.
+        lcp = """() => new Promise(resolve => {
+          new PerformanceObserver(list => {
+            const last = list.getEntries().at(-1);
+            resolve(last.element && last.element.closest('article') && last.element.closest('article').id);
+          }).observe({ type: 'largest-contentful-paint', buffered: true });
+        })"""
+        for width in [1440, 390]:
+            page = self.open(self.context(viewport={'width': width, 'height': 900}), 'list/index.html')
+            first = page.locator('.stream-row img').first
+            self.assertEqual(first.get_attribute('loading'), 'eager')
+            self.assertEqual(first.get_attribute('fetchpriority'), 'high')
+            self.assertEqual(page.locator('img[fetchpriority="high"]').count(), 1)
+            self.assertEqual(page.evaluate(lcp), page.locator('.stream-row').first.get_attribute('id'))
+            page.close()
+        page = self.open(self.context(), 'index.html')
+        self.assertEqual(page.locator('.stream-card img[fetchpriority]').count(), 0)
+        page.close()
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

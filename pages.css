@@ -34,8 +34,10 @@
 .case-study { --case-gutter: var(--gutter); }
 .case-study .case-layout { padding-top: 48px; }
 
-/* Inside a case study, the chrome keeps the site's red for its markers. */
-.case-study :is(.masthead, .about) { --accent: var(--site-accent); }
+/* Inside a case study, the chrome keeps the site's red for its markers, and
+   so do the More from cards and their panels, which match the Grid's. On
+   the project's ink the project colour would hide the Try it badge's ▶. */
+.case-study :is(.masthead, .about, .more-from) { --accent: var(--site-accent); }
 
 /* A figure named in a link, such as /work/conservis#fig-conservis-03, lands
    with a little room above it. */
@@ -67,8 +69,11 @@
   color: var(--case-dark);
 }
 
-/* Cards keep the Grid's width, a fifth of the stream, three to a row. */
+/* Cards keep the Grid's width, a fifth of the stream, three to a row. The
+   card spacing token lives on .stream-grid in stream.css, so this grid sets
+   it too, or the title and meta line would sit flush under the image. */
 .more-from__grid {
+  --card-gap: 10px;
   display: grid;
   grid-template-columns: repeat(3, calc((100vw - 160px) / 5));
   gap: 40px 20px;
@@ -341,7 +346,7 @@ body.page > main { flex: 1 0 auto; }
 @media (max-width: 599px) {
   .more-from { padding: 28px 0 64px; }
   .more-from__title { font-size: 20px; line-height: 25px; }
-  .more-from__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 14px; }
+  .more-from__grid { --card-gap: 8px; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 14px; }
 
   .next-story { padding-top: 64px; padding-bottom: 28px; }
   .next-story::before { clip-path: polygon(0 20px, 100% 0, 100% 100%, 0 100%); }
@@ -369,8 +374,10 @@ body.page > main { flex: 1 0 auto; }
   .entry__bars span { height: 11px; }
   .entry__bars span:first-child { width: min(340px, 95%); }
   .entry__bars span:last-child { width: min(220px, 60%); }
-  /* The whole row is the link; the call to action still gets a 44px row. */
-  .entry__cta { display: flex; align-items: center; min-height: 44px; margin-top: 14px; }
+  /* The whole row is the link; the call to action still gets a 44px row.
+     As a flex container it would drop the space before the arrow, which
+     white-space: pre keeps, still on one line. */
+  .entry__cta { display: flex; align-items: center; min-height: 44px; margin-top: 14px; white-space: pre; }
 
   .post { padding-bottom: 64px; }
   .post__head { gap: 16px; }
