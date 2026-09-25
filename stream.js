@@ -214,16 +214,25 @@
    * An open panel starts a row of its own, so after a reflow it can split the
    * row it sits in. Rows are measured with it set aside. The container keeps
    * its height meanwhile, so the page cannot shorten and clamp the scroll.
+   * Setting the panel aside resets the scroll of anything inside it, such as
+   * the strip, so those offsets are put back.
    */
   function measureRowEnd(card, panel) {
     const container = card.parentElement;
     if (!panel || panel.parentElement !== container) return rowEnd(card, panel);
+    const scrolled = [...panel.querySelectorAll('*')]
+      .filter((el) => el.scrollLeft || el.scrollTop)
+      .map((el) => [el, el.scrollLeft, el.scrollTop]);
     const keep = container.style.minHeight;
     container.style.minHeight = `${container.getBoundingClientRect().height}px`;
     panel.style.display = 'none';
     const end = rowEnd(card, panel);
     panel.style.display = '';
     container.style.minHeight = keep;
+    for (const [el, left, top] of scrolled) {
+      el.scrollLeft = left;
+      el.scrollTop = top;
+    }
     return end;
   }
 
@@ -923,7 +932,10 @@
     if (moving) {
       // At the start the panel takes no room: its margins cancel the row gap
       // that its own grid row adds, so the rows below do not jump.
-      grow(panel, { marginTop: `${-rowGap(panel.parentElement)}px`, marginBottom: '0px' }).then(relayout);
+      grow(panel, { marginTop: `${-rowGap(panel.parentElement)}px`, marginBottom: '0px' }).then(() => {
+        if (deferred) relayout();
+        deferred = false;
+      });
     }
     if (focus) panel.querySelector('#stream-panel-title')?.focus({ preventScroll: true });
   }
@@ -1003,11 +1015,16 @@
   // Reflow: a new column count, or cards shown or hidden by pagination and
   // filters, can move the opener to another row. The panel follows it.
   let frame = 0;
+  let deferred = false;
   function relayout() {
     cancelAnimationFrame(frame);
     frame = requestAnimationFrame(() => {
       if (open.kind === 'item') {
-        if (open.panel.classList.contains('is-moving')) return;
+        // Mid-animation sizes are not final. Try again when it ends.
+        if (open.panel.classList.contains('is-moving')) {
+          deferred = true;
+          return;
+        }
         if (!isRendered(open.card)) closeItem({ animate: false, focus: false });
         else fit();
       } else if (open.kind === 'about') {
@@ -1256,7 +1273,15 @@
     step(event.key === 'ArrowLeft' ? -1 : 1);
   });
 
-  window.addEventListener('resize', relayout);
+  // Only a change of width can change the rows. A phone's address bar
+  // changes the height as the page scrolls, and that must not disturb a swipe.
+  let viewportWidth = document.documentElement.clientWidth;
+  window.addEventListener('resize', () => {
+    const width = document.documentElement.clientWidth;
+    if (width === viewportWidth) return;
+    viewportWidth = width;
+    relayout();
+  });
   document.addEventListener('stream:layout', relayout);
   // Crossing the phone breakpoint changes what a prototype offers.
   media(PHONE).addEventListener('change', () => {
