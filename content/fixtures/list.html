@@ -7,6 +7,8 @@
   <title>List fixture | Jason Spidle</title>
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/panel.css">
+  <script src="/stream.js" defer></script>
   <style>
     /* Fixture-only styles, so the generated rows can be looked at before
        Phase 2D builds the List page. Nothing here ships. */
@@ -15,9 +17,11 @@
     .fixture__intro h1 { margin: 10px 0 12px; font: 400 31px/38px var(--display); }
     .fixture__intro p:last-child { color: var(--ink-muted); font-size: 15px; line-height: 22px; }
 
-    .stream-list { border-top: 1px solid var(--line); }
-    .stream-row { position: relative; display: grid; grid-template-columns: minmax(0, 560px) minmax(0, 1fr); gap: 56px; padding: 36px 40px; border-bottom: 1px solid var(--line); }
-    .stream-row__media { position: relative; aspect-ratio: 560 / 398; overflow: hidden; border: 1px solid var(--line); background: #e4e4df; }
+    /* Two columns on desktop and one on phones, per Jason's ruling of
+       2026-09-24, so a panel can be seen opening under a pair. */
+    .stream-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 56px 40px; padding: 36px 40px 0; }
+    .stream-row { position: relative; display: flex; flex-direction: column; gap: 20px; }
+    .stream-row__media { position: relative; aspect-ratio: 660 / 400; overflow: hidden; border: 1px solid var(--line); background: #e4e4df; }
     .stream-row__media img { width: 100%; height: 100%; object-fit: cover; object-position: left top; background: #fff; }
     .stream-row__media[data-shape="tall"] img { width: 30%; height: auto; margin: 5% auto 0; border: 1px solid var(--line); }
     .stream-row__media--empty { background: repeating-linear-gradient(135deg, transparent 0 10px, var(--line) 10px 11px), #e4e4df; }
@@ -48,7 +52,7 @@
 
     @media (max-width: 767px) {
       .fixture__intro { padding: 0 16px 28px; }
-      .stream-row { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 28px 16px; }
+      .stream-list { grid-template-columns: minmax(0, 1fr); gap: 40px; padding: 28px 16px 0; }
       .stream-row__note { font-size: 21px; line-height: 28px; }
     }
   </style>
