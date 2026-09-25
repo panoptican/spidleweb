@@ -188,19 +188,19 @@
   }
 
   /**
-   * Stretches `el` from its parent's content box to both edges of the
-   * viewport. The insets are custom properties, so the width still follows
-   * the parent when a scrollbar comes or goes.
+   * Stretches `el` from the box its container gives it to both edges of the
+   * viewport. The box is measured with the stretch taken off, since a grid's
+   * tracks need not fill the container, as on a case page's More from. The
+   * insets are custom properties, so the width still follows the container
+   * when a scrollbar comes or goes.
    */
   function bleed(el) {
-    const parent = el.parentElement;
-    if (!parent) return;
-    const style = getComputedStyle(parent);
-    const rect = parent.getBoundingClientRect();
-    const left = rect.left + parseFloat(style.borderLeftWidth) + parseFloat(style.paddingLeft);
-    const right = document.documentElement.clientWidth -
-      (rect.right - parseFloat(style.borderRightWidth) - parseFloat(style.paddingRight));
-    el.style.setProperty('--stream-bleed-start', `${Math.max(0, left)}px`);
+    if (!el.parentElement) return;
+    el.style.setProperty('--stream-bleed-start', '0px');
+    el.style.setProperty('--stream-bleed-end', '0px');
+    const rect = el.getBoundingClientRect();
+    const right = document.documentElement.clientWidth - rect.right;
+    el.style.setProperty('--stream-bleed-start', `${Math.max(0, rect.left)}px`);
     el.style.setProperty('--stream-bleed-end', `${Math.max(0, Math.floor(right))}px`);
   }
 
