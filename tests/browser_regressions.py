@@ -16,6 +16,7 @@ from pathlib import Path
 import time
 import unittest
 from urllib.parse import unquote, urljoin, urlsplit
+from xml.etree import ElementTree
 
 from playwright.sync_api import sync_playwright
 
@@ -770,6 +771,34 @@ class BrowserRegressions(unittest.TestCase):
                         for platform, hint in hints:
                             self.assertIn('Try it here' if width >= 600 or platform == 'mobile' else 'Open', hint)
                     page.close()
+
+    def test_redirects_and_sitemap_carry_the_new_routes(self):
+        # The test origin does not apply _redirects, so this reads the files.
+        # Pages takes one rule a line: source, destination, status.
+        rules = [line.split() for line in (ROOT / '_redirects').read_text().splitlines()
+                 if line.strip() and not line.lstrip().startswith('#')]
+        self.assertTrue(all(len(rule) == 3 for rule in rules), rules)
+        self.assertIn(['/feed/', '/', '301'], rules)
+        self.assertIn(['/feed', '/', '301'], rules)
+        self.assertFalse((ROOT / 'feed').exists())
+
+        namespace = {'s': 'http://www.sitemaps.org/schemas/sitemap/0.9'}
+        urls = ElementTree.parse(ROOT / 'sitemap.xml').getroot().findall('s:url', namespace)
+        locs = [url.find('s:loc', namespace).text for url in urls]
+        expected = ['/', '/list/', '/work/', *[f'/work/{slug}' for slug in WORK_ORDER],
+                    '/writing/', '/writing/how-i-built-description-generator']
+        self.assertEqual(sorted(locs), sorted(f'https://spidleweb.net{path}' for path in expected))
+        for url in urls:
+            self.assertRegex(url.find('s:lastmod', namespace).text, r'^\d{4}-\d{2}-\d{2}$')
+        # Every page listed is served, and names itself as the canonical URL.
+        context = self.context(java_script_enabled=False)
+        for loc in locs:
+            with self.subTest(loc=loc):
+                page = context.new_page()
+                response = page.goto(loc.replace('https://spidleweb.net', ORIGIN))
+                self.assertEqual(response.status, 200)
+                self.assertEqual(page.locator('link[rel="canonical"]').get_attribute('href'), loc)
+                page.close()
 
     def test_next_story_band_moves_forward_and_wraps_in_work_order(self):
         # Replaces the endpaper cycle test: the band is forward only, follows
