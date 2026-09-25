@@ -28,6 +28,8 @@
  *   case-study="<slug>"  only what that case study shares, for "More from"
  *   heading="2..6"       heading level for titles, 2 by default
  *   eager="<n>"          load the first n images eagerly, 0 by default
+ *   priority="<n>"       mark the first n eager images fetchpriority="high",
+ *                        where the region's first image is the page's LCP
  *
  * Two more markers serve the Work pages. Both follow the case studies
  * newest first, so the index and the bands always agree:
@@ -576,7 +578,7 @@ function articleOpen(item, block) {
 }
 
 /** The image, tile, or empty frame, with any badge and running time. */
-function mediaLines(item, block, sizes, eager) {
+function mediaLines(item, block, sizes, eager, priority = false) {
   const extras = [];
   if (item.type === 'prototype') extras.push(`<span class="${block}__badge" aria-hidden="true">Try it</span>`);
   if (item.type === 'reel') extras.push(`<span class="${block}__badge" aria-hidden="true">Reel</span>`);
@@ -600,7 +602,7 @@ function mediaLines(item, block, sizes, eager) {
   }
 
   const { image } = item;
-  const img = `<img src="${esc(image.src)}" width="${image.width}" height="${image.height}" alt="${esc(item.alt)}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">`;
+  const img = `<img src="${esc(image.src)}" width="${image.width}" height="${image.height}" alt="${esc(item.alt)}" loading="${eager ? 'eager' : 'lazy'}"${priority ? ' fetchpriority="high"' : ''} decoding="async">`;
   const picture = image.avif
     ? ['<picture>', `  <source type="image/avif" srcset="${esc(image.avif)}" sizes="${esc(sizes)}">`, `  ${img}`, '</picture>']
     : [img];
@@ -638,13 +640,13 @@ function metaHtml(item, block) {
 }
 
 /** A Grid card: one link wraps the media, the title, and the meta line. */
-function renderCard(item, { heading, eager }) {
+function renderCard(item, { heading, eager, priority }) {
   const labelledBy = [`${item.id}-title`, `${item.id}-meta`];
   if (item.duration) labelledBy.push(`${item.id}-time`);
   return [
     articleOpen(item, 'stream-card'),
     `  <a class="stream-card__link" href="${esc(item.href)}" data-open="${item.id}" aria-labelledby="${labelledBy.join(' ')}">`,
-    ...indent(mediaLines(item, 'stream-card', SIZES.grid, eager), 4),
+    ...indent(mediaLines(item, 'stream-card', SIZES.grid, eager, priority), 4),
     `    <h${heading} class="stream-card__title" id="${item.id}-title">${esc(item.title)}</h${heading}>`,
     `    <p class="stream-card__meta micro" id="${item.id}-meta">${metaHtml(item, 'stream-card')}</p>`,
     '  </a>',
@@ -665,7 +667,7 @@ function dateline(item) {
  * cannot be one link. The title link stretches over the row instead, and the
  * extra links sit above it.
  */
-function renderRow(item, { heading, eager }) {
+function renderRow(item, { heading, eager, priority }) {
   const hint = item.caseStudy && item.type === 'screen' ? 'Open the case study here' : TYPES[item.type].hint;
   const actions = [`<span class="stream-row__hint" aria-hidden="true">${hint} ↓</span>`];
   if (item.type === 'case-study') {
@@ -677,7 +679,7 @@ function renderRow(item, { heading, eager }) {
   const when = dateline(item);
   return [
     articleOpen(item, 'stream-row'),
-    ...indent(mediaLines(item, 'stream-row', SIZES.list, eager), 2),
+    ...indent(mediaLines(item, 'stream-row', SIZES.list, eager, priority), 2),
     '  <div class="stream-row__body">',
     `    <p class="stream-row__meta micro"><span class="stream-row__kind">${metaHtml(item, 'stream-row')}</span>${when ? `<span class="stream-row__dateline">${esc(when)}</span>` : ''}</p>`,
     `    <h${heading} class="stream-row__title"><a class="stream-row__link" href="${esc(item.href)}" data-open="${item.id}">${esc(item.title)}</a></h${heading}>`,
@@ -848,12 +850,13 @@ const WORK_INDEX = /^([ \t]*)<!-- work-index:start -->[\s\S]*?^[ \t]*<!-- work-i
 const NEXT_STORY = /^([ \t]*)<!-- next-story:start case-study="([a-z0-9-]+)" -->[\s\S]*?^[ \t]*<!-- next-story:end -->/gm;
 
 function regionOptions(text, file) {
-  const options = { view: 'grid', caseStudy: null, heading: 2, eager: 0 };
+  const options = { view: 'grid', caseStudy: null, heading: 2, eager: 0, priority: 0 };
   for (const [, name, value] of text.matchAll(/([a-z-]+)="([^"]*)"/g)) {
     if (name === 'view' && ['grid', 'list'].includes(value)) options.view = value;
     else if (name === 'case-study' && value) options.caseStudy = value;
     else if (name === 'heading' && /^[2-6]$/.test(value)) options.heading = Number(value);
     else if (name === 'eager' && /^\d+$/.test(value)) options.eager = Number(value);
+    else if (name === 'priority' && /^\d+$/.test(value)) options.priority = Number(value);
     else throw new Error(`${file}: stream:start has an unknown setting ${name}="${value}"`);
   }
   return options;
@@ -895,7 +898,8 @@ function buildPage(file, items, pages, order) {
     const render = options.view === 'list' ? renderRow : renderCard;
     const lines = list.flatMap((item, i) => [
       ...(i ? [''] : []),
-      ...render(item, { heading: options.heading, eager: i < options.eager }),
+      // A lazy image is never high priority, so priority stops where eager does.
+      ...render(item, { heading: options.heading, eager: i < options.eager, priority: i < Math.min(options.priority, options.eager) }),
     ]);
     checkContract(lines.join('\n'), list, options.view, file);
     shown.push(...list);

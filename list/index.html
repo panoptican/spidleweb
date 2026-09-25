@@ -95,12 +95,12 @@
     </div>
 
     <div class="stream-list" data-stream>
-      <!-- stream:start view="list" eager="2" -->
+      <!-- stream:start view="list" eager="2" priority="1" -->
       <article class="stream-row theme-insights" id="expert-insights" data-type="case-study" data-project="expert-insights" data-industry="sports" data-case-study="expert-insights">
         <div class="stream-row__media" data-shape="wide">
           <picture>
             <source type="image/avif" srcset="/assets/expert-insights-01-240.avif 240w, /assets/expert-insights-01-850.avif 850w, /assets/expert-insights-01-1250.avif 1250w, /assets/expert-insights-01-1700.avif 1700w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)">
-            <img src="/assets/expert-insights-01.png" width="2880" height="2048" alt="Scout insights dashboard: discussion totals, auto-generated highlights, and a roster sentiment table split into my players and rival players" loading="eager" decoding="async">
+            <img src="/assets/expert-insights-01.png" width="2880" height="2048" alt="Scout insights dashboard: discussion totals, auto-generated highlights, and a roster sentiment table split into my players and rival players" loading="eager" fetchpriority="high" decoding="async">
           </picture>
         </div>
         <div class="stream-row__body">

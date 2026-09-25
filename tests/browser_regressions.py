@@ -1785,5 +1785,26 @@ class BrowserRegressions(unittest.TestCase):
                 self.assertEqual(re.match(r'- link "(.*)"', snapshot).group(1), name)
         self.assertEqual(page.errors, [])
 
+    def test_qa_list_marks_its_first_image_as_the_high_priority_lcp(self):
+        # The List's first image is its largest paint, where the Grid's is its
+        # headline, so only the List asks for fetchpriority.
+        lcp = """() => new Promise(resolve => {
+          new PerformanceObserver(list => {
+            const last = list.getEntries().at(-1);
+            resolve(last.element && last.element.closest('article') && last.element.closest('article').id);
+          }).observe({ type: 'largest-contentful-paint', buffered: true });
+        })"""
+        for width in [1440, 390]:
+            page = self.open(self.context(viewport={'width': width, 'height': 900}), 'list/index.html')
+            first = page.locator('.stream-row img').first
+            self.assertEqual(first.get_attribute('loading'), 'eager')
+            self.assertEqual(first.get_attribute('fetchpriority'), 'high')
+            self.assertEqual(page.locator('img[fetchpriority="high"]').count(), 1)
+            self.assertEqual(page.evaluate(lcp), page.locator('.stream-row').first.get_attribute('id'))
+            page.close()
+        page = self.open(self.context(), 'index.html')
+        self.assertEqual(page.locator('.stream-card img[fetchpriority]').count(), 0)
+        page.close()
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
