@@ -19,16 +19,54 @@
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="../assets/fonts/eb-garamond/eb-garamond-latin-400-v33.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../fonts/GT-America-Expanded-Regular.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../style.css">
-  <link rel="stylesheet" href="../pages.css">
+  <script>document.documentElement.classList.add('js')</script>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/site.js" defer onerror="document.documentElement.classList.remove('js')"></script>
+  <link rel="stylesheet" href="/pages.css">
   <script defer src="https://analytics.spidleweb.net/script.js" data-website-id="49720a36-6280-4d69-9531-c1d0c36b8f11"></script>
 </head>
 <body class="case-study theme-conservis">
   <a class="skip-link micro" href="#project">Skip to project</a>
-  <header class="case-masthead micro">
-    <a class="case-masthead__identity" href="/">Jason Spidle <span>/ Work</span></a>
-    <a class="case-masthead__index" href="/">← Index</a>
+  <header class="masthead" id="top">
+    <div class="masthead__id">
+      <p class="masthead__name"><a href="/">Jason Spidle</a></p>
+      <p class="masthead__role micro">Product designer · Minneapolis</p>
+    </div>
+    <nav class="masthead__nav" aria-label="Site">
+      <button class="masthead__trigger micro" type="button" aria-expanded="false" aria-controls="site-places"><span class="visually-hidden">Menu, </span>Work</button>
+      <ul class="masthead__places micro" id="site-places">
+        <li><a href="/">Craft</a></li>
+        <li><a href="/work/" aria-current="page">Work</a></li>
+        <li><a href="/writing/">Writing</a></li>
+        <li><a href="#about">About</a></li>
+      </ul>
+    </nav>
   </header>
+
+  <section class="about" id="about" aria-labelledby="about-title" hidden>
+    <div class="about__inner">
+      <p class="about__kicker micro"><span>About</span><span class="about__place">Minneapolis</span></p>
+      <h2 class="about__title" id="about-title">Comfortable in dense data.</h2>
+      <p class="about__status micro">Open to contract and full&#8209;time roles</p>
+      <div class="about__body">
+        <p>I'm a product designer in Minneapolis. I've spent ten years shipping enterprise software in financial services, agtech, and healthcare. Most of it has been dashboards and complex workflows, where the job is turning dense operational data into clear decisions. I organize screens around the tasks people are actually there to do, and I keep them approachable for newer users without taking depth away from the experienced ones.</p>
+        <p>I work in Figma every day, from discovery and user flows through high-fidelity UI and developer handoff. I build the design systems that keep a product coherent as it grows. To test a workflow before committing to it, I build working browser prototypes with coding agents. A live build shows how the interface feels with realistic data before anything goes to production.</p>
+        <p>Before design, I spent a decade programming and analyzing market research studies. That's where the comfort with dense data started.</p>
+        <p>Almost everything I know, I've learned from experience. I've lived in over fifty homes across ten states and two countries. I've worn just about every collar they've fitted for the working class. In the company of countless people, some who matter to me and some just passing through, I've found beauty and felt understood. It's a whole wide world out there.</p>
+      </div>
+      <ul class="about__roles micro" aria-label="Roles">
+        <li><span>Blueshift</span><span>Partner / Design lead · <span class="nobreak">2024–</span></span></li>
+        <li><span>Vault AI Systems</span><span>Fractional CDO · <span class="nobreak">2025–</span></span></li>
+        <li><span>Foundry</span><span>Designer, then director · <span class="nobreak">2015–24</span></span></li>
+      </ul>
+      <div class="about__contact">
+        <p class="micro">Contact</p>
+        <a class="email email--large" href="mailto:jason@spidleweb.net">jason@spidleweb.net</a>
+        <a class="about__linkedin micro" href="https://www.linkedin.com/in/jspidle">LinkedIn&nbsp;<span aria-hidden="true">↗</span></a>
+      </div>
+      <a class="about__close micro" href="#top">Close <span aria-hidden="true">×</span><kbd aria-hidden="true">esc</kbd></a>
+    </div>
+  </section>
 
   <main id="project" class="case-layout">
     <div class="case-context">
@@ -171,9 +209,12 @@
   </nav>
   <!-- next-story:end -->
 
-  <footer class="footer footer-line micro">
-    <p class="footer-line__contact"><a href="mailto:jason@spidleweb.net">jason@spidleweb.net</a> <a href="https://www.linkedin.com/in/jspidle">LinkedIn <span aria-hidden="true">↗</span></a></p>
-    <p class="footer-line__copyright">© <span id="year">2026</span> Jason Spidle</p>
+  <footer class="site-footer">
+    <div class="footline micro">
+      <a class="email" href="mailto:jason@spidleweb.net">jason@spidleweb.net</a>
+      <a class="footline__link" href="https://www.linkedin.com/in/jspidle">LinkedIn&nbsp;<span aria-hidden="true">↗</span></a>
+      <p class="footline__copy">© <span id="year">2026</span> Jason Spidle</p>
+    </div>
   </footer>
 
   <!-- stream-data:start -->
