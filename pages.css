@@ -22,15 +22,17 @@
 }
 
 /* Paper places each page's first line a fixed distance below the top of
-   the window. The masthead is --mast-h tall on desktop, so each page's own
-   top padding is that distance less the masthead. */
+   the window: 124px on a case study, 132px on an index, and 163px on a post.
+   The desktop masthead sizes to its content at 76px, so each page's own top
+   padding is that distance less 76px. If the masthead's height changes,
+   change these three with it. */
 
 /* ---- Case-study pages ---------------------------------------------------- */
 
 /* The case study sits on the site's gutter, so it lines up with the
    masthead and the footer line, and starts where row 13 starts it. */
 .case-study { --case-gutter: var(--gutter); }
-.case-study .case-layout { padding-top: calc(124px - var(--mast-h)); }
+.case-study .case-layout { padding-top: 48px; }
 
 /* Inside a case study, the chrome keeps the site's red for its markers. */
 .case-study :is(.masthead, .about) { --accent: var(--site-accent); }
@@ -121,7 +123,7 @@ body.page > main { flex: 1 0 auto; }
 .page-main { padding: 0 var(--gutter) 96px; }
 
 .page-head {
-  padding-top: calc(132px - var(--mast-h));
+  padding-top: 56px;
   padding-bottom: 28px;
   border-bottom: 1px solid var(--ink);
 }
@@ -237,7 +239,7 @@ body.page > main { flex: 1 0 auto; }
   display: grid;
   grid-template-columns: minmax(0, 276px) minmax(0, 1fr);
   column-gap: 56px;
-  padding: calc(163px - var(--mast-h)) var(--gutter) 96px;
+  padding: 87px var(--gutter) 96px;
 }
 @media (min-width: 1441px) {
   .post { grid-template-columns: minmax(276px, 276fr) minmax(0, 1028fr); }
