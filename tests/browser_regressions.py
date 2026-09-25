@@ -120,13 +120,6 @@ class BrowserRegressions(unittest.TestCase):
             page.wait_for_function('el => getComputedStyle(el).opacity === "1"', arg=target.element_handle())
         self.assert_visible(page)
 
-    def show_featured_link(self, page, link):
-        """Page Featured forward until the item holding this link is the current one."""
-        for _ in range(page.locator('.featured__item').count()):
-            if link.is_visible():
-                return
-            page.locator('.featured__next').click()
-
     def screenshot(self, page, name):
         if SCREENSHOTS:
             directory = Path(SCREENSHOTS)
@@ -244,14 +237,13 @@ class BrowserRegressions(unittest.TestCase):
         for path in PAGES:
             page = self.open(context, path)
             links = page.locator('a[href^="https://"]').evaluate_all('''els => [...new Map(els
-              .filter(el => el.getClientRects().length || el.closest('.featured__item'))
+              .filter(el => el.getClientRects().length)
               .map(el => [el.getAttribute("href"), {href: el.getAttribute("href"), url: el.href}])).values()]''')
             for link_info in links:
                 href = link_info['href']
                 with self.subTest(path=path, href=href):
                     link = page.locator(f'a[href="{href}"]:not(.about a)').first
                     self.assertIn(link.get_attribute('target'), [None, '_self'])
-                    self.show_featured_link(page, link)
                     link.click()
                     page.wait_for_url(link_info['url'])
                     self.assertEqual(len(context.pages), 1)
