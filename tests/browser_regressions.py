@@ -25,7 +25,7 @@ CASE_PAGES = [str(p.relative_to(ROOT)) for p in sorted((ROOT / 'work').glob('*.h
 # The Work and Writing indexes and the posts (Phase 2C).
 READING_PAGES = ['work/index.html', 'writing/index.html',
                  *[str(p.relative_to(ROOT)) for p in sorted((ROOT / 'writing').glob('*.html')) if p.name != 'index.html']]
-PAGES = ['index.html', 'feed/index.html', *CASE_PAGES, *READING_PAGES]
+PAGES = ['index.html', 'list/index.html', 'feed/index.html', *CASE_PAGES, *READING_PAGES]
 # /work/ lists the case studies newest first, and the next-story band follows it.
 WORK_ORDER = ['expert-insights', 'campaign-sim', 'everag', 'vidscrip', 'conservis', 'plinth']
 SCREENSHOTS = os.environ.get('SPIDLEWEB_TEST_SCREENSHOTS')
@@ -577,6 +577,203 @@ class BrowserRegressions(unittest.TestCase):
             self.assertFalse(dock.is_visible())
             self.assertEqual(page.errors, [])
             page.close()
+
+    # ---- Craft in List (Phase 2D) ----
+
+    def list_rows(self, page):
+        return page.locator('.stream-row').evaluate_all("""els => els.map(el => ({id: el.id,
+          type: el.dataset.type, industry: el.dataset.industry}))""")
+
+    def page_part(self, path, pattern):
+        """One block of a page's source, found by a regular expression."""
+        match = re.search(pattern, (ROOT / path).read_text(), re.S)
+        self.assertIsNotNone(match, f'{pattern} in {path}')
+        return match.group(0)
+
+    def test_list_carries_the_craft_chrome_with_list_current(self):
+        # The same masthead, About, head, filters, pagination, and footer line
+        # as the Grid, word for word, and the same styles and scripts.
+        for pattern in [r'<header class="masthead".*?</header>', r'<section class="about".*?</section>',
+                        r'<div class="craft-head">.*?\n    </div>\n', r'<div class="stream-foot">.*?</main>',
+                        r'<div class="footline micro">.*?</footer>',
+                        r'<script>document\.documentElement.*?<script defer src="https://analytics']:
+            with self.subTest(pattern=pattern):
+                self.assertEqual(self.page_part('list/index.html', pattern), self.page_part('index.html', pattern))
+        self.assertIn('<script src="/site.js" defer onerror="document.documentElement.classList.remove(\'js\')"></script>',
+                      (ROOT / 'list/index.html').read_text())
+
+        page = self.open(self.context(reduced_motion='reduce'), 'list/')
+        self.assertEqual(page.locator('h1').count(), 1)
+        self.assertEqual(page.locator('.masthead__name').evaluate('el => el.tagName'), 'H1')
+        self.assertEqual(page.locator('link[rel="canonical"]').get_attribute('href'), 'https://spidleweb.net/list/')
+        self.assertEqual(page.locator('.masthead__places a[aria-current="page"]').text_content(), 'Craft')
+        current = 'els => els.map(el => [el.getAttribute("href"), el.getAttribute("aria-current")])'
+        self.assertEqual(page.locator('.view-switch a').evaluate_all(current), [['/', None], ['/list/', 'page']])
+        self.assertEqual(page.locator('.view-dock a').evaluate_all(current), [['/', None], ['/list/', 'page']])
+        self.assertEqual(page.locator('.legend__item').evaluate_all(current),
+                         [['/', None], ['/list/', 'page'], ['/work/', None]])
+        switch = page.locator('.view-switch').bounding_box()
+        self.assertAlmostEqual(switch['x'] + switch['width'] / 2, 720, delta=1)
+        self.assertTrue(page.locator('.craft-head__line').is_visible())
+        self.assertTrue(page.locator('[data-filters]').is_visible())
+        # Grid in the switcher goes back to the Grid.
+        page.locator('.view-switch a[href="/"]').click()
+        page.wait_for_url(f'{ORIGIN}/')
+        self.assertEqual(page.locator('.view-switch a[aria-current="page"]').get_attribute('href'), '/')
+        self.assertEqual(page.errors, [])
+        page = self.open(self.context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True), 'list/')
+        self.assertEqual(page.locator('.masthead__trigger').text_content(), 'Menu, Craft')
+        self.assertEqual(page.locator('.view-switch').bounding_box()['width'], 358)
+
+    def test_list_runs_two_columns_on_desktop_and_one_on_phones(self):
+        # Row 09: 660 by 400 frames in two columns at 1440, and 358 by 254 in
+        # one column at 390, each image above its rule, title, and note.
+        for width, columns, frame in [(1440, 2, (660, 400)), (1024, 2, None), (768, 2, None),
+                                      (390, 1, (358, 254)), (320, 1, None)]:
+            with self.subTest(width=width):
+                page = self.open(self.context(viewport={'width': width, 'height': 900}, reduced_motion='reduce'), 'list/')
+                rows = page.evaluate("""() => [...document.querySelectorAll('.stream-row:not([hidden])')].map(el => {
+                  const media = el.querySelector('.stream-row__media').getBoundingClientRect();
+                  const body = el.querySelector('.stream-row__body');
+                  return {id: el.id, left: Math.round(el.getBoundingClientRect().left),
+                          top: Math.round(el.getBoundingClientRect().top + scrollY),
+                          frame: [Math.round(media.width), Math.round(media.height)],
+                          stacked: media.bottom <= body.getBoundingClientRect().top,
+                          rule: parseFloat(getComputedStyle(body).borderTopWidth)};
+                })""")
+                self.assertEqual(len({row['left'] for row in rows}), columns)
+                for i in range(0, len(rows) - len(rows) % columns, columns):
+                    self.assertEqual(len({row['top'] for row in rows[i:i + columns]}), 1, rows[i]['id'])
+                self.assertTrue(all(row['stacked'] and row['rule'] == 3 for row in rows))
+                if frame:
+                    self.assertEqual(tuple(rows[0]['frame']), frame)
+                self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
+                if width == 1440:
+                    # The title's link covers the row, and the row's own links sit above it.
+                    hit = """([x, y]) => { const a = document.elementFromPoint(x, y).closest('a');
+                      return a && (a.dataset.open || a.getAttribute('href')); }"""
+                    media = page.locator('#expert-insights .stream-row__media').bounding_box()
+                    self.assertEqual(page.evaluate(hit, [media['x'] + media['width'] / 2, media['y'] + media['height'] / 2]),
+                                     'expert-insights')
+                    action = page.locator('#expert-insights .stream-row__action').bounding_box()
+                    self.assertEqual(page.evaluate(hit, [action['x'] + action['width'] / 2, action['y'] + action['height'] / 2]),
+                                     '/work/expert-insights')
+                self.assertEqual(page.errors, [])
+                page.close()
+
+    def test_list_opens_an_item_under_its_pair(self):
+        # Either item of a pair opens under the pair, with the rise under the
+        # item itself. On a phone the row is the pair, and it drops its hairline.
+        for width, index, end in [(1440, 4, 5), (1440, 5, 5), (390, 5, 5)]:
+            with self.subTest(width=width, index=index):
+                context = self.context(viewport={'width': width, 'height': 900}, is_mobile=width < 600,
+                                       has_touch=width < 600)
+                page = self.open(context, 'list/')
+                ids = self.item_ids(page, '.stream-list > .stream-row')
+                self.open_item(page, ids[index])
+                state = self.panel_state(page)
+                self.assertEqual((state['prev'], state['next'], state['opener']), (ids[end], ids[end + 1], ids[index]))
+                self.assertEqual((state['left'], state['width']), (0, state['viewport']))
+                self.assertAlmostEqual(state['peak'], state['openerCentre'], delta=0.6)
+                self.assertEqual(page.locator(f'#{ids[index]} .stream-row__link').get_attribute('aria-expanded'), 'true')
+                if width < 600:
+                    self.assertEqual(page.locator(f'#{ids[index]}').evaluate('el => getComputedStyle(el).borderBottomWidth'), '0px')
+                self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
+                page.keyboard.press('Escape')
+                page.wait_for_function("() => !document.querySelector('.stream-panel')")
+                self.assertEqual(page.evaluate('document.activeElement.dataset.open'), ids[index])
+                self.assertEqual(page.errors, [])
+                page.close()
+        # The image opens the item too, and a row's own link leaves for its page.
+        def click_image(page, item_id):
+            box = page.locator(f'#{item_id} .stream-row__media').bounding_box()
+            page.mouse.click(box['x'] + box['width'] / 2, box['y'] + box['height'] / 2)
+
+        page = self.open(self.context(), 'list/')
+        click_image(page, 'expert-insights')
+        self.wait_for_panel(page, 'expert-insights')
+        page.keyboard.press('Escape')
+        page.locator('#expert-insights .stream-row__action').click()
+        page.wait_for_url(f'{ORIGIN}/work/expert-insights')
+        # Without JavaScript the title's link goes to the item's page.
+        page = self.open(self.context(java_script_enabled=False), 'list/')
+        self.assertTrue(page.locator('.stream-row').first.is_visible())
+        page.locator('#fields-on-the-map').scroll_into_view_if_needed()
+        click_image(page, 'fields-on-the-map')
+        page.wait_for_url(f'{ORIGIN}/work/conservis#fig-conservis-03')
+
+    def test_list_filters_pagination_and_deep_links_follow_the_grid(self):
+        context = self.context(reduced_motion='reduce')
+        grid = self.open(context)
+        order = [card['id'] for card in self.craft_cards(grid)]
+        grid.close()
+        page = self.open(context, 'list/')
+        rows = self.list_rows(page)
+        self.assertEqual([row['id'] for row in rows], order)
+        total = len(rows)
+        shown = min(30, total)
+        self.assertEqual(page.locator('.stream-row:not([hidden])').count(), shown)
+        self.assertEqual(page.locator('.pager__count').text_content(), f'{shown} of {total} items')
+        # Right-aligned at the edge of the last column.
+        pager = page.locator('[data-pager]').bounding_box()
+        last = page.locator('.stream-row').nth(1).bounding_box()
+        self.assertAlmostEqual(pager['x'] + pager['width'], last['x'] + last['width'], delta=1)
+        page.locator('.pager__more').click()
+        self.assertEqual(page.locator('.stream-row:not([hidden])').count(), min(60, total))
+        self.assertEqual(page.evaluate('document.activeElement.closest("article")?.id'), rows[shown]['id'])
+        page.reload()
+        self.settle(page)
+        self.assertEqual(page.locator('.stream-row:not([hidden])').count(), min(60, total))
+
+        page = self.open(context, 'list/')
+        page.locator('select[data-filter="type"]').select_option('prototype')
+        prototypes = [row for row in rows if row['type'] == 'prototype']
+        self.assertEqual(page.locator('.stream-row:not([hidden])').count(), min(30, len(prototypes)))
+        self.assertTrue(page.url.endswith('/list/?type=prototype'))
+        industry = prototypes[0]['industry']
+        page.locator('select[data-filter="industry"]').select_option(industry)
+        self.assertEqual(page.locator('.stream-row:not([hidden])').count(),
+                         sum(row['industry'] == industry for row in prototypes))
+        page.goto(f'{ORIGIN}/list/?type=reel&industry=finance')
+        self.settle(page)
+        self.assertTrue(page.locator('[data-stream-empty]').is_visible())
+        page.locator('[data-filters-clear]').click()
+        self.assertEqual(page.locator('.stream-row:not([hidden])').count(), shown)
+
+        # A link deep into the List reveals everything up to its row and opens it.
+        page = self.open(context, f'list/#{order[-1]}')
+        self.wait_for_panel(page, order[-1])
+        self.assertEqual(page.locator('.stream-row:not([hidden])').count(), total)
+        self.assertEqual(self.panel_state(page)['opener'], order[-1])
+        self.assertEqual(page.errors, [])
+
+    def test_phones_drop_try_it_for_prototypes_that_are_not_mobile(self):
+        # Jason's ruling of 2026-09-24: a phone offers only a Mobile prototype
+        # live, so the rest drop Try it, in the Grid and in the List.
+        for path, block in [('index.html', 'stream-card'), ('list/', 'stream-row')]:
+            for width in [1440, 390]:
+                with self.subTest(path=path, width=width):
+                    page = self.open(self.context(viewport={'width': width, 'height': 900}), path)
+                    island = page.evaluate("JSON.parse(document.getElementById('stream-data').textContent).items")
+                    platforms = page.locator(f'.{block}').evaluate_all('els => els.map(el => [el.id, el.dataset.platform || null])')
+                    for item_id, platform in platforms:
+                        expected = island[item_id].get('platform')
+                        self.assertEqual(platform, expected.lower() if expected else None, item_id)
+                    badges = page.locator(f'.{block}[data-type="prototype"]').evaluate_all(f"""els => els.map(el =>
+                      [el.dataset.platform, getComputedStyle(el.querySelector('.{block}__badge')).display !== 'none'])""")
+                    self.assertTrue({platform for platform, _ in badges} >= {'mobile', 'web'})
+                    for platform, shown in badges:
+                        self.assertEqual(shown, width >= 600 or platform == 'mobile', platform)
+                    if block == 'stream-row':
+                        hints = page.locator('.stream-row[data-type="prototype"]').evaluate_all("""els => els.map(el => {
+                          const hint = el.querySelector('.stream-row__hint');
+                          const shown = parseFloat(getComputedStyle(hint).fontSize) ? hint.textContent
+                            : getComputedStyle(hint, '::before').content;
+                          return [el.dataset.platform, shown];
+                        })""")
+                        for platform, hint in hints:
+                            self.assertIn('Try it here' if width >= 600 or platform == 'mobile' else 'Open', hint)
+                    page.close()
 
     def test_feed_monolith_layout_titles_icons_and_type_mix(self):
         page = self.open(self.context(viewport={'width': 1440, 'height': 900}), 'feed/')

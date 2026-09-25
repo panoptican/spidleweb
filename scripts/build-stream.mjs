@@ -49,6 +49,7 @@ const STREAM_FILE = 'content/stream.json';
 // Pages with generated regions. Add a page here when it gains one.
 const PAGES = [
   'index.html',
+  'list/index.html',
   'content/fixtures/grid.html',
   'content/fixtures/list.html',
   'content/fixtures/more-from.html',
@@ -88,13 +89,14 @@ const ITEM_KEYS = [
 ];
 const MEDIA_KEYS = ['src', 'width', 'height', 'video', 'duration', 'tile'];
 
-// Image `sizes` hints. Keep them in step with the Grid columns in stream.css
-// (Phase 2A) and the List image column (Phase 2D). Grid runs two columns on
-// phones, three from 600px, four from 900px, and five from 1200px, inside
-// gutters of 16, 24, 40, and 40px with gaps of 14px and then 20px.
+// Image `sizes` hints. Keep them in step with the Grid and List columns in
+// stream.css. Grid runs two columns on phones, three from 600px, four from
+// 900px, and five from 1200px, inside gutters of 16, 24, 40, and 40px with
+// gaps of 14px and then 20px. List runs one column on phones, inside 16px
+// gutters, then two columns with gaps of 24px and, from 900px, 40px.
 const SIZES = {
   grid: '(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)',
-  list: '(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)',
+  list: '(max-width: 599px) calc(100vw - 32px), (max-width: 899px) calc((100vw - 72px) / 2), calc((100vw - 120px) / 2)',
 };
 
 // A /work/ cover is 306px wide beside its text, and runs the width of the
@@ -113,6 +115,7 @@ const isObject = (value) => value !== null && typeof value === 'object' && !Arra
 const isText = (value) => typeof value === 'string' && value.trim() !== '';
 const url = (path) => `/${path}`;
 const year = (shared) => (shared ? shared.slice(0, 4) : '');
+const pad = (n) => String(n).padStart(2, '0');
 
 function slugify(text) {
   return text.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -618,8 +621,12 @@ function metaHtml(item, block) {
     return `<span class="${block}__case">${chip}${type}${dot}${count}</span>`;
   }
   if (item.caseStudy) {
-    // Read aloud as "Screen from the Conservis case study".
-    return `${type} <span class="${block}__case">${chip}<span class="visually-hidden">from the </span>${esc(item.project)}<span class="visually-hidden"> case study</span></span>`;
+    // Read aloud as "Screen from the Conservis case study". A List row adds
+    // a figure's place on its page, as in "Conservis · 01 of 08" (row 09).
+    const place = block === 'stream-row' && item.caseStudy.position
+      ? `${dot}${pad(item.caseStudy.position)} of ${pad(item.caseStudy.total)}`
+      : '';
+    return `${type} <span class="${block}__case">${chip}<span class="visually-hidden">from the </span>${esc(item.project)}<span class="visually-hidden"> case study</span>${place}</span>`;
   }
   if (item.type === 'post') {
     // A List row carries the year in its dateline, so it is not repeated here.
