@@ -1055,7 +1055,8 @@
     dialog.showModal();
     // The entry underneath keeps no hash, so going back leaves nothing open.
     clearHash();
-    history.pushState({ streamFullscreen: item.id }, '', `${location.pathname}${location.search}#${encodeURIComponent(item.id)}`);
+    // Keep what else the entry holds, such as how many cards site.js shows.
+    history.pushState({ ...history.state, streamFullscreen: item.id }, '', `${location.pathname}${location.search}#${encodeURIComponent(item.id)}`);
     fullscreen = { dialog, link, id: item.id };
     setExpanded(link, true);
     dialog.querySelector('[data-fullscreen-close]').focus();
