@@ -1847,6 +1847,28 @@ class BrowserRegressions(unittest.TestCase):
                         self.assertEqual(card.evaluate(spacing), grid)
                     page.close()
 
+    def test_qa_index_calls_to_action_keep_the_space_before_the_arrow_on_phones(self):
+        # On phones the call to action is a 44px flex row, which dropped the
+        # space in "Read the case study →". Its width now matches the desktop's.
+        measure = """el => {
+          const text = document.createRange();
+          text.selectNodeContents(el.firstChild);
+          return { width: el.getBoundingClientRect().width, height: el.getBoundingClientRect().height,
+                   arrow: el.querySelector('span').getBoundingClientRect().left - text.getBoundingClientRect().left };
+        }"""
+        for path in ['work/', 'writing/']:
+            with self.subTest(path=path):
+                desk = self.open(self.context(), path)
+                wide = desk.locator('.entry__cta').first.evaluate(measure)
+                desk.close()
+                phone = self.open(self.context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True), path)
+                ctas = phone.locator('.entry__cta')
+                for i in range(ctas.count()):
+                    narrow = ctas.nth(i).evaluate(measure)
+                    self.assertAlmostEqual(narrow['arrow'], wide['arrow'], delta=0.5)
+                    self.assertGreaterEqual(narrow['height'], 44)
+                phone.close()
+
     def test_qa_list_marks_its_first_image_as_the_high_priority_lcp(self):
         # The List's first image is its largest paint, where the Grid's is its
         # headline, so only the List asks for fetchpriority.
