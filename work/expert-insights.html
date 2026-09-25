@@ -17,120 +17,147 @@
   <meta property="og:image:alt" content="Expert Insights case study opening: project details beside the case introduction.">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
-  <link rel="preload" href="../fonts/GT-America-Standard-Medium.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../assets/fonts/eb-garamond/eb-garamond-latin-400-v33.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../fonts/GT-America-Expanded-Regular.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../style.css">
-  <script>document.documentElement.classList.add('js-active');</script>
+  <script>document.documentElement.classList.add('js')</script>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/stream.css">
+  <link rel="stylesheet" href="/panel.css">
+  <script src="/site.js" defer onerror="document.documentElement.classList.remove('js')"></script>
+  <script src="/stream.js" defer></script>
+  <link rel="stylesheet" href="/pages.css">
   <script defer src="https://analytics.spidleweb.net/script.js" data-website-id="49720a36-6280-4d69-9531-c1d0c36b8f11"></script>
 </head>
-<body class="theme-insights">
+<body class="case-study theme-insights">
+  <a class="skip-link micro" href="#project">Skip to project</a>
+  <header class="masthead" id="top">
+    <div class="masthead__id">
+      <p class="masthead__name"><a href="/">Jason Spidle</a></p>
+      <p class="masthead__role micro">Product designer · Minneapolis</p>
+    </div>
+    <nav class="masthead__nav" aria-label="Site">
+      <button class="masthead__trigger micro" type="button" aria-expanded="false" aria-controls="site-places"><span class="visually-hidden">Menu, </span>Work</button>
+      <ul class="masthead__places micro" id="site-places">
+        <li><a href="/">Craft</a></li>
+        <li><a href="/work/" aria-current="page">Work</a></li>
+        <li><a href="/writing/">Writing</a></li>
+        <li><a href="#about">About</a></li>
+      </ul>
+    </nav>
+  </header>
 
-  <div class="viewport">
-
-    <aside class="panel panel--case">
-
-      <div class="panel__meta micro">
-        <a href="../index.html">← Index</a>
+  <section class="about" id="about" aria-labelledby="about-title" hidden>
+    <div class="about__inner">
+      <p class="about__kicker micro"><span>About</span><span class="about__place">Minneapolis</span></p>
+      <h2 class="about__title" id="about-title">Comfortable in dense data.</h2>
+      <p class="about__status micro">Open to contract and full&#8209;time roles</p>
+      <div class="about__body">
+        <p>I'm a product designer in Minneapolis. I've spent ten years shipping enterprise software in financial services, agtech, and healthcare. Most of it has been dashboards and complex workflows, where the job is turning dense operational data into clear decisions. I organize screens around the tasks people are actually there to do, and I keep them approachable for newer users without taking depth away from the experienced ones.</p>
+        <p>I work in Figma every day, from discovery and user flows through high-fidelity UI and developer handoff. I build the design systems that keep a product coherent as it grows. To test a workflow before committing to it, I build working browser prototypes with coding agents. A live build shows how the interface feels with realistic data before anything goes to production.</p>
+        <p>Before design, I spent a decade programming and analyzing market research studies. That's where the comfort with dense data started.</p>
+        <p>Almost everything I know, I've learned from experience. I've lived in over fifty homes across ten states and two countries. I've worn just about every collar they've fitted for the working class. In the company of countless people, some who matter to me and some just passing through, I've found beauty and felt understood. It's a whole wide world out there.</p>
       </div>
-
-      <div>
-        <h1 class="panel__type"><span>Expert Insights</span></h1>
-        <dl class="panel__facts micro">
-          <div><dt>Client</dt><dd>Sports representation (NDA)</dd></div>
-          <div><dt>Studio</dt><dd>Blueshift</dd></div>
-          <div><dt>Role</dt><dd>Design lead</dd></div>
-          <div><dt>Scope</dt><dd>Dashboard · Search · Analysis</dd></div>
-          <div><dt>Year</dt><dd class="nobreak">2025</dd></div>
-          <div><dt>Note</dt><dd>Domain changed under NDA</dd></div>
-        </dl>
+      <ul class="about__roles micro" aria-label="Roles">
+        <li><span>Blueshift</span><span>Partner / Design lead · <span class="nobreak">2024–</span></span></li>
+        <li><span>Vault AI Systems</span><span>Fractional CDO · <span class="nobreak">2025–</span></span></li>
+        <li><span>Foundry</span><span>Designer, then director · <span class="nobreak">2015–24</span></span></li>
+      </ul>
+      <div class="about__contact">
+        <p class="micro">Contact</p>
+        <a class="email email--large" href="mailto:jason@spidleweb.net">jason@spidleweb.net</a>
+        <a class="about__linkedin micro" href="https://www.linkedin.com/in/jspidle">LinkedIn&nbsp;<span aria-hidden="true">↗</span></a>
       </div>
+      <a class="about__close micro" href="#top">Close <span aria-hidden="true">✕</span><kbd aria-hidden="true">esc</kbd></a>
+    </div>
+  </section>
 
-      <div class="panel__footer">
-        <p class="panel__blurb">What the scouts are saying about players, tracked across every channel where they say it.</p>
+  <main id="project" class="case-layout">
+    <div class="case-context">
+      <div class="case-context__intro">
+        <h1 class="case-context__title case-context__title--long">Expert Insights</h1>
+        <p class="case-context__premise">A clear view of the conversation around a roster.</p>
       </div>
-    </aside>
+      <dl class="case-context__facts">
+        <div><dt class="visually-hidden">Role</dt><dd>Design lead</dd></div>
+        <div><dt class="visually-hidden">Studio and dates</dt><dd>Blueshift · <span class="nobreak">2025</span></dd></div>
+        <div class="case-context__scope"><dt class="visually-hidden">Scope</dt><dd>Dashboard · Search · Analysis</dd></div>
+      </dl>
+      <p class="case-context__note">I led design from the dashboard and search through comparative analysis. A consistent table structure keeps sentiment and scout activity readable, while the answer panel ties each generated summary to the discussions it draws on.</p>
 
-    <main class="archive">
+      <p class="case-context__disclosure">Client: Sports representation (NDA). Domain and data changed under NDA; the design problem and role are retained.</p>
 
-      <header class="archive__header micro">
-        <span>Expert Insights · Scout dashboards</span>
-        <span class="nobreak">2025</span>
-      </header>
+    </div>
 
-      <article class="article">
+    <section class="case-proofs" aria-label="Expert Insights project imagery">
+        <figure class="proof" id="fig-expert-insights-01">
+          <div class="proof__frame"><picture><source srcset="../assets/expert-insights-01-850.avif 850w, ../assets/expert-insights-01-1250.avif 1250w, ../assets/expert-insights-01-1700.avif 1700w" sizes="(max-width: 599px) calc(100vw - 40px), (max-width: 999px) calc(100vw - 64px), (max-width: 1440px) calc(100vw - 412px), calc(78.8344vw - 107.2147px)" type="image/avif"><img src="../assets/expert-insights-01.png" width="2880" height="2048" alt="Scout insights dashboard: discussion totals, auto-generated highlights, and a roster sentiment table split into my players and rival players" loading="eager" fetchpriority="high" decoding="async"></picture></div>
+          <figcaption>Roster sentiment uses one three-way split, with the relevant scouts beside each player.</figcaption>
+        </figure>
 
-        <section class="article__section reveal">
-          <h2 class="article__head">Ten thousand discussions, one screen.</h2>
-          <p>Agencies need to know what scouts are saying about their players and their rivals' players, whether it's said on social platforms or in the press. The platform, built for a client under NDA, pulls that conversation from nine channels into one feed. I led design across the platform, from the dashboard and search through to comparative analysis.</p>
-          <p>The core design problem is density. An agency scans dozens of players and thousands of discussions in one sitting, with the sentiment shifting under them. The answer is a strict tabular language. Sentiment always reads in the same three-color split and numbers stay in columns. Every list ends in a person you can click, because the whole point is knowing which scout to talk to next.</p>
+        <figure class="proof" id="fig-expert-insights-02">
+          <div class="proof__frame"><picture><source srcset="../assets/expert-insights-02-850.avif 850w, ../assets/expert-insights-02-1250.avif 1250w, ../assets/expert-insights-02-1700.avif 1700w" sizes="(max-width: 599px) calc(100vw - 40px), (max-width: 999px) calc(100vw - 64px), (max-width: 1440px) calc(100vw - 412px), calc(78.8344vw - 107.2147px)" type="image/avif"><img src="../assets/expert-insights-02.png" width="2880" height="2048" alt="Search results for a scouting hashtag with an auto-generated insights summary, sentiment bar, and per-channel post feed" loading="lazy" decoding="async"></picture></div>
+          <figcaption>Search puts an explicitly labeled, auto-generated summary above the discussions that support it. Outputs still require independent review.</figcaption>
+        </figure>
 
-          <figure class="figure">
-            <div class="figure__frame"><picture><source srcset="../assets/expert-insights-01-850.avif 850w, ../assets/expert-insights-01-1250.avif 1250w, ../assets/expert-insights-01-1700.avif 1700w" sizes="(max-width: 1024px) 94vw, (max-width: 1620px) 53vw, 850px" type="image/avif"><img src="../assets/expert-insights-01.png" width="2880" height="2048" alt="Scout insights dashboard: discussion totals, auto-generated highlights, and a roster sentiment table split into my players and rival players" loading="lazy"></picture></div>
-            <figcaption class="micro">Roster sentiment with top scouts inline</figcaption>
-          </figure>
-        </section>
+        <figure class="proof" id="fig-expert-insights-03">
+          <div class="proof__frame"><picture><source srcset="../assets/expert-insights-03-850.avif 850w, ../assets/expert-insights-03-1250.avif 1250w, ../assets/expert-insights-03-1700.avif 1700w" sizes="(max-width: 599px) calc(100vw - 40px), (max-width: 999px) calc(100vw - 64px), (max-width: 1440px) calc(100vw - 412px), calc(78.8344vw - 107.2147px)" type="image/avif"><img src="../assets/expert-insights-03.png" width="2880" height="2048" alt="Social Explorer comparing three players side by side with combined analysis, sentiment bars, and top scout lists" loading="lazy" decoding="async"></picture></div>
+          <figcaption>Three players share matching sentiment and scout panels, so comparisons read across one row.</figcaption>
+        </figure>
 
-        <section class="article__section reveal">
-          <h2 class="article__head">Auto-generated, and labeled that way.</h2>
-          <p>The platform generates plain-language summaries of what's moving and why, such as a rival gaining share of voice or a sentiment dip tied to one player. When a single evaluation can move a transfer fee, that kind of synthesis needs guardrails. Anything auto-generated is labeled at the point of reading, with a standing disclaimer that outputs are informational and need independent review. The summaries speed up the work, but the person remains responsible for the judgment.</p>
+        <figure class="proof" id="fig-expert-insights-04">
+          <div class="proof__frame"><picture><source srcset="../assets/expert-insights-04-850.avif 850w, ../assets/expert-insights-04-1250.avif 1250w, ../assets/expert-insights-04-1700.avif 1700w" sizes="(max-width: 599px) calc(100vw - 40px), (max-width: 999px) calc(100vw - 64px), (max-width: 1440px) calc(100vw - 412px), calc(78.8344vw - 107.2147px)" type="image/avif"><img src="../assets/expert-insights-04.png" width="2880" height="2048" alt="Dashboard with the ask panel open over the roster table, offering four suggested questions" loading="lazy" decoding="async"></picture></div>
+          <figcaption>Suggested questions open over the roster. The underlying numbers stay visible while a reader asks for more detail.</figcaption>
+        </figure>
 
-          <figure class="figure">
-            <div class="figure__frame"><picture><source srcset="../assets/expert-insights-02-850.avif 850w, ../assets/expert-insights-02-1250.avif 1250w, ../assets/expert-insights-02-1700.avif 1700w" sizes="(max-width: 1024px) 94vw, (max-width: 1620px) 53vw, 850px" type="image/avif"><img src="../assets/expert-insights-02.png" width="2880" height="2048" alt="Search results for a scouting hashtag with an auto-generated insights summary, sentiment bar, and per-channel post feed" loading="lazy"></picture></div>
-            <figcaption class="micro">Auto-generated insights, clearly labeled</figcaption>
-          </figure>
-        </section>
+        <figure class="proof" id="fig-expert-insights-05-full">
+          <div class="proof__frame"><picture><source srcset="../assets/expert-insights-05-full-850.avif 850w, ../assets/expert-insights-05-full-1250.avif 1250w, ../assets/expert-insights-05-full-1700.avif 1700w" sizes="(max-width: 599px) calc(100vw - 40px), (max-width: 999px) calc(100vw - 64px), (max-width: 1440px) calc(100vw - 412px), calc(78.8344vw - 107.2147px)" type="image/avif"><img src="../assets/expert-insights-05-full.png" width="2880" height="2048" alt="Answer panel for what is driving Elias Braun&#x27;s positive sentiment, with an insights summary, two drivers carrying sentiment chips, and the top scouts discussing him" loading="lazy" decoding="async"></picture></div>
+          <figcaption>Sentiment drivers come first, followed by the scouts discussing them.</figcaption>
+        </figure>
 
-        <section class="article__section reveal">
-          <h2 class="article__head">Compare the same view side by side.</h2>
-          <p>Roster questions are rarely about one name. Social Explorer runs up to three side by side, with a combined analysis on top and matching sentiment and scout panels below, so differences read across a single row rather than across three exports.</p>
+        <figure class="proof" id="fig-expert-insights-06-full">
+          <div class="proof__frame"><picture><source srcset="../assets/expert-insights-06-full-850.avif 850w, ../assets/expert-insights-06-full-1250.avif 1250w, ../assets/expert-insights-06-full-1700.avif 1700w" sizes="(max-width: 599px) calc(100vw - 40px), (max-width: 999px) calc(100vw - 64px), (max-width: 1440px) calc(100vw - 412px), calc(78.8344vw - 107.2147px)" type="image/avif"><img src="../assets/expert-insights-06-full.png" width="2880" height="2048" alt="Answer panel ranking the five scouts most active on under-21 prospects by post count, each with a sentiment chip" loading="lazy" decoding="async"></picture></div>
+          <figcaption>A ranked list answers who is most active, with post counts and sentiment in fixed columns.</figcaption>
+        </figure>
 
-          <figure class="figure">
-            <div class="figure__frame"><picture><source srcset="../assets/expert-insights-03-850.avif 850w, ../assets/expert-insights-03-1250.avif 1250w, ../assets/expert-insights-03-1700.avif 1700w" sizes="(max-width: 1024px) 94vw, (max-width: 1620px) 53vw, 850px" type="image/avif"><img src="../assets/expert-insights-03.png" width="2880" height="2048" alt="Social Explorer comparing three players side by side with combined analysis, sentiment bars, and top scout lists" loading="lazy"></picture></div>
-            <figcaption class="micro">Three players, one read</figcaption>
-          </figure>
-        </section>
+        <figure class="proof" id="fig-expert-insights-07-full">
+          <div class="proof__frame"><picture><source srcset="../assets/expert-insights-07-full-850.avif 850w, ../assets/expert-insights-07-full-1250.avif 1250w, ../assets/expert-insights-07-full-1700.avif 1700w" sizes="(max-width: 599px) calc(100vw - 40px), (max-width: 999px) calc(100vw - 64px), (max-width: 1440px) calc(100vw - 412px), calc(78.8344vw - 107.2147px)" type="image/avif"><img src="../assets/expert-insights-07-full.png" width="2880" height="2048" alt="Answer panel comparing two players on paired bars for discussion volume, scouts discussing, and positive and negative sentiment" loading="lazy" decoding="async"></picture></div>
+          <figcaption>Paired bars answer a comparison question. Each response includes its source period and space for a follow-up.</figcaption>
+        </figure>
+    </section>
+  </main>
 
-        <section class="article__section reveal">
-          <h2 class="article__head">The answer takes the shape of the question.</h2>
-          <p>The ask panel opens over the dashboard with four suggested questions, and the answer comes back in a different shape for each kind of question. Asking why a player's sentiment moved returns a list of drivers, each with its own sentiment chip. Asking who is most active on a topic returns a ranked list of scouts with their post counts. Asking for two players against each other returns paired bars for volume and sentiment.</p>
-          <p>Every answer carries the auto-generated label and a line giving the discussions and dates it drew on, with a field for the follow-up underneath. The roster table stays visible behind the panel, so an answer can be checked against the numbers without leaving the screen.</p>
+  <section class="more-from" aria-labelledby="more-from-title">
+    <h2 class="more-from__title" id="more-from-title">More from Expert Insights</h2>
+    <div class="more-from__grid">
+      <!-- stream:start case-study="expert-insights" heading="3" -->
+      <!-- stream:end -->
+    </div>
+  </section>
 
-          <figure class="figure">
-            <div class="figure__frame"><picture><source srcset="../assets/expert-insights-04-850.avif 850w, ../assets/expert-insights-04-1250.avif 1250w, ../assets/expert-insights-04-1700.avif 1700w" sizes="(max-width: 1024px) 94vw, (max-width: 1620px) 53vw, 850px" type="image/avif"><img src="../assets/expert-insights-04.png" width="2880" height="2048" alt="Dashboard with the ask panel open over the roster table, offering four suggested questions" loading="lazy"></picture></div>
-            <figcaption class="micro">Four questions to start from</figcaption>
-          </figure>
+  <!-- next-story:start case-study="expert-insights" -->
+  <nav class="next-story theme-sim" aria-label="Next case study">
+    <a class="next-story__link" href="/work/campaign-sim">
+      <span class="next-story__name">Campaign Sim</span>
+      <span class="next-story__arrow" aria-hidden="true">→</span>
+    </a>
+  </nav>
+  <!-- next-story:end -->
 
-          <figure class="figure">
-            <div class="figure__frame"><picture><source srcset="../assets/expert-insights-05-850.avif 850w, ../assets/expert-insights-05-1250.avif 1250w, ../assets/expert-insights-05-1700.avif 1700w" sizes="(max-width: 1024px) 94vw, (max-width: 1620px) 53vw, 850px" type="image/avif"><img src="../assets/expert-insights-05.png" width="1788" height="1788" alt="Answer panel for what is driving Elias Braun's positive sentiment, with an insights summary, two drivers carrying sentiment chips, and the top scouts discussing him" loading="lazy"></picture></div>
-            <figcaption class="micro">Drivers first, then the scouts discussing them</figcaption>
-          </figure>
+  <footer class="site-footer">
+    <div class="footline micro">
+      <a class="email" href="mailto:jason@spidleweb.net">jason@spidleweb.net</a>
+      <a class="footline__link" href="https://www.linkedin.com/in/jspidle">LinkedIn&nbsp;<span aria-hidden="true">↗</span></a>
+      <p class="footline__copy">© <span id="year">2026</span> Jason Spidle</p>
+    </div>
+  </footer>
 
-          <figure class="figure">
-            <div class="figure__frame"><picture><source srcset="../assets/expert-insights-06-850.avif 850w, ../assets/expert-insights-06-1250.avif 1250w, ../assets/expert-insights-06-1700.avif 1700w" sizes="(max-width: 1024px) 94vw, (max-width: 1620px) 53vw, 850px" type="image/avif"><img src="../assets/expert-insights-06.png" width="1788" height="1788" alt="Answer panel ranking the five scouts most active on under-21 prospects by post count, each with a sentiment chip" loading="lazy"></picture></div>
-            <figcaption class="micro">Ranked by post count</figcaption>
-          </figure>
-
-          <figure class="figure">
-            <div class="figure__frame"><picture><source srcset="../assets/expert-insights-07-850.avif 850w, ../assets/expert-insights-07-1250.avif 1250w, ../assets/expert-insights-07-1700.avif 1700w" sizes="(max-width: 1024px) 94vw, (max-width: 1620px) 53vw, 850px" type="image/avif"><img src="../assets/expert-insights-07.png" width="1788" height="1788" alt="Answer panel comparing two players on paired bars for discussion volume, scouts discussing, and positive and negative sentiment" loading="lazy"></picture></div>
-            <figcaption class="micro">Two players on paired bars</figcaption>
-          </figure>
-        </section>
-
-      </article>
-
-      <a class="next" href="campaign-sim.html">
-        <span class="next__title">Campaign Sim</span>
-        <span class="next__arrow" aria-hidden="true">→</span>
-      </a>
-
-      <footer class="footer micro">
-        <span>© 2026 Jason Spidle</span>
-        <span><a href="../index.html">Back to index</a></span>
-      </footer>
-
-    </main>
-  </div>
-
+  <!-- stream-data:start -->
+  <script type="application/json" id="stream-data">
+  {"items":{
+  },"caseStudies":{
+  }}
+  </script>
+  <!-- stream-data:end -->
   <script src="../script.js"></script>
 </body>
 </html>

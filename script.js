@@ -1,75 +1,80 @@
-// Reveal sections as they enter the viewport. Progressive enhancement:
-// without JS, content stays visible (js-active never set); reduced motion skips animation.
-const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const targets = document.querySelectorAll('.reveal');
+// spidleweb.net: case-study pages. The context column sticks while it fits,
+// scrolling phone captures take a keyboard stop, and proofs fade to colour as
+// they reach the middle of the window. The site chrome is site.js, and opening
+// in place is stream.js.
 
-function revealNow(el) {
-  el.classList.add('is-in');
+const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+
+// A complete context column sticks only when every item fits the viewport.
+const caseContext = document.querySelector('.case-context');
+if (caseContext) {
+  const desktop = matchMedia('(min-width: 1000px) and (min-height: 600px)');
+  function updateContextPosition() {
+    caseContext.classList.toggle('is-sticky', desktop.matches &&
+      caseContext.offsetHeight + 48 <= window.innerHeight);
+  }
+  window.addEventListener('resize', updateContextPosition);
+  if ('ResizeObserver' in window) new ResizeObserver(updateContextPosition).observe(caseContext);
+  document.fonts.ready.then(updateContextPosition);
+  updateContextPosition();
 }
 
-function isInViewport(el) {
-  const rect = el.getBoundingClientRect();
-  return rect.top < window.innerHeight && rect.bottom > 0;
-}
+const proofFrames = [...document.querySelectorAll('.proof__frame')];
+if (proofFrames.length) {
+  // Only scrollable phone captures need a keyboard stop.
+  const scrollers = document.querySelectorAll('.proof-phone .proof__frame');
+  function updateScrollAccess() {
+    scrollers.forEach((el) => {
+      const scrollable = el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1;
+      el.tabIndex = scrollable ? 0 : -1;
+    });
+  }
+  window.addEventListener('resize', updateScrollAccess);
+  if ('ResizeObserver' in window) {
+    const sizeObserver = new ResizeObserver(updateScrollAccess);
+    scrollers.forEach((el) => sizeObserver.observe(el));
+  }
+  proofFrames.forEach((frame) => frame.querySelector('img').addEventListener('load', updateScrollAccess));
+  updateScrollAccess();
 
-if (reduced || !('IntersectionObserver' in window)) {
-  targets.forEach(revealNow);
-} else {
-  const io = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          revealNow(entry.target);
-          io.unobserve(entry.target);
-        }
-      });
-    },
-    { threshold: 0.05, rootMargin: '48px 0px' }
-  );
-
-  // Hash deep-links and above-the-fold items must not stay invisible.
-  const hashTarget = location.hash ? document.querySelector(location.hash) : null;
-  targets.forEach((el) => {
-    if (
-      isInViewport(el) ||
-      (hashTarget && (el === hashTarget || hashTarget.contains(el)))
-    ) {
-      revealNow(el);
-      return;
-    }
-    io.observe(el);
-  });
-}
-
-// Keep the footer year current.
-const year = document.getElementById('year');
-if (year) year.textContent = new Date().getFullYear();
-
-// Active navigation highlighting based on scroll position
-const sections = document.querySelectorAll('main.archive section[id]');
-const navLinks = document.querySelectorAll('.archive__nav a');
-
-if (sections.length && navLinks.length && 'IntersectionObserver' in window) {
-  const observerOptions = {
-    root: null,
-    rootMargin: '-20% 0px -60% 0px', // Trigger when section occupies the upper-middle of viewport
-    threshold: 0
-  };
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const id = entry.target.getAttribute('id');
-        navLinks.forEach((link) => {
-          if (link.getAttribute('href') === `#${id}`) {
-            link.classList.add('is-active');
-          } else {
-            link.classList.remove('is-active');
-          }
-        });
+  // The trigger is the frame's midpoint, independent of the capture's scroll height.
+  const pendingFrames = new Set(proofFrames);
+  let colorUpdatePending = false;
+  function stopColorReveal() {
+    document.documentElement.classList.remove('color-reveal-active');
+    pendingFrames.clear();
+    window.removeEventListener('scroll', scheduleColorReveal);
+    window.removeEventListener('resize', scheduleColorReveal);
+  }
+  function updateColorReveal() {
+    colorUpdatePending = false;
+    pendingFrames.forEach((frame) => {
+      const rect = frame.getBoundingClientRect();
+      if (rect.top + rect.height / 2 <= window.innerHeight) {
+        frame.classList.add('is-color');
+        pendingFrames.delete(frame);
       }
     });
-  }, observerOptions);
-
-  sections.forEach((section) => observer.observe(section));
+    if (!pendingFrames.size) {
+      window.removeEventListener('scroll', scheduleColorReveal);
+      window.removeEventListener('resize', scheduleColorReveal);
+    }
+  }
+  function scheduleColorReveal() {
+    if (colorUpdatePending) return;
+    colorUpdatePending = true;
+    requestAnimationFrame(updateColorReveal);
+  }
+  if (!motionPreference.matches) {
+    updateColorReveal();
+    if (pendingFrames.size) {
+      document.documentElement.classList.add('color-reveal-active');
+      window.addEventListener('scroll', scheduleColorReveal, { passive: true });
+      window.addEventListener('resize', scheduleColorReveal);
+      document.fonts.ready.then(scheduleColorReveal);
+    }
+  }
+  motionPreference.addEventListener('change', (event) => {
+    if (event.matches) stopColorReveal();
+  });
 }

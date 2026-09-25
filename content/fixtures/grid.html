@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Grid fixture | Jason Spidle</title>
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <script>document.documentElement.classList.add('js')</script>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/panel.css">
+  <script src="/site.js" defer onerror="document.documentElement.classList.remove('js')"></script>
+  <script src="/stream.js" defer></script>
+  <style>
+    /* Fixture-only styles, so the generated cards can be looked at before
+       Phase 2A writes stream.css. Nothing here ships. */
+    .fixture { padding: 40px 0 96px; }
+    .fixture__intro { max-width: 720px; padding: 0 40px 36px; }
+    .fixture__intro h1 { margin: 10px 0 12px; font: 400 31px/38px var(--display); }
+    .fixture__intro p:last-child { color: var(--ink-muted); font-size: 15px; line-height: 22px; }
+
+    .stream-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 40px 20px; padding: 0 40px; }
+    @media (max-width: 1099px) { .stream-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (max-width: 599px) {
+      .fixture__intro { padding: 0 16px 28px; }
+      /* Two columns on phones, as the approved 390 boards draw Grid. */
+      .stream-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 14px; padding: 0 16px; }
+    }
+
+    .stream-card__link { display: flex; flex-direction: column; gap: 10px; text-decoration: none; }
+    .stream-card__link:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+    .stream-card__media { position: relative; aspect-ratio: 256 / 182; overflow: hidden; border: 1px solid var(--line); background: #e4e4df; }
+    .stream-card__media img { width: 100%; height: 100%; object-fit: cover; object-position: left top; background: #fff; }
+    .stream-card__media[data-shape="tall"] img { width: 38%; height: auto; margin: 7% auto 0; border: 1px solid var(--line); }
+    .stream-card__media--empty { background: repeating-linear-gradient(135deg, transparent 0 10px, var(--line) 10px 11px), #e4e4df; }
+    .stream-card__media--tile { display: flex; flex-direction: column; justify-content: space-between; padding: 16px; border: 0; background: var(--ink); color: var(--paper); }
+    .stream-card__kicker { font: 400 11px/14px var(--mono); letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.6; }
+    .stream-card__tile-title { font: 400 17px/19px var(--display); text-transform: uppercase; }
+    .stream-card[data-type="case-study"] .stream-card__media { margin: 14px 14px 0 0; box-shadow: 7px -7px 0 color-mix(in oklch, var(--case-dark) 72%, white), 14px -14px 0 var(--case-dark); }
+    .stream-card__badge,
+    .stream-card__time { position: absolute; bottom: 10px; padding: 5px 8px; background: var(--ink); color: var(--paper); font: 400 11px/14px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
+    .stream-card__badge { left: 10px; }
+    .stream-card[data-type="prototype"] .stream-card__badge::before { content: "▶"; margin-right: 6px; color: var(--accent); }
+    .stream-card[data-type="reel"] .stream-card__badge { top: 10px; bottom: auto; }
+    .stream-card__time { right: 10px; }
+
+    .stream-card__title { font: 500 14px/19px var(--body); }
+    .stream-card[data-type="case-study"] .stream-card__title { font: 400 15px/19px var(--display); text-transform: uppercase; }
+    .stream-card[data-type="post"] .stream-card__title { font: 400 20px/23px "EB Garamond", Georgia, serif; }
+    .stream-card__meta { color: var(--ink-muted); }
+    .stream-card__case { color: var(--case-dark); }
+    .stream-card__chip { display: inline-block; width: 8px; height: 8px; margin: 0 7px 0 2px; background: var(--case-dark); }
+    .stream-card[data-type="case-study"] .stream-card__chip { margin-left: 0; }
+    .stream-card[data-placeholder] .stream-card__meta::after { content: "Placeholder"; margin-left: 8px; color: var(--accent); }
+
+  </style>
+</head>
+<body>
+  <!-- The site chrome from the Chrome contract in specs/redesign.md, so the
+       fixture opens About the way every page will. -->
+  <header class="masthead" id="top">
+    <div class="masthead__id">
+      <h1 class="masthead__name"><a href="/">Jason Spidle</a><span class="visually-hidden">, Principal Product Designer</span></h1>
+      <p class="masthead__role micro">Product designer · Minneapolis</p>
+    </div>
+    <nav class="masthead__nav" aria-label="Site">
+      <button class="masthead__trigger micro" type="button" aria-expanded="false" aria-controls="site-places"><span class="visually-hidden">Menu, </span>Craft</button>
+      <ul class="masthead__places micro" id="site-places">
+        <li><a href="/" aria-current="page">Craft</a></li>
+        <li><a href="/work/">Work</a></li>
+        <li><a href="/writing/">Writing</a></li>
+        <li><a href="#about">About</a></li>
+      </ul>
+    </nav>
+  </header>
+  <section class="about" id="about" aria-labelledby="about-title" hidden>
+    <div class="about__inner">
+      <p class="about__kicker micro"><span>About</span><span class="about__place">Minneapolis</span></p>
+      <h2 class="about__title" id="about-title">Comfortable in dense data.</h2>
+      <p class="about__status micro">Open to contract and full&#8209;time roles</p>
+      <div class="about__body">
+        <p>I'm a product designer in Minneapolis. I've spent ten years shipping enterprise software in financial services, agtech, and healthcare. Most of it has been dashboards and complex workflows, where the job is turning dense operational data into clear decisions. I organize screens around the tasks people are actually there to do, and I keep them approachable for newer users without taking depth away from the experienced ones.</p>
+        <p>I work in Figma every day, from discovery and user flows through high-fidelity UI and developer handoff. I build the design systems that keep a product coherent as it grows. To test a workflow before committing to it, I build working browser prototypes with coding agents. A live build shows how the interface feels with realistic data before anything goes to production.</p>
+        <p>Before design, I spent a decade programming and analyzing market research studies. That's where the comfort with dense data started.</p>
+        <p>Almost everything I know, I've learned from experience. I've lived in over fifty homes across ten states and two countries. I've worn just about every collar they've fitted for the working class. In the company of countless people, some who matter to me and some just passing through, I've found beauty and felt understood. It's a whole wide world out there.</p>
+      </div>
+      <ul class="about__roles micro" aria-label="Roles">
+        <li><span>Blueshift</span><span>Partner / Design lead · <span class="nobreak">2024–</span></span></li>
+        <li><span>Vault AI Systems</span><span>Fractional CDO · <span class="nobreak">2025–</span></span></li>
+        <li><span>Foundry</span><span>Designer, then director · <span class="nobreak">2015–24</span></span></li>
+      </ul>
+      <div class="about__contact">
+        <p class="micro">Contact</p>
+        <a class="email email--large" href="mailto:jason@spidleweb.net">jason@spidleweb.net</a>
+        <a class="about__linkedin micro" href="https://www.linkedin.com/in/jspidle">LinkedIn&nbsp;<span aria-hidden="true">↗</span></a>
+      </div>
+      <a class="about__close micro" href="#top">Close <span aria-hidden="true">✕</span><kbd aria-hidden="true">esc</kbd></a>
+    </div>
+  </section>
+  <main class="fixture">
+    <header class="fixture__intro">
+      <p class="micro">Fixture, generated by scripts/build-stream.mjs</p>
+      <h1>The stream in Grid</h1>
+      <p>Everything between the stream markers comes from content/stream.json. Edit that file and run the generator, rather than editing this page.</p>
+    </header>
+    <div class="stream-grid">
+      <!-- stream:start eager="5" -->
+      <article class="stream-card theme-insights" id="expert-insights" data-type="case-study" data-project="expert-insights" data-industry="sports" data-case-study="expert-insights">
+        <a class="stream-card__link" href="/work/expert-insights" data-open="expert-insights" aria-labelledby="expert-insights-title expert-insights-meta">
+          <div class="stream-card__media" data-shape="wide">
+            <picture>
+              <source type="image/avif" srcset="/assets/expert-insights-01-240.avif 240w, /assets/expert-insights-01-850.avif 850w, /assets/expert-insights-01-1250.avif 1250w, /assets/expert-insights-01-1700.avif 1700w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/expert-insights-01.png" width="2880" height="2048" alt="Scout insights dashboard: discussion totals, auto-generated highlights, and a roster sentiment table split into my players and rival players" loading="eager" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="expert-insights-title">Expert Insights</h2>
+          <p class="stream-card__meta micro" id="expert-insights-meta"><span class="stream-card__case"><span class="stream-card__chip" aria-hidden="true"></span><span class="stream-card__type">Case study</span> <span aria-hidden="true">·</span> 7 screens</span></p>
+        </a>
+      </article>
+
+      <article class="stream-card" id="how-i-built-description-generator" data-type="post" data-project="description-generator" data-industry="design-systems" data-placeholder>
+        <a class="stream-card__link" href="/writing/how-i-built-description-generator" data-open="how-i-built-description-generator" aria-labelledby="how-i-built-description-generator-title how-i-built-description-generator-meta">
+          <div class="stream-card__media stream-card__media--empty" data-shape="wide"></div>
+          <h2 class="stream-card__title" id="how-i-built-description-generator-title">How I built Description Generator</h2>
+          <p class="stream-card__meta micro" id="how-i-built-description-generator-meta"><span class="stream-card__type">Writing</span> <span aria-hidden="true">·</span> 2026</p>
+        </a>
+      </article>
+
+      <article class="stream-card" id="activity-central" data-type="prototype" data-project="activity-central" data-industry="productivity" data-platform="mobile" data-placeholder>
+        <a class="stream-card__link" href="/#activity-central" data-open="activity-central" aria-labelledby="activity-central-title activity-central-meta">
+          <div class="stream-card__media stream-card__media--empty" data-shape="wide">
+            <span class="stream-card__badge" aria-hidden="true">Try it</span>
+          </div>
+          <h2 class="stream-card__title" id="activity-central-title">Activity Central</h2>
+          <p class="stream-card__meta micro" id="activity-central-meta"><span class="stream-card__type">Prototype</span> <span aria-hidden="true">·</span> Productivity</p>
+        </a>
+      </article>
+
+      <article class="stream-card" id="weekly-activity-calendar" data-type="screen" data-project="activity-central" data-industry="productivity" data-platform="mobile">
+        <a class="stream-card__link" href="/#weekly-activity-calendar" data-open="weekly-activity-calendar" aria-labelledby="weekly-activity-calendar-title weekly-activity-calendar-meta">
+          <div class="stream-card__media" data-shape="tall">
+            <picture>
+              <source type="image/avif" srcset="/assets/feed/responsive/weekly-activity-calendar-480.avif 480w, /assets/feed/responsive/weekly-activity-calendar-750.avif 750w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/feed/weekly-activity-calendar.webp" width="750" height="1624" alt="Mobile monthly calendar with the selected day expanded into a timed activity schedule" loading="eager" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="weekly-activity-calendar-title">Weekly activity calendar</h2>
+          <p class="stream-card__meta micro" id="weekly-activity-calendar-meta"><span class="stream-card__type">Screen</span> <span aria-hidden="true">·</span> Productivity</p>
+        </a>
+      </article>
+
+      <article class="stream-card" id="description-generator" data-type="tool" data-project="description-generator" data-industry="design-systems" data-platform="figma" data-placeholder>
+        <a class="stream-card__link" href="/#description-generator" data-open="description-generator" aria-labelledby="description-generator-title description-generator-meta">
+          <div class="stream-card__media stream-card__media--tile" aria-hidden="true">
+            <span class="stream-card__kicker">Figma plugin</span>
+            <span class="stream-card__tile-title">Description Generator</span>
+          </div>
+          <h2 class="stream-card__title" id="description-generator-title">Description Generator</h2>
+          <p class="stream-card__meta micro" id="description-generator-meta"><span class="stream-card__type">Tool</span> <span aria-hidden="true">·</span> Design systems</p>
+        </a>
+      </article>
+
+      <article class="stream-card theme-conservis" id="fields-on-the-map" data-type="screen" data-project="conservis" data-industry="agriculture" data-platform="web" data-case-study="conservis">
+        <a class="stream-card__link" href="/work/conservis#fig-conservis-03" data-open="fields-on-the-map" aria-labelledby="fields-on-the-map-title fields-on-the-map-meta">
+          <div class="stream-card__media" data-shape="wide">
+            <picture>
+              <source type="image/avif" srcset="/assets/conservis-03-240.avif 240w, /assets/conservis-03-850.avif 850w, /assets/conservis-03-1250.avif 1250w, /assets/conservis-03-1700.avif 1700w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/conservis-03.png" width="2880" height="2048" alt="Conservis fields view: a satellite map with crop-coded field shapes beside a filterable field list" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="fields-on-the-map-title">Fields on the map</h2>
+          <p class="stream-card__meta micro" id="fields-on-the-map-meta"><span class="stream-card__type">Screen</span> <span class="stream-card__case"><span class="stream-card__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Conservis<span class="visually-hidden"> case study</span></span></p>
+        </a>
+      </article>
+
+      <article class="stream-card theme-everag" id="ground-corn-overview" data-type="screen" data-project="everag" data-industry="agriculture" data-platform="web" data-case-study="everag">
+        <a class="stream-card__link" href="/work/everag#fig-everag-feed-overview" data-open="ground-corn-overview" aria-labelledby="ground-corn-overview-title ground-corn-overview-meta">
+          <div class="stream-card__media" data-shape="square">
+            <picture>
+              <source type="image/avif" srcset="/assets/everag-feed-overview-850.avif 850w, /assets/everag-feed-overview-1250.avif 1250w, /assets/everag-feed-overview-1700.avif 1700w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/everag-feed-overview.png" width="2904" height="3244" alt="Feed overview with stacked monthly coverage charts for corn-based, soybean-meal-based, and other ingredients" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="ground-corn-overview-title">Ground corn overview</h2>
+          <p class="stream-card__meta micro" id="ground-corn-overview-meta"><span class="stream-card__type">Screen</span> <span class="stream-card__case"><span class="stream-card__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Ever.Ag<span class="visually-hidden"> case study</span></span></p>
+        </a>
+      </article>
+
+      <article class="stream-card" id="lawn-assessment-recommendation" data-type="screen" data-project="trugreen" data-industry="home-services" data-platform="mobile">
+        <a class="stream-card__link" href="/#lawn-assessment-recommendation" data-open="lawn-assessment-recommendation" aria-labelledby="lawn-assessment-recommendation-title lawn-assessment-recommendation-meta">
+          <div class="stream-card__media" data-shape="tall">
+            <picture>
+              <source type="image/avif" srcset="/assets/feed/responsive/lawn-assessment-recommendation-480.avif 480w, /assets/feed/responsive/lawn-assessment-recommendation-750.avif 750w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/feed/lawn-assessment-recommendation.webp" width="750" height="1624" alt="Mobile lawn assessment recommendation explaining a tailored TruComplete service plan" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="lawn-assessment-recommendation-title">Lawn assessment recommendation</h2>
+          <p class="stream-card__meta micro" id="lawn-assessment-recommendation-meta"><span class="stream-card__type">Screen</span> <span aria-hidden="true">·</span> Home services</p>
+        </a>
+      </article>
+
+      <article class="stream-card" id="text-diff" data-type="tool" data-project="atomic-tools" data-industry="writing" data-platform="web" data-placeholder>
+        <a class="stream-card__link" href="/#text-diff" data-open="text-diff" aria-labelledby="text-diff-title text-diff-meta">
+          <div class="stream-card__media stream-card__media--tile" aria-hidden="true">
+            <span class="stream-card__kicker">Atomic Tools</span>
+            <span class="stream-card__tile-title">Text diff</span>
+          </div>
+          <h2 class="stream-card__title" id="text-diff-title">Text diff</h2>
+          <p class="stream-card__meta micro" id="text-diff-meta"><span class="stream-card__type">Tool</span> <span aria-hidden="true">·</span> Writing</p>
+        </a>
+      </article>
+
+      <article class="stream-card theme-sim" id="channel-impact-simulator" data-type="prototype" data-project="campaign-sim" data-industry="sports" data-platform="web" data-case-study="campaign-sim" data-placeholder>
+        <a class="stream-card__link" href="/#channel-impact-simulator" data-open="channel-impact-simulator" aria-labelledby="channel-impact-simulator-title channel-impact-simulator-meta">
+          <div class="stream-card__media" data-shape="wide">
+            <picture>
+              <source type="image/avif" srcset="/assets/feed/responsive/channel-impact-simulator-480.avif 480w, /assets/feed/responsive/channel-impact-simulator-850.avif 850w, /assets/feed/responsive/channel-impact-simulator-1250.avif 1250w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/feed/channel-impact-simulator.webp" width="1250" height="889" alt="Campaign simulation table comparing channels by reach, expected impact, waste, and cost" loading="lazy" decoding="async">
+            </picture>
+            <span class="stream-card__badge" aria-hidden="true">Try it</span>
+          </div>
+          <h2 class="stream-card__title" id="channel-impact-simulator-title">Channel impact simulator</h2>
+          <p class="stream-card__meta micro" id="channel-impact-simulator-meta"><span class="stream-card__type">Prototype</span> <span class="stream-card__case"><span class="stream-card__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Campaign Sim<span class="visually-hidden"> case study</span></span></p>
+        </a>
+      </article>
+
+      <article class="stream-card theme-conservis" id="filtering-fields" data-type="video" data-project="conservis" data-industry="agriculture" data-platform="web" data-case-study="conservis" data-placeholder>
+        <a class="stream-card__link" href="/#filtering-fields" data-open="filtering-fields" aria-labelledby="filtering-fields-title filtering-fields-meta filtering-fields-time">
+          <div class="stream-card__media stream-card__media--empty" data-shape="wide">
+            <span class="stream-card__time" id="filtering-fields-time"><span class="visually-hidden">Running time </span>2:02</span>
+          </div>
+          <h2 class="stream-card__title" id="filtering-fields-title">Filtering fields, start to finish</h2>
+          <p class="stream-card__meta micro" id="filtering-fields-meta"><span class="stream-card__type">Video</span> <span class="stream-card__case"><span class="stream-card__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Conservis<span class="visually-hidden"> case study</span></span></p>
+        </a>
+      </article>
+
+      <article class="stream-card" id="family-week" data-type="reel" data-project="activity-central" data-industry="productivity" data-platform="mobile" data-placeholder>
+        <a class="stream-card__link" href="/#family-week" data-open="family-week" aria-labelledby="family-week-title family-week-meta family-week-time">
+          <div class="stream-card__media stream-card__media--empty" data-shape="tall">
+            <span class="stream-card__badge" aria-hidden="true">Reel</span>
+            <span class="stream-card__time" id="family-week-time"><span class="visually-hidden">Running time </span>2:01</span>
+          </div>
+          <h2 class="stream-card__title" id="family-week-title">A family week, planned on one phone</h2>
+          <p class="stream-card__meta micro" id="family-week-meta"><span class="stream-card__type">Reel</span> <span aria-hidden="true">·</span> Productivity</p>
+        </a>
+      </article>
+
+      <article class="stream-card" id="markdown-to-rich-text" data-type="video" data-project="atomic-tools" data-industry="writing" data-platform="web" data-placeholder>
+        <a class="stream-card__link" href="/#markdown-to-rich-text" data-open="markdown-to-rich-text" aria-labelledby="markdown-to-rich-text-title markdown-to-rich-text-meta markdown-to-rich-text-time">
+          <div class="stream-card__media stream-card__media--empty" data-shape="wide">
+            <span class="stream-card__time" id="markdown-to-rich-text-time"><span class="visually-hidden">Running time </span>0:44</span>
+          </div>
+          <h2 class="stream-card__title" id="markdown-to-rich-text-title">Markdown ↔ rich text, in 44 seconds</h2>
+          <p class="stream-card__meta micro" id="markdown-to-rich-text-meta"><span class="stream-card__type">Video</span> <span aria-hidden="true">·</span> Writing</p>
+        </a>
+      </article>
+
+      <article class="stream-card theme-vidscrip" id="patient-enrollment-form" data-type="screen" data-project="vidscrip" data-industry="healthcare" data-platform="mobile" data-case-study="vidscrip">
+        <a class="stream-card__link" href="/#patient-enrollment-form" data-open="patient-enrollment-form" aria-labelledby="patient-enrollment-form-title patient-enrollment-form-meta">
+          <div class="stream-card__media" data-shape="tall">
+            <picture>
+              <source type="image/avif" srcset="/assets/feed/responsive/patient-enrollment-form-480.avif 480w, /assets/feed/responsive/patient-enrollment-form-758.avif 758w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/feed/patient-enrollment-form.webp" width="758" height="2332" alt="Mobile patient enrollment form with introduction, progress steps, and a date question" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="patient-enrollment-form-title">Patient enrollment form</h2>
+          <p class="stream-card__meta micro" id="patient-enrollment-form-meta"><span class="stream-card__type">Screen</span> <span class="stream-card__case"><span class="stream-card__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Vidscrip<span class="visually-hidden"> case study</span></span></p>
+        </a>
+      </article>
+
+      <article class="stream-card theme-everag" id="population-forecast-matrix" data-type="screen" data-project="everag" data-industry="agriculture" data-platform="web" data-case-study="everag">
+        <a class="stream-card__link" href="/#population-forecast-matrix" data-open="population-forecast-matrix" aria-labelledby="population-forecast-matrix-title population-forecast-matrix-meta">
+          <div class="stream-card__media" data-shape="square">
+            <picture>
+              <source type="image/avif" srcset="/assets/feed/responsive/population-forecast-matrix-480.avif 480w, /assets/feed/responsive/population-forecast-matrix-850.avif 850w, /assets/feed/responsive/population-forecast-matrix-1250.avif 1250w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/feed/population-forecast-matrix.webp" width="1250" height="1150" alt="Livestock population forecast matrix organized by week and age in a dense planning grid" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="population-forecast-matrix-title">Population forecast matrix</h2>
+          <p class="stream-card__meta micro" id="population-forecast-matrix-meta"><span class="stream-card__type">Screen</span> <span class="stream-card__case"><span class="stream-card__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Ever.Ag<span class="visually-hidden"> case study</span></span></p>
+        </a>
+      </article>
+
+      <article class="stream-card theme-insights" id="scouting-sentiment-search" data-type="screen" data-project="expert-insights" data-industry="sports" data-platform="web" data-case-study="expert-insights">
+        <a class="stream-card__link" href="/work/expert-insights#fig-expert-insights-02" data-open="scouting-sentiment-search" aria-labelledby="scouting-sentiment-search-title scouting-sentiment-search-meta">
+          <div class="stream-card__media" data-shape="wide">
+            <picture>
+              <source type="image/avif" srcset="/assets/feed/responsive/scouting-sentiment-search-480.avif 480w, /assets/feed/responsive/scouting-sentiment-search-850.avif 850w, /assets/feed/responsive/scouting-sentiment-search-1250.avif 1250w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/feed/scouting-sentiment-search.webp" width="1250" height="889" alt="Search results with an insight summary, sentiment bar, and a feed of scouting comments" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="scouting-sentiment-search-title">Scouting sentiment search</h2>
+          <p class="stream-card__meta micro" id="scouting-sentiment-search-meta"><span class="stream-card__type">Screen</span> <span class="stream-card__case"><span class="stream-card__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Expert Insights<span class="visually-hidden"> case study</span></span></p>
+        </a>
+      </article>
+
+      <article class="stream-card theme-conservis" id="conservis" data-type="case-study" data-project="conservis" data-industry="agriculture" data-case-study="conservis">
+        <a class="stream-card__link" href="/work/conservis" data-open="conservis" aria-labelledby="conservis-title conservis-meta">
+          <div class="stream-card__media" data-shape="wide">
+            <picture>
+              <source type="image/avif" srcset="/assets/conservis-02-850.avif 850w, /assets/conservis-02-1250.avif 1250w, /assets/conservis-02-1700.avif 1700w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/conservis-02.png" width="2880" height="2048" alt="Field activity log showing an irrigation ticket with equipment, operator, and input details" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="conservis-title">Conservis</h2>
+          <p class="stream-card__meta micro" id="conservis-meta"><span class="stream-card__case"><span class="stream-card__chip" aria-hidden="true"></span><span class="stream-card__type">Case study</span> <span aria-hidden="true">·</span> 8 screens</span></p>
+        </a>
+      </article>
+
+      <article class="stream-card" id="daily-activity-schedule" data-type="screen" data-project="activity-central" data-industry="productivity" data-platform="mobile">
+        <a class="stream-card__link" href="/#daily-activity-schedule" data-open="daily-activity-schedule" aria-labelledby="daily-activity-schedule-title daily-activity-schedule-meta">
+          <div class="stream-card__media" data-shape="tall">
+            <picture>
+              <source type="image/avif" srcset="/assets/feed/responsive/daily-activity-schedule-480.avif 480w, /assets/feed/responsive/daily-activity-schedule-750.avif 750w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/feed/daily-activity-schedule.webp" width="750" height="1624" alt="Mobile daily schedule with swimming practice, fishing camp, and reminders arranged by time" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="daily-activity-schedule-title">Today’s activity schedule</h2>
+          <p class="stream-card__meta micro" id="daily-activity-schedule-meta"><span class="stream-card__type">Screen</span> <span aria-hidden="true">·</span> Productivity</p>
+        </a>
+      </article>
+
+      <article class="stream-card" id="specialist-profile" data-type="screen" data-project="sophconnect" data-industry="healthcare" data-platform="mobile">
+        <a class="stream-card__link" href="/#specialist-profile" data-open="specialist-profile" aria-labelledby="specialist-profile-title specialist-profile-meta">
+          <div class="stream-card__media" data-shape="tall">
+            <picture>
+              <source type="image/avif" srcset="/assets/feed/responsive/specialist-profile-480.avif 480w, /assets/feed/responsive/specialist-profile-750.avif 750w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/feed/specialist-profile.webp" width="750" height="1624" alt="Mobile specialist profile with portrait, biography, and message and call actions" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="specialist-profile-title">Specialist profile and contact</h2>
+          <p class="stream-card__meta micro" id="specialist-profile-meta"><span class="stream-card__type">Screen</span> <span aria-hidden="true">·</span> Healthcare</p>
+        </a>
+      </article>
+
+      <article class="stream-card theme-sim" id="campaign-sim" data-type="case-study" data-project="campaign-sim" data-industry="sports" data-case-study="campaign-sim">
+        <a class="stream-card__link" href="/work/campaign-sim" data-open="campaign-sim" aria-labelledby="campaign-sim-title campaign-sim-meta">
+          <div class="stream-card__media" data-shape="wide">
+            <picture>
+              <source type="image/avif" srcset="/assets/campaign-sim-01-240.avif 240w, /assets/campaign-sim-01-850.avif 850w, /assets/campaign-sim-01-1250.avif 1250w, /assets/campaign-sim-01-1700.avif 1700w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/campaign-sim-01.png" width="2880" height="2048" alt="Select Channels screen: a scout profile panel beside a grid of channel cards like international showcase, scout visit, and remote film session" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="campaign-sim-title">Campaign Sim</h2>
+          <p class="stream-card__meta micro" id="campaign-sim-meta"><span class="stream-card__case"><span class="stream-card__chip" aria-hidden="true"></span><span class="stream-card__type">Case study</span> <span aria-hidden="true">·</span> 4 screens</span></p>
+        </a>
+      </article>
+
+      <article class="stream-card theme-conservis" id="direct-expense-planning" data-type="screen" data-project="conservis" data-industry="agriculture" data-platform="web" data-case-study="conservis">
+        <a class="stream-card__link" href="/#direct-expense-planning" data-open="direct-expense-planning" aria-labelledby="direct-expense-planning-title direct-expense-planning-meta">
+          <div class="stream-card__media" data-shape="wide">
+            <picture>
+              <source type="image/avif" srcset="/assets/feed/responsive/direct-expense-planning-480.avif 480w, /assets/feed/responsive/direct-expense-planning-850.avif 850w, /assets/feed/responsive/direct-expense-planning-1250.avif 1250w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/feed/direct-expense-planning.webp" width="1250" height="781" alt="Crop-plan wizard for entering direct expenses, acres, rates, costs, and totals by seed and fertilizer" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="direct-expense-planning-title">Direct expense planning</h2>
+          <p class="stream-card__meta micro" id="direct-expense-planning-meta"><span class="stream-card__type">Screen</span> <span class="stream-card__case"><span class="stream-card__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Conservis<span class="visually-hidden"> case study</span></span></p>
+        </a>
+      </article>
+
+      <article class="stream-card" id="application-confirmation" data-type="screen" data-project="patriot" data-industry="finance" data-platform="web">
+        <a class="stream-card__link" href="/#application-confirmation" data-open="application-confirmation" aria-labelledby="application-confirmation-title application-confirmation-meta">
+          <div class="stream-card__media" data-shape="square">
+            <picture>
+              <source type="image/avif" srcset="/assets/feed/responsive/application-confirmation-480.avif 480w, /assets/feed/responsive/application-confirmation-850.avif 850w, /assets/feed/responsive/application-confirmation-1250.avif 1250w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/feed/application-confirmation.webp" width="1250" height="1143" alt="Financial application workflow showing a confirmation message and completed section navigation" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="application-confirmation-title">Application confirmation</h2>
+          <p class="stream-card__meta micro" id="application-confirmation-meta"><span class="stream-card__type">Screen</span> <span aria-hidden="true">·</span> Finance</p>
+        </a>
+      </article>
+
+      <article class="stream-card theme-everag" id="everag" data-type="case-study" data-project="everag" data-industry="agriculture" data-case-study="everag">
+        <a class="stream-card__link" href="/work/everag" data-open="everag" aria-labelledby="everag-title everag-meta">
+          <div class="stream-card__media" data-shape="wide">
+            <picture>
+              <source type="image/avif" srcset="/assets/everag-01-240.avif 240w, /assets/everag-01-850.avif 850w, /assets/everag-01-1250.avif 1250w, /assets/everag-01-1440.avif 1440w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/everag-01.png" width="1440" height="1024" alt="Dashboard template assembled from design system parts: KPI cards with sparklines and warnings, a news feed, and stat tiles" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="everag-title">Ever.Ag</h2>
+          <p class="stream-card__meta micro" id="everag-meta"><span class="stream-card__case"><span class="stream-card__chip" aria-hidden="true"></span><span class="stream-card__type">Case study</span> <span aria-hidden="true">·</span> 9 screens</span></p>
+        </a>
+      </article>
+
+      <article class="stream-card" id="household-task-builder" data-type="screen" data-project="motivated-moms" data-industry="productivity" data-platform="mobile">
+        <a class="stream-card__link" href="/#household-task-builder" data-open="household-task-builder" aria-labelledby="household-task-builder-title household-task-builder-meta">
+          <div class="stream-card__media" data-shape="tall">
+            <picture>
+              <source type="image/avif" srcset="/assets/feed/responsive/household-task-builder-480.avif 480w, /assets/feed/responsive/household-task-builder-850.avif 850w, /assets/feed/responsive/household-task-builder-1125.avif 1125w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/feed/household-task-builder.webp" width="1125" height="3741" alt="Long mobile task form with schedule, assignee, room, supplies, instructions, and notes" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="household-task-builder-title">Household task builder</h2>
+          <p class="stream-card__meta micro" id="household-task-builder-meta"><span class="stream-card__type">Screen</span> <span aria-hidden="true">·</span> Productivity</p>
+        </a>
+      </article>
+
+      <article class="stream-card theme-conservis" id="one-field-in-detail" data-type="screen" data-project="conservis" data-industry="agriculture" data-platform="web" data-case-study="conservis">
+        <a class="stream-card__link" href="/#one-field-in-detail" data-open="one-field-in-detail" aria-labelledby="one-field-in-detail-title one-field-in-detail-meta">
+          <div class="stream-card__media" data-shape="wide">
+            <picture>
+              <source type="image/avif" srcset="/assets/conservis-01-850.avif 850w, /assets/conservis-01-1250.avif 1250w, /assets/conservis-01-1700.avif 1700w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/conservis-01.png" width="2880" height="2048" alt="Conservis field detail for AG Burnstton, with crop plantings and ownership sections beside a satellite map outlining the field" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="one-field-in-detail-title">One field, in detail</h2>
+          <p class="stream-card__meta micro" id="one-field-in-detail-meta"><span class="stream-card__type">Screen</span> <span class="stream-card__case"><span class="stream-card__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Conservis<span class="visually-hidden"> case study</span></span></p>
+        </a>
+      </article>
+
+      <article class="stream-card" id="advisor-insights-hub" data-type="screen" data-project="ascensus" data-industry="finance" data-platform="web" data-placeholder>
+        <a class="stream-card__link" href="/#advisor-insights-hub" data-open="advisor-insights-hub" aria-labelledby="advisor-insights-hub-title advisor-insights-hub-meta">
+          <div class="stream-card__media" data-shape="tall">
+            <picture>
+              <source type="image/avif" srcset="/assets/feed/responsive/advisor-insights-hub-480.avif 480w, /assets/feed/responsive/advisor-insights-hub-850.avif 850w, /assets/feed/responsive/advisor-insights-hub-1250.avif 1250w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/feed/advisor-insights-hub.webp" width="1250" height="5378" alt="Long-form advisor insights website with articles, video, research, and green editorial feature panels" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="advisor-insights-hub-title">Advisor insights hub</h2>
+          <p class="stream-card__meta micro" id="advisor-insights-hub-meta"><span class="stream-card__type">Screen</span> <span aria-hidden="true">·</span> Finance</p>
+        </a>
+      </article>
+
+      <article class="stream-card theme-vidscrip" id="vidscrip" data-type="case-study" data-project="vidscrip" data-industry="healthcare" data-case-study="vidscrip">
+        <a class="stream-card__link" href="/work/vidscrip" data-open="vidscrip" aria-labelledby="vidscrip-title vidscrip-meta">
+          <div class="stream-card__media" data-shape="wide">
+            <picture>
+              <source type="image/avif" srcset="/assets/vidscrip-desktop-journey-850.avif 850w, /assets/vidscrip-desktop-journey-1250.avif 1250w, /assets/vidscrip-desktop-journey-1700.avif 1700w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/vidscrip-desktop-journey.png" width="2880" height="2048" alt="Vidscrip desktop journey with three procedure phases and a physician video expanded in the preparation column" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="vidscrip-title">Vidscrip</h2>
+          <p class="stream-card__meta micro" id="vidscrip-meta"><span class="stream-card__case"><span class="stream-card__chip" aria-hidden="true"></span><span class="stream-card__type">Case study</span> <span aria-hidden="true">·</span> 6 screens</span></p>
+        </a>
+      </article>
+
+      <article class="stream-card" id="competency-video-assessment" data-type="prototype" data-project="patriot" data-industry="finance" data-platform="web" data-placeholder>
+        <a class="stream-card__link" href="/#competency-video-assessment" data-open="competency-video-assessment" aria-labelledby="competency-video-assessment-title competency-video-assessment-meta">
+          <div class="stream-card__media" data-shape="square">
+            <picture>
+              <source type="image/avif" srcset="/assets/feed/responsive/competency-video-assessment-480.avif 480w, /assets/feed/responsive/competency-video-assessment-850.avif 850w, /assets/feed/responsive/competency-video-assessment-1250.avif 1250w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/feed/competency-video-assessment.webp" width="1250" height="1667" alt="Prototype competency step with a video player, progress timeline, and continue action" loading="lazy" decoding="async">
+            </picture>
+            <span class="stream-card__badge" aria-hidden="true">Try it</span>
+          </div>
+          <h2 class="stream-card__title" id="competency-video-assessment-title">Competency video assessment</h2>
+          <p class="stream-card__meta micro" id="competency-video-assessment-meta"><span class="stream-card__type">Prototype</span> <span aria-hidden="true">·</span> Finance</p>
+        </a>
+      </article>
+
+      <article class="stream-card theme-everag" id="feed-ingredient-defaults" data-type="screen" data-project="everag" data-industry="agriculture" data-platform="web" data-case-study="everag">
+        <a class="stream-card__link" href="/work/everag#fig-everag-feed-ingredients" data-open="feed-ingredient-defaults" aria-labelledby="feed-ingredient-defaults-title feed-ingredient-defaults-meta">
+          <div class="stream-card__media" data-shape="wide">
+            <picture>
+              <source type="image/avif" srcset="/assets/feed/responsive/feed-ingredient-defaults-480.avif 480w, /assets/feed/responsive/feed-ingredient-defaults-850.avif 850w, /assets/feed/responsive/feed-ingredient-defaults-1250.avif 1250w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/feed/feed-ingredient-defaults.webp" width="1250" height="887" alt="Feed ingredient settings table with inclusion percentages, prices, costs, and editable defaults" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="feed-ingredient-defaults-title">Feed ingredient defaults</h2>
+          <p class="stream-card__meta micro" id="feed-ingredient-defaults-meta"><span class="stream-card__type">Screen</span> <span class="stream-card__case"><span class="stream-card__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Ever.Ag<span class="visually-hidden"> case study</span></span></p>
+        </a>
+      </article>
+
+      <article class="stream-card theme-plinth" id="plinth" data-type="case-study" data-project="plinth" data-industry="publishing" data-case-study="plinth">
+        <a class="stream-card__link" href="/work/plinth" data-open="plinth" aria-labelledby="plinth-title plinth-meta">
+          <div class="stream-card__media" data-shape="wide">
+            <picture>
+              <source type="image/avif" srcset="/assets/plinth-06-240.avif 240w, /assets/plinth-06-850.avif 850w, /assets/plinth-06-1250.avif 1250w, /assets/plinth-06-1440.avif 1440w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/plinth-06.jpg" width="1440" height="1000" alt="PLINTH issue 06 contents page: a white serif wordmark over a mirrored, inkblot-like graphic on black, with the contents listed in two flanking columns" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="plinth-title">Plinth</h2>
+          <p class="stream-card__meta micro" id="plinth-meta"><span class="stream-card__case"><span class="stream-card__chip" aria-hidden="true"></span><span class="stream-card__type">Case study</span> <span aria-hidden="true">·</span> 9 screens</span></p>
+        </a>
+      </article>
+
+      <article class="stream-card theme-conservis" id="field-task-setup" data-type="screen" data-project="conservis" data-industry="agriculture" data-platform="mobile" data-case-study="conservis">
+        <a class="stream-card__link" href="/#field-task-setup" data-open="field-task-setup" aria-labelledby="field-task-setup-title field-task-setup-meta">
+          <div class="stream-card__media" data-shape="tall">
+            <picture>
+              <source type="image/avif" srcset="/assets/feed/responsive/field-task-setup-480.avif 480w, /assets/feed/responsive/field-task-setup-850.avif 850w, /assets/feed/responsive/field-task-setup-1250.avif 1250w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/feed/field-task-setup.webp" width="1250" height="2295" alt="Mobile field-task setup with crop, equipment, inputs, operators, and notes in an expandable form" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="field-task-setup-title">Field task setup</h2>
+          <p class="stream-card__meta micro" id="field-task-setup-meta"><span class="stream-card__type">Screen</span> <span class="stream-card__case"><span class="stream-card__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Conservis<span class="visually-hidden"> case study</span></span></p>
+        </a>
+      </article>
+
+      <article class="stream-card" id="manufacturing-careers-story" data-type="post" data-project="third-wave" data-industry="manufacturing" data-placeholder>
+        <a class="stream-card__link" href="/#manufacturing-careers-story" data-open="manufacturing-careers-story" aria-labelledby="manufacturing-careers-story-title manufacturing-careers-story-meta">
+          <div class="stream-card__media" data-shape="tall">
+            <picture>
+              <source type="image/avif" srcset="/assets/feed/responsive/manufacturing-careers-story-480.avif 480w, /assets/feed/responsive/manufacturing-careers-story-850.avif 850w, /assets/feed/responsive/manufacturing-careers-story-1250.avif 1250w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/feed/manufacturing-careers-story.webp" width="1250" height="1869" alt="Third Wave story page about developing more than five hundred next-generation manufacturing careers" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="manufacturing-careers-story-title">Building 500+ manufacturing careers</h2>
+          <p class="stream-card__meta micro" id="manufacturing-careers-story-meta"><span class="stream-card__type">Writing</span> <span aria-hidden="true">·</span> 2026</p>
+        </a>
+      </article>
+
+      <article class="stream-card theme-everag" id="position-detail-transactions" data-type="screen" data-project="everag" data-industry="agriculture" data-platform="mobile" data-case-study="everag">
+        <a class="stream-card__link" href="/work/everag#fig-everag-position" data-open="position-detail-transactions" aria-labelledby="position-detail-transactions-title position-detail-transactions-meta">
+          <div class="stream-card__media" data-shape="tall">
+            <picture>
+              <source type="image/avif" srcset="/assets/feed/responsive/position-detail-transactions-480.avif 480w, /assets/feed/responsive/position-detail-transactions-780.avif 780w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/feed/position-detail-transactions.webp" width="780" height="1688" alt="Mobile grain position detail with profit and loss totals and an expandable transaction history" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="position-detail-transactions-title">Position detail and transactions</h2>
+          <p class="stream-card__meta micro" id="position-detail-transactions-meta"><span class="stream-card__type">Screen</span> <span class="stream-card__case"><span class="stream-card__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Ever.Ag<span class="visually-hidden"> case study</span></span></p>
+        </a>
+      </article>
+
+      <article class="stream-card theme-sim" id="campaign-investment-review" data-type="prototype" data-project="campaign-sim" data-industry="sports" data-platform="web" data-case-study="campaign-sim" data-placeholder>
+        <a class="stream-card__link" href="/#campaign-investment-review" data-open="campaign-investment-review" aria-labelledby="campaign-investment-review-title campaign-investment-review-meta">
+          <div class="stream-card__media" data-shape="wide">
+            <picture>
+              <source type="image/avif" srcset="/assets/feed/responsive/campaign-investment-review-480.avif 480w, /assets/feed/responsive/campaign-investment-review-850.avif 850w, /assets/feed/responsive/campaign-investment-review-1250.avif 1250w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/feed/campaign-investment-review.webp" width="1250" height="889" alt="Campaign review prototype with player investment rows, resource totals, and channel mix breakdowns" loading="lazy" decoding="async">
+            </picture>
+            <span class="stream-card__badge" aria-hidden="true">Try it</span>
+          </div>
+          <h2 class="stream-card__title" id="campaign-investment-review-title">Campaign investment review</h2>
+          <p class="stream-card__meta micro" id="campaign-investment-review-meta"><span class="stream-card__type">Prototype</span> <span class="stream-card__case"><span class="stream-card__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Campaign Sim<span class="visually-hidden"> case study</span></span></p>
+        </a>
+      </article>
+
+      <article class="stream-card theme-conservis" id="conservis-dashboard" data-type="prototype" data-project="conservis" data-industry="agriculture" data-platform="web" data-case-study="conservis" data-placeholder>
+        <a class="stream-card__link" href="/#conservis-dashboard" data-open="conservis-dashboard" aria-labelledby="conservis-dashboard-title conservis-dashboard-meta">
+          <div class="stream-card__media" data-shape="wide">
+            <picture>
+              <source type="image/avif" srcset="/assets/feed/responsive/field-performance-explorer-480.avif 480w, /assets/feed/responsive/field-performance-explorer-850.avif 850w, /assets/feed/responsive/field-performance-explorer-1250.avif 1250w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/feed/field-performance-explorer.webp" width="1250" height="889" alt="Fertilizer metrics dashboard with projected yield scatter plot and planned-versus-actual input cost bars" loading="lazy" decoding="async">
+            </picture>
+            <span class="stream-card__badge" aria-hidden="true">Try it</span>
+          </div>
+          <h2 class="stream-card__title" id="conservis-dashboard-title">Conservis dashboard</h2>
+          <p class="stream-card__meta micro" id="conservis-dashboard-meta"><span class="stream-card__type">Prototype</span> <span class="stream-card__case"><span class="stream-card__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Conservis<span class="visually-hidden"> case study</span></span></p>
+        </a>
+      </article>
+
+      <article class="stream-card" id="retirement-education-library" data-type="screen" data-project="ascensus" data-industry="finance" data-platform="web" data-placeholder>
+        <a class="stream-card__link" href="/#retirement-education-library" data-open="retirement-education-library" aria-labelledby="retirement-education-library-title retirement-education-library-meta">
+          <div class="stream-card__media" data-shape="tall">
+            <picture>
+              <source type="image/avif" srcset="/assets/feed/responsive/retirement-education-library-480.avif 480w, /assets/feed/responsive/retirement-education-library-850.avif 850w, /assets/feed/responsive/retirement-education-library-1250.avif 1250w" sizes="(max-width: 599px) calc((100vw - 46px) / 2), (max-width: 899px) calc((100vw - 88px) / 3), (max-width: 1199px) calc((100vw - 140px) / 4), calc((100vw - 160px) / 5)">
+              <img src="/assets/feed/retirement-education-library.webp" width="1250" height="5236" alt="Long retirement education website with product explanations, video, tools, and editorial resource cards" loading="lazy" decoding="async">
+            </picture>
+          </div>
+          <h2 class="stream-card__title" id="retirement-education-library-title">Retirement education library</h2>
+          <p class="stream-card__meta micro" id="retirement-education-library-meta"><span class="stream-card__type">Screen</span> <span aria-hidden="true">·</span> Finance</p>
+        </a>
+      </article>
+      <!-- stream:end -->
+    </div>
+  </main>
+  <!-- stream-data:start -->
+  <script type="application/json" id="stream-data">
+  {"items":{
+  "expert-insights":{"type":"case-study","title":"Expert Insights","note":"A clear view of the conversation around a roster.","href":"/work/expert-insights","project":"Expert Insights","industry":"Sports","shared":"2026-07","caseStudy":{"slug":"expert-insights","total":7},"media":{"src":"/assets/expert-insights-01.png","width":2880,"height":2048,"alt":"Scout insights dashboard: discussion totals, auto-generated highlights, and a roster sentiment table split into my players and rival players","avif":"/assets/expert-insights-01-240.avif 240w, /assets/expert-insights-01-850.avif 850w, /assets/expert-insights-01-1250.avif 1250w, /assets/expert-insights-01-1700.avif 1700w"},"links":{"full":"/work/expert-insights"}},
+  "how-i-built-description-generator":{"type":"post","title":"How I built Description Generator","note":"A Figma plugin for component descriptions, and the conversations with coding agents behind its turning points.","href":"/writing/how-i-built-description-generator","project":"Description Generator","industry":"Design systems","shared":"2026-09","links":{"full":"/writing/how-i-built-description-generator"},"related":["description-generator"],"facts":[{"label":"Source","value":"Commits and transcripts"},{"label":"Moments","value":"32, five pivotal"}],"placeholder":true},
+  "activity-central":{"type":"prototype","title":"Activity Central","note":"A working prototype of a family activity coordinator. It covers the home dashboard, calendar logistics, activity detail, and messaging.","href":"/#activity-central","project":"Activity Central","industry":"Productivity","platform":"Mobile","shared":"2026-09","related":["weekly-activity-calendar","daily-activity-schedule","family-week"],"facts":[{"label":"Built","value":"React, from the Figma frames"}],"steps":["Open a day in the calendar and see who is driving","Assign a pick-up from an activity’s detail","Reply to a message about the day"],"placeholder":true},
+  "weekly-activity-calendar":{"type":"screen","title":"Weekly activity calendar","note":"The month stays in view while the selected day opens into its timed schedule.","href":"/#weekly-activity-calendar","project":"Activity Central","industry":"Productivity","platform":"Mobile","shared":"2026-09","media":{"src":"/assets/feed/weekly-activity-calendar.webp","width":750,"height":1624,"alt":"Mobile monthly calendar with the selected day expanded into a timed activity schedule","avif":"/assets/feed/responsive/weekly-activity-calendar-480.avif 480w, /assets/feed/responsive/weekly-activity-calendar-750.avif 750w"},"related":["daily-activity-schedule","activity-central","family-week"]},
+  "description-generator":{"type":"tool","title":"Description Generator","note":"Edit Figma component descriptions in one place, or use AI to write a first pass. It works across a page or an entire file.","href":"/#description-generator","project":"Description Generator","industry":"Design systems","platform":"Figma","shared":"2026-09","media":{"tile":"Figma plugin"},"related":["how-i-built-description-generator"],"facts":[{"label":"Works on","value":"Components, sets, variants"},{"label":"Price","value":"Free, with a Pro plan"}],"placeholder":true},
+  "fields-on-the-map":{"type":"screen","title":"Fields on the map","note":"Growers think field by field. A map connects each crop and record to a real place across the operation.","href":"/work/conservis#fig-conservis-03","project":"Conservis","industry":"Agriculture","platform":"Web","shared":"2026-09","caseStudy":{"slug":"conservis","figure":"conservis-03","position":1,"total":8},"media":{"src":"/assets/conservis-03.png","width":2880,"height":2048,"alt":"Conservis fields view: a satellite map with crop-coded field shapes beside a filterable field list","avif":"/assets/conservis-03-240.avif 240w, /assets/conservis-03-850.avif 850w, /assets/conservis-03-1250.avif 1250w, /assets/conservis-03-1700.avif 1700w"},"links":{"full":"/work/conservis"}},
+  "ground-corn-overview":{"type":"screen","title":"Ground corn overview","note":"A consistent chart grammar shows feed coverage across ingredients and months. The same components support the rest of the financial suite.","href":"/work/everag#fig-everag-feed-overview","project":"Ever.Ag","industry":"Agriculture","platform":"Web","shared":"2026-09","caseStudy":{"slug":"everag","figure":"everag-feed-overview","position":1,"total":9},"media":{"src":"/assets/everag-feed-overview.png","width":2904,"height":3244,"alt":"Feed overview with stacked monthly coverage charts for corn-based, soybean-meal-based, and other ingredients","avif":"/assets/everag-feed-overview-850.avif 850w, /assets/everag-feed-overview-1250.avif 1250w, /assets/everag-feed-overview-1700.avif 1700w"},"links":{"full":"/work/everag"}},
+  "lawn-assessment-recommendation":{"type":"screen","title":"Lawn assessment recommendation","href":"/#lawn-assessment-recommendation","project":"TruGreen","industry":"Home services","platform":"Mobile","shared":"2026-09","media":{"src":"/assets/feed/lawn-assessment-recommendation.webp","width":750,"height":1624,"alt":"Mobile lawn assessment recommendation explaining a tailored TruComplete service plan","avif":"/assets/feed/responsive/lawn-assessment-recommendation-480.avif 480w, /assets/feed/responsive/lawn-assessment-recommendation-750.avif 750w"}},
+  "text-diff":{"type":"tool","title":"Text diff","href":"/#text-diff","project":"Atomic Tools","industry":"Writing","platform":"Web","shared":"2026-09","media":{"tile":"Atomic Tools"},"related":["markdown-to-rich-text"],"placeholder":true},
+  "channel-impact-simulator":{"type":"prototype","title":"Channel impact simulator","href":"/#channel-impact-simulator","project":"Campaign Sim","industry":"Sports","platform":"Web","shared":"2026-09","caseStudy":{"slug":"campaign-sim","total":4},"media":{"src":"/assets/feed/channel-impact-simulator.webp","width":1250,"height":889,"alt":"Campaign simulation table comparing channels by reach, expected impact, waste, and cost","avif":"/assets/feed/responsive/channel-impact-simulator-480.avif 480w, /assets/feed/responsive/channel-impact-simulator-850.avif 850w, /assets/feed/responsive/channel-impact-simulator-1250.avif 1250w"},"links":{"full":"/work/campaign-sim"},"related":["campaign-investment-review"],"placeholder":true},
+  "filtering-fields":{"type":"video","title":"Filtering fields, start to finish","href":"/#filtering-fields","project":"Conservis","industry":"Agriculture","platform":"Web","shared":"2026-09","caseStudy":{"slug":"conservis","total":8},"media":{"duration":"2:02"},"links":{"full":"/work/conservis"},"placeholder":true},
+  "family-week":{"type":"reel","title":"A family week, planned on one phone","href":"/#family-week","project":"Activity Central","industry":"Productivity","platform":"Mobile","shared":"2026-09","media":{"duration":"2:01"},"related":["activity-central"],"placeholder":true},
+  "markdown-to-rich-text":{"type":"video","title":"Markdown ↔ rich text, in 44 seconds","href":"/#markdown-to-rich-text","project":"Atomic Tools","industry":"Writing","platform":"Web","shared":"2026-09","media":{"duration":"0:44"},"related":["text-diff"],"placeholder":true},
+  "patient-enrollment-form":{"type":"screen","title":"Patient enrollment form","href":"/#patient-enrollment-form","project":"Vidscrip","industry":"Healthcare","platform":"Mobile","shared":"2026-09","caseStudy":{"slug":"vidscrip","total":6},"media":{"src":"/assets/feed/patient-enrollment-form.webp","width":758,"height":2332,"alt":"Mobile patient enrollment form with introduction, progress steps, and a date question","avif":"/assets/feed/responsive/patient-enrollment-form-480.avif 480w, /assets/feed/responsive/patient-enrollment-form-758.avif 758w"},"links":{"full":"/work/vidscrip"}},
+  "population-forecast-matrix":{"type":"screen","title":"Population forecast matrix","href":"/#population-forecast-matrix","project":"Ever.Ag","industry":"Agriculture","platform":"Web","shared":"2026-09","caseStudy":{"slug":"everag","total":9},"media":{"src":"/assets/feed/population-forecast-matrix.webp","width":1250,"height":1150,"alt":"Livestock population forecast matrix organized by week and age in a dense planning grid","avif":"/assets/feed/responsive/population-forecast-matrix-480.avif 480w, /assets/feed/responsive/population-forecast-matrix-850.avif 850w, /assets/feed/responsive/population-forecast-matrix-1250.avif 1250w"},"links":{"full":"/work/everag"}},
+  "scouting-sentiment-search":{"type":"screen","title":"Scouting sentiment search","note":"Search puts an explicitly labeled, auto-generated summary above the discussions that support it. Outputs still require independent review.","href":"/work/expert-insights#fig-expert-insights-02","project":"Expert Insights","industry":"Sports","platform":"Web","shared":"2026-09","caseStudy":{"slug":"expert-insights","figure":"expert-insights-02","position":2,"total":7},"media":{"src":"/assets/feed/scouting-sentiment-search.webp","width":1250,"height":889,"alt":"Search results with an insight summary, sentiment bar, and a feed of scouting comments","avif":"/assets/feed/responsive/scouting-sentiment-search-480.avif 480w, /assets/feed/responsive/scouting-sentiment-search-850.avif 850w, /assets/feed/responsive/scouting-sentiment-search-1250.avif 1250w"},"links":{"full":"/work/expert-insights"}},
+  "conservis":{"type":"case-study","title":"Conservis","note":"Field work and financial planning, connected acre by acre.","href":"/work/conservis","project":"Conservis","industry":"Agriculture","shared":"2026-07","caseStudy":{"slug":"conservis","total":8},"media":{"src":"/assets/conservis-02.png","width":2880,"height":2048,"alt":"Field activity log showing an irrigation ticket with equipment, operator, and input details","avif":"/assets/conservis-02-850.avif 850w, /assets/conservis-02-1250.avif 1250w, /assets/conservis-02-1700.avif 1700w"},"links":{"full":"/work/conservis"}},
+  "daily-activity-schedule":{"type":"screen","title":"Today’s activity schedule","href":"/#daily-activity-schedule","project":"Activity Central","industry":"Productivity","platform":"Mobile","shared":"2026-09","media":{"src":"/assets/feed/daily-activity-schedule.webp","width":750,"height":1624,"alt":"Mobile daily schedule with swimming practice, fishing camp, and reminders arranged by time","avif":"/assets/feed/responsive/daily-activity-schedule-480.avif 480w, /assets/feed/responsive/daily-activity-schedule-750.avif 750w"},"related":["weekly-activity-calendar","activity-central"]},
+  "specialist-profile":{"type":"screen","title":"Specialist profile and contact","href":"/#specialist-profile","project":"SophConnect","industry":"Healthcare","platform":"Mobile","shared":"2026-09","media":{"src":"/assets/feed/specialist-profile.webp","width":750,"height":1624,"alt":"Mobile specialist profile with portrait, biography, and message and call actions","avif":"/assets/feed/responsive/specialist-profile-480.avif 480w, /assets/feed/responsive/specialist-profile-750.avif 750w"}},
+  "campaign-sim":{"type":"case-study","title":"Campaign Sim","note":"Learning campaign planning within a real set of constraints.","href":"/work/campaign-sim","project":"Campaign Sim","industry":"Sports","shared":"2026-07","caseStudy":{"slug":"campaign-sim","total":4},"media":{"src":"/assets/campaign-sim-01.png","width":2880,"height":2048,"alt":"Select Channels screen: a scout profile panel beside a grid of channel cards like international showcase, scout visit, and remote film session","avif":"/assets/campaign-sim-01-240.avif 240w, /assets/campaign-sim-01-850.avif 850w, /assets/campaign-sim-01-1250.avif 1250w, /assets/campaign-sim-01-1700.avif 1700w"},"links":{"full":"/work/campaign-sim"}},
+  "direct-expense-planning":{"type":"screen","title":"Direct expense planning","href":"/#direct-expense-planning","project":"Conservis","industry":"Agriculture","platform":"Web","shared":"2026-09","caseStudy":{"slug":"conservis","total":8},"media":{"src":"/assets/feed/direct-expense-planning.webp","width":1250,"height":781,"alt":"Crop-plan wizard for entering direct expenses, acres, rates, costs, and totals by seed and fertilizer","avif":"/assets/feed/responsive/direct-expense-planning-480.avif 480w, /assets/feed/responsive/direct-expense-planning-850.avif 850w, /assets/feed/responsive/direct-expense-planning-1250.avif 1250w"},"links":{"full":"/work/conservis"}},
+  "application-confirmation":{"type":"screen","title":"Application confirmation","href":"/#application-confirmation","project":"Patriot","industry":"Finance","platform":"Web","shared":"2026-09","media":{"src":"/assets/feed/application-confirmation.webp","width":1250,"height":1143,"alt":"Financial application workflow showing a confirmation message and completed section navigation","avif":"/assets/feed/responsive/application-confirmation-480.avif 480w, /assets/feed/responsive/application-confirmation-850.avif 850w, /assets/feed/responsive/application-confirmation-1250.avif 1250w"},"related":["competency-video-assessment"]},
+  "everag":{"type":"case-study","title":"Ever.Ag","note":"A shared foundation for a growing product family.","href":"/work/everag","project":"Ever.Ag","industry":"Agriculture","shared":"2026-08","caseStudy":{"slug":"everag","total":9},"media":{"src":"/assets/everag-01.png","width":1440,"height":1024,"alt":"Dashboard template assembled from design system parts: KPI cards with sparklines and warnings, a news feed, and stat tiles","avif":"/assets/everag-01-240.avif 240w, /assets/everag-01-850.avif 850w, /assets/everag-01-1250.avif 1250w, /assets/everag-01-1440.avif 1440w"},"links":{"full":"/work/everag"}},
+  "household-task-builder":{"type":"screen","title":"Household task builder","href":"/#household-task-builder","project":"Motivated Moms","industry":"Productivity","platform":"Mobile","shared":"2026-09","media":{"src":"/assets/feed/household-task-builder.webp","width":1125,"height":3741,"alt":"Long mobile task form with schedule, assignee, room, supplies, instructions, and notes","avif":"/assets/feed/responsive/household-task-builder-480.avif 480w, /assets/feed/responsive/household-task-builder-850.avif 850w, /assets/feed/responsive/household-task-builder-1125.avif 1125w"}},
+  "one-field-in-detail":{"type":"screen","title":"One field, in detail","href":"/#one-field-in-detail","project":"Conservis","industry":"Agriculture","platform":"Web","shared":"2026-09","caseStudy":{"slug":"conservis","total":8},"media":{"src":"/assets/conservis-01.png","width":2880,"height":2048,"alt":"Conservis field detail for AG Burnstton, with crop plantings and ownership sections beside a satellite map outlining the field","avif":"/assets/conservis-01-850.avif 850w, /assets/conservis-01-1250.avif 1250w, /assets/conservis-01-1700.avif 1700w"},"links":{"full":"/work/conservis"}},
+  "advisor-insights-hub":{"type":"screen","title":"Advisor insights hub","href":"/#advisor-insights-hub","project":"Ascensus","industry":"Finance","platform":"Web","shared":"2026-09","media":{"src":"/assets/feed/advisor-insights-hub.webp","width":1250,"height":5378,"alt":"Long-form advisor insights website with articles, video, research, and green editorial feature panels","avif":"/assets/feed/responsive/advisor-insights-hub-480.avif 480w, /assets/feed/responsive/advisor-insights-hub-850.avif 850w, /assets/feed/responsive/advisor-insights-hub-1250.avif 1250w"},"related":["retirement-education-library"],"placeholder":true},
+  "vidscrip":{"type":"case-study","title":"Vidscrip","note":"Your doctor’s guidance, from preparation through recovery.","href":"/work/vidscrip","project":"Vidscrip","industry":"Healthcare","shared":"2026-07","caseStudy":{"slug":"vidscrip","total":6},"media":{"src":"/assets/vidscrip-desktop-journey.png","width":2880,"height":2048,"alt":"Vidscrip desktop journey with three procedure phases and a physician video expanded in the preparation column","avif":"/assets/vidscrip-desktop-journey-850.avif 850w, /assets/vidscrip-desktop-journey-1250.avif 1250w, /assets/vidscrip-desktop-journey-1700.avif 1700w"},"links":{"full":"/work/vidscrip"}},
+  "competency-video-assessment":{"type":"prototype","title":"Competency video assessment","href":"/#competency-video-assessment","project":"Patriot","industry":"Finance","platform":"Web","shared":"2026-09","media":{"src":"/assets/feed/competency-video-assessment.webp","width":1250,"height":1667,"alt":"Prototype competency step with a video player, progress timeline, and continue action","avif":"/assets/feed/responsive/competency-video-assessment-480.avif 480w, /assets/feed/responsive/competency-video-assessment-850.avif 850w, /assets/feed/responsive/competency-video-assessment-1250.avif 1250w"},"related":["application-confirmation"],"placeholder":true},
+  "feed-ingredient-defaults":{"type":"screen","title":"Feed ingredient defaults","note":"The ingredient table aligns price types and basis costs for comparison, with actions held in fixed columns.","href":"/work/everag#fig-everag-feed-ingredients","project":"Ever.Ag","industry":"Agriculture","platform":"Web","shared":"2026-09","caseStudy":{"slug":"everag","figure":"everag-feed-ingredients","position":2,"total":9},"media":{"src":"/assets/feed/feed-ingredient-defaults.webp","width":1250,"height":887,"alt":"Feed ingredient settings table with inclusion percentages, prices, costs, and editable defaults","avif":"/assets/feed/responsive/feed-ingredient-defaults-480.avif 480w, /assets/feed/responsive/feed-ingredient-defaults-850.avif 850w, /assets/feed/responsive/feed-ingredient-defaults-1250.avif 1250w"},"links":{"full":"/work/everag"}},
+  "plinth":{"type":"case-study","title":"Plinth","note":"A literary journal with a new design language every issue.","href":"/work/plinth","project":"Plinth","industry":"Publishing","shared":"2026-08","caseStudy":{"slug":"plinth","total":9},"media":{"src":"/assets/plinth-06.jpg","width":1440,"height":1000,"alt":"PLINTH issue 06 contents page: a white serif wordmark over a mirrored, inkblot-like graphic on black, with the contents listed in two flanking columns","avif":"/assets/plinth-06-240.avif 240w, /assets/plinth-06-850.avif 850w, /assets/plinth-06-1250.avif 1250w, /assets/plinth-06-1440.avif 1440w"},"links":{"full":"/work/plinth"}},
+  "field-task-setup":{"type":"screen","title":"Field task setup","href":"/#field-task-setup","project":"Conservis","industry":"Agriculture","platform":"Mobile","shared":"2026-09","caseStudy":{"slug":"conservis","total":8},"media":{"src":"/assets/feed/field-task-setup.webp","width":1250,"height":2295,"alt":"Mobile field-task setup with crop, equipment, inputs, operators, and notes in an expandable form","avif":"/assets/feed/responsive/field-task-setup-480.avif 480w, /assets/feed/responsive/field-task-setup-850.avif 850w, /assets/feed/responsive/field-task-setup-1250.avif 1250w"},"links":{"full":"/work/conservis"}},
+  "manufacturing-careers-story":{"type":"post","title":"Building 500+ manufacturing careers","href":"/#manufacturing-careers-story","project":"Third Wave","industry":"Manufacturing","shared":"2026-09","media":{"src":"/assets/feed/manufacturing-careers-story.webp","width":1250,"height":1869,"alt":"Third Wave story page about developing more than five hundred next-generation manufacturing careers","avif":"/assets/feed/responsive/manufacturing-careers-story-480.avif 480w, /assets/feed/responsive/manufacturing-careers-story-850.avif 850w, /assets/feed/responsive/manufacturing-careers-story-1250.avif 1250w"},"placeholder":true},
+  "position-detail-transactions":{"type":"screen","title":"Position detail and transactions","href":"/work/everag#fig-everag-position","project":"Ever.Ag","industry":"Agriculture","platform":"Mobile","shared":"2026-09","caseStudy":{"slug":"everag","figure":"everag-position","position":5,"total":9},"media":{"src":"/assets/feed/position-detail-transactions.webp","width":780,"height":1688,"alt":"Mobile grain position detail with profit and loss totals and an expandable transaction history","avif":"/assets/feed/responsive/position-detail-transactions-480.avif 480w, /assets/feed/responsive/position-detail-transactions-780.avif 780w"},"links":{"full":"/work/everag"}},
+  "campaign-investment-review":{"type":"prototype","title":"Campaign investment review","href":"/#campaign-investment-review","project":"Campaign Sim","industry":"Sports","platform":"Web","shared":"2026-09","caseStudy":{"slug":"campaign-sim","total":4},"media":{"src":"/assets/feed/campaign-investment-review.webp","width":1250,"height":889,"alt":"Campaign review prototype with player investment rows, resource totals, and channel mix breakdowns","avif":"/assets/feed/responsive/campaign-investment-review-480.avif 480w, /assets/feed/responsive/campaign-investment-review-850.avif 850w, /assets/feed/responsive/campaign-investment-review-1250.avif 1250w"},"links":{"full":"/work/campaign-sim"},"related":["channel-impact-simulator"],"placeholder":true},
+  "conservis-dashboard":{"type":"prototype","title":"Conservis dashboard","href":"/#conservis-dashboard","project":"Conservis","industry":"Agriculture","platform":"Web","shared":"2026-09","caseStudy":{"slug":"conservis","total":8},"media":{"src":"/assets/feed/field-performance-explorer.webp","width":1250,"height":889,"alt":"Fertilizer metrics dashboard with projected yield scatter plot and planned-versus-actual input cost bars","avif":"/assets/feed/responsive/field-performance-explorer-480.avif 480w, /assets/feed/responsive/field-performance-explorer-850.avif 850w, /assets/feed/responsive/field-performance-explorer-1250.avif 1250w"},"links":{"full":"/work/conservis"},"placeholder":true},
+  "retirement-education-library":{"type":"screen","title":"Retirement education library","href":"/#retirement-education-library","project":"Ascensus","industry":"Finance","platform":"Web","shared":"2026-09","media":{"src":"/assets/feed/retirement-education-library.webp","width":1250,"height":5236,"alt":"Long retirement education website with product explanations, video, tools, and editorial resource cards","avif":"/assets/feed/responsive/retirement-education-library-480.avif 480w, /assets/feed/responsive/retirement-education-library-850.avif 850w, /assets/feed/responsive/retirement-education-library-1250.avif 1250w"},"related":["advisor-insights-hub"],"placeholder":true}
+  },"caseStudies":{
+  "expert-insights":{"title":"Expert Insights","theme":"insights","href":"/work/expert-insights","premise":"A clear view of the conversation around a roster.","facts":["Design lead","Blueshift · 2025","Dashboard · Search · Analysis"],"note":"I led design from the dashboard and search through comparative analysis. A consistent table structure keeps sentiment and scout activity readable, while the answer panel ties each generated summary to the discussions it draws on.","figures":[{"id":"expert-insights-01","anchor":"fig-expert-insights-01","src":"/assets/expert-insights-01.png","width":2880,"height":2048,"alt":"Scout insights dashboard: discussion totals, auto-generated highlights, and a roster sentiment table split into my players and rival players","avif":"/assets/expert-insights-01-850.avif 850w, /assets/expert-insights-01-1250.avif 1250w, /assets/expert-insights-01-1700.avif 1700w","caption":"Roster sentiment uses one three-way split, with the relevant scouts beside each player."},{"id":"expert-insights-02","anchor":"fig-expert-insights-02","src":"/assets/expert-insights-02.png","width":2880,"height":2048,"alt":"Search results for a scouting hashtag with an auto-generated insights summary, sentiment bar, and per-channel post feed","avif":"/assets/expert-insights-02-850.avif 850w, /assets/expert-insights-02-1250.avif 1250w, /assets/expert-insights-02-1700.avif 1700w","caption":"Search puts an explicitly labeled, auto-generated summary above the discussions that support it. Outputs still require independent review."},{"id":"expert-insights-03","anchor":"fig-expert-insights-03","src":"/assets/expert-insights-03.png","width":2880,"height":2048,"alt":"Social Explorer comparing three players side by side with combined analysis, sentiment bars, and top scout lists","avif":"/assets/expert-insights-03-850.avif 850w, /assets/expert-insights-03-1250.avif 1250w, /assets/expert-insights-03-1700.avif 1700w","caption":"Three players share matching sentiment and scout panels, so comparisons read across one row."},{"id":"expert-insights-04","anchor":"fig-expert-insights-04","src":"/assets/expert-insights-04.png","width":2880,"height":2048,"alt":"Dashboard with the ask panel open over the roster table, offering four suggested questions","avif":"/assets/expert-insights-04-850.avif 850w, /assets/expert-insights-04-1250.avif 1250w, /assets/expert-insights-04-1700.avif 1700w","caption":"Suggested questions open over the roster. The underlying numbers stay visible while a reader asks for more detail."},{"id":"expert-insights-05-full","anchor":"fig-expert-insights-05-full","src":"/assets/expert-insights-05-full.png","width":2880,"height":2048,"alt":"Answer panel for what is driving Elias Braun's positive sentiment, with an insights summary, two drivers carrying sentiment chips, and the top scouts discussing him","avif":"/assets/expert-insights-05-full-850.avif 850w, /assets/expert-insights-05-full-1250.avif 1250w, /assets/expert-insights-05-full-1700.avif 1700w","caption":"Sentiment drivers come first, followed by the scouts discussing them."},{"id":"expert-insights-06-full","anchor":"fig-expert-insights-06-full","src":"/assets/expert-insights-06-full.png","width":2880,"height":2048,"alt":"Answer panel ranking the five scouts most active on under-21 prospects by post count, each with a sentiment chip","avif":"/assets/expert-insights-06-full-850.avif 850w, /assets/expert-insights-06-full-1250.avif 1250w, /assets/expert-insights-06-full-1700.avif 1700w","caption":"A ranked list answers who is most active, with post counts and sentiment in fixed columns."},{"id":"expert-insights-07-full","anchor":"fig-expert-insights-07-full","src":"/assets/expert-insights-07-full.png","width":2880,"height":2048,"alt":"Answer panel comparing two players on paired bars for discussion volume, scouts discussing, and positive and negative sentiment","avif":"/assets/expert-insights-07-full-850.avif 850w, /assets/expert-insights-07-full-1250.avif 1250w, /assets/expert-insights-07-full-1700.avif 1700w","caption":"Paired bars answer a comparison question. Each response includes its source period and space for a follow-up."}]},
+  "conservis":{"title":"Conservis","theme":"conservis","href":"/work/conservis","premise":"Field work and financial planning, connected acre by acre.","facts":["Product design lead","Foundry · 2016–21","Dashboard · Mobile · Reports"],"note":"I led design as the farm-management suite expanded. We kept fields at the center of the dashboard, brought task recording into the field, and turned the same operation’s data into budgets and reports a grower could take to a lender.","figures":[{"id":"conservis-03","anchor":"fig-conservis-03","src":"/assets/conservis-03.png","width":2880,"height":2048,"alt":"Conservis fields view: a satellite map with crop-coded field shapes beside a filterable field list","avif":"/assets/conservis-03-850.avif 850w, /assets/conservis-03-1250.avif 1250w, /assets/conservis-03-1700.avif 1700w","caption":"Growers think field by field. A map connects each crop and record to a real place across the operation."},{"id":"conservis-02","anchor":"fig-conservis-02","src":"/assets/conservis-02.png","width":2880,"height":2048,"alt":"Field activity log showing an irrigation ticket with equipment, operator, and input details","avif":"/assets/conservis-02-850.avif 850w, /assets/conservis-02-1250.avif 1250w, /assets/conservis-02-1700.avif 1700w","caption":"Activity tickets connect equipment, people, and inputs to the field where the work happened."},{"id":"conservis-field-task","anchor":"fig-conservis-field-task","src":"/assets/conservis-field-task.png","width":2048,"height":1536,"alt":"Tablet production task showing a field map, start task action, equipment, inputs, and work instructions","avif":"/assets/conservis-field-task-850.avif 850w, /assets/conservis-field-task-1250.avif 1250w, /assets/conservis-field-task-1700.avif 1700w","caption":"The tablet puts the selected task beside its map, equipment, inputs, and work instructions. Workers can record progress where the work happens."},{"id":"conservis-mobile-field","anchor":"fig-conservis-mobile-field","src":"/assets/conservis-mobile-field.png","width":750,"height":1624,"alt":"Phone field record with mapped boundary, crop details, and a new ticket action","avif":"/assets/conservis-mobile-field-750.avif 750w","caption":"Field record","group":"The field record leads into a ticket. The phone carries the same operational detail without requiring a trip back to the desk."},{"id":"conservis-transport-ticket","anchor":"fig-conservis-transport-ticket","src":"/assets/conservis-transport-ticket.png","width":750,"height":3006,"alt":"Phone transport ticket with equipment, field, crop, destination, and quantity entries","avif":"/assets/conservis-transport-ticket-750.avif 750w","caption":"Transport ticket","group":"The field record leads into a ticket. The phone carries the same operational detail without requiring a trip back to the desk."},{"id":"conservis-04","anchor":"fig-conservis-04","src":"/assets/conservis-04.png","width":2880,"height":2048,"alt":"Fertilizer metrics dashboard with projected yield scatter plot and planned-versus-actual input cost bars","avif":"/assets/conservis-04-850.avif 850w, /assets/conservis-04-1250.avif 1250w, /assets/conservis-04-1700.avif 1700w","caption":"Projected yield and planned versus actual input costs stay beside the map. Widget guidance let the Conservis team extend the dashboard."},{"id":"conservis-crop-plan","anchor":"fig-conservis-crop-plan","src":"/assets/conservis-crop-plan.png","width":2880,"height":1800,"alt":"Crop planning step with editable crop acreage, yield, price, and production rows","avif":"/assets/conservis-crop-plan-850.avif 850w, /assets/conservis-crop-plan-1250.avif 1250w, /assets/conservis-crop-plan-1700.avif 1700w","caption":"The crop plan aligns acreage, yield, and price assumptions before they feed into the budget."},{"id":"conservis-budget-report","anchor":"fig-conservis-budget-report","src":"/assets/conservis-budget-report.png","width":2880,"height":1800,"alt":"Conservis target budget with revenue, expenses, per-acre totals, crop margins, and export controls","avif":"/assets/conservis-budget-report-850.avif 850w, /assets/conservis-budget-report-1250.avif 1250w, /assets/conservis-budget-report-1700.avif 1700w","caption":"Budget totals and per-acre costs sit beside each crop’s margin. The report can be exported for the conversations growers have with lenders."}]},
+  "everag":{"title":"Ever.Ag","theme":"everag","href":"/work/everag","premise":"A shared foundation for a growing product family.","facts":["Product design lead","Foundry · 2022–24","Design system · Web \u0026 mobile products"],"note":"I pitched the engagement and led design across the suite. After our team established the foundations, I owned the system hands-on and worked with teams across three countries to carry it into web and mobile products.","figures":[{"id":"everag-feed-overview","anchor":"fig-everag-feed-overview","src":"/assets/everag-feed-overview.png","width":2904,"height":3244,"alt":"Feed overview with stacked monthly coverage charts for corn-based, soybean-meal-based, and other ingredients","avif":"/assets/everag-feed-overview-850.avif 850w, /assets/everag-feed-overview-1250.avif 1250w, /assets/everag-feed-overview-1700.avif 1700w","caption":"A consistent chart grammar shows feed coverage across ingredients and months. The same components support the rest of the financial suite."},{"id":"everag-feed-ingredients","anchor":"fig-everag-feed-ingredients","src":"/assets/everag-feed-ingredients.png","width":2904,"height":2060,"alt":"Feed ingredients table with ingredient names, feed price types, basis costs, and edit and remove actions","avif":"/assets/everag-feed-ingredients-850.avif 850w, /assets/everag-feed-ingredients-1250.avif 1250w, /assets/everag-feed-ingredients-1700.avif 1700w","caption":"The ingredient table aligns price types and basis costs for comparison, with actions held in fixed columns."},{"id":"everag-brokerage","anchor":"fig-everag-brokerage","src":"/assets/everag-brokerage.png","width":780,"height":1688,"alt":"Brokerage overview on a phone, with open positions and recent transactions","avif":"/assets/everag-brokerage-780.avif 780w","caption":"Brokerage","group":"From a brokerage overview to an account and a single position. The phone keeps the same balance, price, and transaction patterns."},{"id":"everag-account","anchor":"fig-everag-account","src":"/assets/everag-account.png","width":780,"height":1688,"alt":"Brokerage account summary, open positions, balances, and transaction history","avif":"/assets/everag-account-780.avif 780w","caption":"Account","group":"From a brokerage overview to an account and a single position. The phone keeps the same balance, price, and transaction patterns."},{"id":"everag-position","anchor":"fig-everag-position","src":"/assets/everag-position.png","width":780,"height":1688,"alt":"A single brokerage position with price, quantity, gain or loss, and transaction history","avif":"/assets/everag-position-780.avif 780w","caption":"Position","group":"From a brokerage overview to an account and a single position. The phone keeps the same balance, price, and transaction patterns."},{"id":"everag-market-search","anchor":"fig-everag-market-search","src":"/assets/everag-market-search.png","width":780,"height":1688,"alt":"Markets search on a phone with commodity prices and plus or check controls showing which products are in the watchlist","avif":"/assets/everag-market-search-780.avif 780w","caption":"Find products","group":"Search results show prices beside the controls for adding products. A sheet over the product page lets the grower choose which watchlists it belongs to."},{"id":"everag-manage-product","anchor":"fig-everag-manage-product","src":"/assets/everag-manage-product.png","width":780,"height":1688,"alt":"Manage Product sheet over the dry whey overview with selected watchlists and a Create New Watchlist action","avif":"/assets/everag-manage-product-780.avif 780w","caption":"Choose watchlists","group":"Search results show prices beside the controls for adding products. A sheet over the product page lets the grower choose which watchlists it belongs to."},{"id":"everag-02","anchor":"fig-everag-02","src":"/assets/everag-02.png","width":2880,"height":2048,"alt":"Hauler routes screen: a list of routes with last completed date, destination, and pickup count, beside a map of southern Minnesota tracing the selected route and its stops with pickup times","avif":"/assets/everag-02-850.avif 850w, /assets/everag-02-1250.avif 1250w, /assets/everag-02-1700.avif 1700w","caption":"The same foundation carries into dairy logistics. Routes pair a map with an ordered list of stops, making the next pickup clear."},{"id":"everag-01","anchor":"fig-everag-01","src":"/assets/everag-01.png","width":1440,"height":1024,"alt":"Dashboard template assembled from design system parts: KPI cards with sparklines and warnings, a news feed, and stat tiles","avif":"/assets/everag-01-850.avif 850w, /assets/everag-01-1250.avif 1250w, /assets/everag-01-1440.avif 1440w","caption":"A dashboard assembled from shared components. I maintained the system with contribution rules, a changelog, and a weekly design sync, then documented its remaining gaps for handoff."}]},
+  "campaign-sim":{"title":"Campaign Sim","theme":"sim","href":"/work/campaign-sim","premise":"Learning campaign planning within a real set of constraints.","facts":["Design lead","Blueshift · 2025","Planning tool · Simulation UX"],"note":"I led design of the planning and simulation experience. Channel choices stay beside the scout’s preferences and the team’s budget, then come together in a review that connects each round’s expected results to the decisions behind them.","figures":[{"id":"campaign-sim-03","anchor":"fig-campaign-sim-03","src":"/assets/campaign-sim-03.png","width":2880,"height":2048,"alt":"Channel Insights table listing every channel with expected exposure, reach, impact, and variable and fixed cost, grouped into deep engagement and enablement channels, beside a welcome video","avif":"/assets/campaign-sim-03-850.avif 850w, /assets/campaign-sim-03-1250.avif 1250w, /assets/campaign-sim-03-1700.avif 1700w","caption":"Before a team spends anything, channel exposure and reach can be weighed against cost. An onboarding video sits alongside the reference."},{"id":"campaign-sim-01","anchor":"fig-campaign-sim-01","src":"/assets/campaign-sim-01.png","width":2880,"height":2048,"alt":"Select Channels screen: a scout profile panel beside a grid of channel cards like international showcase, scout visit, and remote film session","avif":"/assets/campaign-sim-01-850.avif 850w, /assets/campaign-sim-01-1250.avif 1250w, /assets/campaign-sim-01-1700.avif 1700w","caption":"Channel descriptions sit beside the scout’s preferences and running plan totals. Every choice is made against both the person and the budget."},{"id":"campaign-sim-02","anchor":"fig-campaign-sim-02","src":"/assets/campaign-sim-02.png","width":2880,"height":2048,"alt":"Select Content screen: content types from player news to event information listed with descriptions inside the advertisement channel","avif":"/assets/campaign-sim-02-850.avif 850w, /assets/campaign-sim-02-1250.avif 1250w, /assets/campaign-sim-02-1700.avif 1700w","caption":"Within a channel, teams choose the content mix and frequency while keeping their current plan in view."},{"id":"campaign-sim-04","anchor":"fig-campaign-sim-04","src":"/assets/campaign-sim-04.png","width":2880,"height":2048,"alt":"Review Campaign screen: per-scout investment table with round-over-round deltas beside mix breakdowns by type and content","avif":"/assets/campaign-sim-04-850.avif 850w, /assets/campaign-sim-04-1250.avif 1250w, /assets/campaign-sim-04-1700.avif 1700w","caption":"The review brings investment, expected exposure, resources, and mix together before submission."}]},
+  "vidscrip":{"title":"Vidscrip","theme":"vidscrip","href":"/work/vidscrip","premise":"Your doctor’s guidance, from preparation through recovery.","facts":["Product design lead","Foundry · 2021","Patient journey · Enrollment"],"note":"I led product design at Foundry as we brought a patient’s scattered messages into one journey. We connected videos and questions to the procedure date, with enrollment and reminders leading back to a page patients could share.","figures":[{"id":"vidscrip-desktop-journey","anchor":"fig-vidscrip-desktop-journey","src":"/assets/vidscrip-desktop-journey.png","width":2880,"height":2048,"alt":"Vidscrip desktop journey with three procedure phases and a physician video expanded in the preparation column","avif":"/assets/vidscrip-desktop-journey-850.avif 850w, /assets/vidscrip-desktop-journey-1250.avif 1250w, /assets/vidscrip-desktop-journey-1700.avif 1700w","caption":"Preparation, procedure day, and recovery share one timeline. Videos expand in place, so the patient keeps their place in the journey."},{"id":"vidscrip-02","anchor":"fig-vidscrip-02","src":"/assets/vidscrip-02.png","width":758,"height":3150,"alt":"Patient journey on a phone with procedure date, countdown, sharing, and preparation steps","avif":"/assets/vidscrip-02-758.avif 758w","caption":"Journey hub","group":"A new procedure date reschedules the journey. The same page holds questions and satisfaction scores alongside the doctor’s videos."},{"id":"vidscrip-04","anchor":"fig-vidscrip-04","src":"/assets/vidscrip-04.png","width":750,"height":1624,"alt":"Procedure date form on a phone with a date input and save and return actions","avif":"/assets/vidscrip-04-750.avif 750w","caption":"Change the date","group":"A new procedure date reschedules the journey. The same page holds questions and satisfaction scores alongside the doctor’s videos."},{"id":"vidscrip-03","anchor":"fig-vidscrip-03","src":"/assets/vidscrip-03.png","width":750,"height":1624,"alt":"Procedure experience survey inside the patient journey","avif":"/assets/vidscrip-03-750.avif 750w","caption":"Experience survey","group":"A new procedure date reschedules the journey. The same page holds questions and satisfaction scores alongside the doctor’s videos."},{"id":"vidscrip-enrollment-program","anchor":"fig-vidscrip-enrollment-program","src":"/assets/vidscrip-enrollment-program.png","width":758,"height":2760,"alt":"Enrollment form with healthcare provider, video introduction, and program selection","avif":"/assets/vidscrip-enrollment-program-758.avif 758w","caption":"Provider \u0026 program","group":"Enrollment starts with the patient’s provider and program, then sets their reminder preferences. Messages lead back to one shareable page."},{"id":"vidscrip-enrollment-messaging","anchor":"fig-vidscrip-enrollment-messaging","src":"/assets/vidscrip-enrollment-messaging.png","width":758,"height":2856,"alt":"Enrollment messaging step with reminder channels, phone field, consent, and submit button","avif":"/assets/vidscrip-enrollment-messaging-758.avif 758w","caption":"Reminders \u0026 consent","group":"Enrollment starts with the patient’s provider and program, then sets their reminder preferences. Messages lead back to one shareable page."}]},
+  "plinth":{"title":"Plinth","theme":"plinth","href":"/work/plinth","premise":"A literary journal with a new design language every issue.","facts":["Design · Typography · Build","Literary journal · 2014–19","Seven issues · Hand-written HTML \u0026 CSS"],"note":"I designed the typography and built every page, reshaping a small column grid for each issue. The contents page announced the edition; reading pages gave prose a measured column and let poetry keep its own arrangement.","figures":[{"id":"plinth-06","anchor":"fig-plinth-06","src":"/assets/plinth-06.jpg","width":1440,"height":1000,"alt":"PLINTH issue 06 contents page: a white serif wordmark over a mirrored, inkblot-like graphic on black, with the contents listed in two flanking columns","avif":"/assets/plinth-06-850.avif 850w, /assets/plinth-06-1250.avif 1250w, /assets/plinth-06-1440.avif 1440w","caption":"Issue 06 puts the entire journal on one scrolling black page. Utopia’s caption cut becomes the wordmark. \u003ca href=\"https://plinth.us/issue06/\"\u003eRead it \u003cspan aria-hidden=\"true\"\u003e↗\u003c/span\u003e\u003c/a\u003e."},{"id":"plinth-03","anchor":"fig-plinth-03","src":"/assets/plinth-03.jpg","width":1440,"height":1000,"alt":"PLINTH issue 03 contents page set like a printed broadside: an oversized black display letter, justified text columns, solid black bars, over a photograph of an ice face","avif":"/assets/plinth-03-850.avif 850w, /assets/plinth-03-1250.avif 1250w, /assets/plinth-03-1440.avif 1440w","caption":"Issue 03 makes its contents a broadside image, with polygon hotspots turning the large letterforms into links. \u003ca href=\"https://plinth.us/issue03/\"\u003eRead it \u003cspan aria-hidden=\"true\"\u003e↗\u003c/span\u003e\u003c/a\u003e."},{"id":"plinth-04","anchor":"fig-plinth-04","src":"/assets/plinth-04.jpg","width":1440,"height":1000,"alt":"PLINTH issue 04 contents page: the wordmark set in wide-spaced condensed capitals on white, ruled by a mint hairline grid inside a navy border, with a vertical photographic panel at right","avif":"/assets/plinth-04-850.avif 850w, /assets/plinth-04-1250.avif 1250w, /assets/plinth-04-1440.avif 1440w","caption":"Issue 04 pairs condensed capitals with a mint hairline grid and a navy border. \u003ca href=\"https://plinth.us/issue04/\"\u003eRead it \u003cspan aria-hidden=\"true\"\u003e↗\u003c/span\u003e\u003c/a\u003e."},{"id":"plinth-05","anchor":"fig-plinth-05","src":"/assets/plinth-05.jpg","width":1440,"height":1000,"alt":"PLINTH issue 05 contents page: a full-bleed rust-and-rose photographic ground with a white triangular sigil built out of letterforms","avif":"/assets/plinth-05-850.avif 850w, /assets/plinth-05-1250.avif 1250w, /assets/plinth-05-1440.avif 1440w","caption":"Issue 05 sets a letterform sigil against Tyann Prentice’s photographic ground. \u003ca href=\"https://plinth.us/issue05/\"\u003eRead it \u003cspan aria-hidden=\"true\"\u003e↗\u003c/span\u003e\u003c/a\u003e."},{"id":"plinth-07","anchor":"fig-plinth-07","src":"/assets/plinth-07.jpg","width":1440,"height":1000,"alt":"PLINTH issue 07 contents page: piece titles and author names on bracket rules, beside a photograph of black volcanic rock lit from within by red","avif":"/assets/plinth-07-850.avif 850w, /assets/plinth-07-1250.avif 1250w, /assets/plinth-07-1440.avif 1440w","caption":"Issue 07 returns to the first issue’s bracket rules, closing a run of seven distinct designs. \u003ca href=\"https://plinth.us/issue07/\"\u003eRead it \u003cspan aria-hidden=\"true\"\u003e↗\u003c/span\u003e\u003c/a\u003e."},{"id":"plinth-evenson","anchor":"fig-plinth-evenson","src":"/assets/plinth-evenson.jpg","width":1440,"height":1000,"alt":"Reading page for Brian Evenson's The Tower: justified prose in a single measured column, with issue 07's bracket-rule navigation at the left and a large multicolour wordmark below","avif":"/assets/plinth-evenson-850.avif 850w, /assets/plinth-evenson-1250.avif 1250w, /assets/plinth-evenson-1440.avif 1440w","caption":"Brian Evenson’s “The Tower”: justified prose in a measured column, with issue navigation held to the margin. \u003ca href=\"https://plinth.us/issue07/evenson\"\u003eRead it \u003cspan aria-hidden=\"true\"\u003e↗\u003c/span\u003e\u003c/a\u003e."},{"id":"plinth-attar","anchor":"fig-plinth-attar","src":"/assets/plinth-attar.jpg","width":1440,"height":1000,"alt":"Reading page for Tipu Attar's Lines: the poem's words positioned at varying indents and alignments across the full width of the page, inside a salmon ruled frame","avif":"/assets/plinth-attar-850.avif 850w, /assets/plinth-attar-1250.avif 1250w, /assets/plinth-attar-1440.avif 1440w","caption":"Tipu Attar’s “Lines”: words keep their positions across the page instead of reflowing into one column. \u003ca href=\"https://plinth.us/issue05/attar\"\u003eRead it \u003cspan aria-hidden=\"true\"\u003e↗\u003c/span\u003e\u003c/a\u003e."},{"id":"plinth-kreiden","anchor":"fig-plinth-kreiden","src":"/assets/plinth-kreiden.jpg","width":1440,"height":1000,"alt":"Reading page for Purdey Lord Kreiden's from Paradise City: a narrow left-aligned poem column on issue 04's mint hairline grid inside a navy border, with the title block set in condensed capitals","avif":"/assets/plinth-kreiden-850.avif 850w, /assets/plinth-kreiden-1250.avif 1250w, /assets/plinth-kreiden-1440.avif 1440w","caption":"Purdey Lord Kreiden’s “from Paradise City”: a narrow, ragged poem column within the issue’s grid. \u003ca href=\"https://plinth.us/issue04/kreiden\"\u003eRead it \u003cspan aria-hidden=\"true\"\u003e↗\u003c/span\u003e\u003c/a\u003e."},{"id":"plinth-conn","anchor":"fig-plinth-conn","src":"/assets/plinth-conn.jpg","width":1440,"height":1000,"alt":"Reading page for Brian Conn's The Hub: justified prose flanked by solid black vertical rules, which are the page's custom inverted scrollbars, with slab-serif navigation at the left","avif":"/assets/plinth-conn-850.avif 850w, /assets/plinth-conn-1250.avif 1250w, /assets/plinth-conn-1440.avif 1440w","caption":"Brian Conn’s “The Hub”: the black rule beside the prose is the custom scrollbar, with a white thumb. \u003ca href=\"https://plinth.us/issue03/conn\"\u003eRead it \u003cspan aria-hidden=\"true\"\u003e↗\u003c/span\u003e\u003c/a\u003e."}]}
+  }}
+  </script>
+  <!-- stream-data:end -->
+</body>
+</html>

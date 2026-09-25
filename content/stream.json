@@ -1,0 +1,709 @@
+[
+  {
+    "id": "expert-insights",
+    "type": "case-study",
+    "title": "Expert Insights",
+    "note": "A clear view of the conversation around a roster.",
+    "alt": "Scout insights dashboard: discussion totals, auto-generated highlights, and a roster sentiment table split into my players and rival players",
+    "project": "Expert Insights",
+    "industry": "Sports",
+    "shared": "2026-07",
+    "caseStudy": {
+      "slug": "expert-insights"
+    },
+    "theme": "insights",
+    "media": {
+      "src": "assets/expert-insights-01.png",
+      "width": 2880,
+      "height": 2048
+    }
+  },
+  {
+    "id": "how-i-built-description-generator",
+    "type": "post",
+    "title": "How I built Description Generator",
+    "note": "A Figma plugin for component descriptions, and the conversations with coding agents behind its turning points.",
+    "project": "Description Generator",
+    "industry": "Design systems",
+    "shared": "2026-09",
+    "links": {
+      "full": "/writing/how-i-built-description-generator"
+    },
+    "related": [
+      "description-generator"
+    ],
+    "facts": [
+      {
+        "label": "Source",
+        "value": "Commits and transcripts"
+      },
+      {
+        "label": "Moments",
+        "value": "32, five pivotal"
+      }
+    ],
+    "placeholder": true
+  },
+  {
+    "id": "activity-central",
+    "type": "prototype",
+    "title": "Activity Central",
+    "note": "A working prototype of a family activity coordinator. It covers the home dashboard, calendar logistics, activity detail, and messaging.",
+    "project": "Activity Central",
+    "industry": "Productivity",
+    "platform": "Mobile",
+    "shared": "2026-09",
+    "related": [
+      "weekly-activity-calendar",
+      "daily-activity-schedule",
+      "family-week"
+    ],
+    "facts": [
+      {
+        "label": "Built",
+        "value": "React, from the Figma frames"
+      }
+    ],
+    "steps": [
+      "Open a day in the calendar and see who is driving",
+      "Assign a pick-up from an activity’s detail",
+      "Reply to a message about the day"
+    ],
+    "placeholder": true
+  },
+  {
+    "id": "weekly-activity-calendar",
+    "type": "screen",
+    "title": "Weekly activity calendar",
+    "note": "The month stays in view while the selected day opens into its timed schedule.",
+    "alt": "Mobile monthly calendar with the selected day expanded into a timed activity schedule",
+    "project": "Activity Central",
+    "industry": "Productivity",
+    "platform": "Mobile",
+    "shared": "2026-09",
+    "media": {
+      "src": "assets/feed/weekly-activity-calendar.webp",
+      "width": 750,
+      "height": 1624
+    },
+    "related": [
+      "daily-activity-schedule",
+      "activity-central",
+      "family-week"
+    ]
+  },
+  {
+    "id": "description-generator",
+    "type": "tool",
+    "title": "Description Generator",
+    "note": "Edit Figma component descriptions in one place, or use AI to write a first pass. It works across a page or an entire file.",
+    "project": "Description Generator",
+    "industry": "Design systems",
+    "platform": "Figma",
+    "shared": "2026-09",
+    "media": {
+      "tile": "Figma plugin"
+    },
+    "related": [
+      "how-i-built-description-generator"
+    ],
+    "facts": [
+      {
+        "label": "Works on",
+        "value": "Components, sets, variants"
+      },
+      {
+        "label": "Price",
+        "value": "Free, with a Pro plan"
+      }
+    ],
+    "placeholder": true
+  },
+  {
+    "id": "fields-on-the-map",
+    "type": "screen",
+    "title": "Fields on the map",
+    "note": "Growers think field by field. A map connects each crop and record to a real place across the operation.",
+    "alt": "Conservis fields view: a satellite map with crop-coded field shapes beside a filterable field list",
+    "project": "Conservis",
+    "industry": "Agriculture",
+    "platform": "Web",
+    "shared": "2026-09",
+    "caseStudy": {
+      "slug": "conservis",
+      "figure": "conservis-03"
+    },
+    "media": {
+      "src": "assets/conservis-03.png",
+      "width": 2880,
+      "height": 2048
+    }
+  },
+  {
+    "id": "ground-corn-overview",
+    "type": "screen",
+    "title": "Ground corn overview",
+    "note": "A consistent chart grammar shows feed coverage across ingredients and months. The same components support the rest of the financial suite.",
+    "alt": "Feed overview with stacked monthly coverage charts for corn-based, soybean-meal-based, and other ingredients",
+    "project": "Ever.Ag",
+    "industry": "Agriculture",
+    "platform": "Web",
+    "shared": "2026-09",
+    "caseStudy": {
+      "slug": "everag",
+      "figure": "everag-feed-overview"
+    },
+    "media": {
+      "src": "assets/everag-feed-overview.png",
+      "width": 2904,
+      "height": 3244
+    }
+  },
+  {
+    "id": "lawn-assessment-recommendation",
+    "type": "screen",
+    "title": "Lawn assessment recommendation",
+    "note": "",
+    "alt": "Mobile lawn assessment recommendation explaining a tailored TruComplete service plan",
+    "project": "TruGreen",
+    "industry": "Home services",
+    "platform": "Mobile",
+    "shared": "2026-09",
+    "media": {
+      "src": "assets/feed/lawn-assessment-recommendation.webp",
+      "width": 750,
+      "height": 1624
+    }
+  },
+  {
+    "id": "text-diff",
+    "type": "tool",
+    "title": "Text diff",
+    "note": "",
+    "project": "Atomic Tools",
+    "industry": "Writing",
+    "platform": "Web",
+    "shared": "2026-09",
+    "media": {
+      "tile": "Atomic Tools"
+    },
+    "related": [
+      "markdown-to-rich-text"
+    ],
+    "placeholder": true
+  },
+  {
+    "id": "channel-impact-simulator",
+    "type": "prototype",
+    "title": "Channel impact simulator",
+    "note": "",
+    "alt": "Campaign simulation table comparing channels by reach, expected impact, waste, and cost",
+    "project": "Campaign Sim",
+    "industry": "Sports",
+    "platform": "Web",
+    "shared": "2026-09",
+    "caseStudy": {
+      "slug": "campaign-sim"
+    },
+    "media": {
+      "src": "assets/feed/channel-impact-simulator.webp",
+      "width": 1250,
+      "height": 889
+    },
+    "related": [
+      "campaign-investment-review"
+    ],
+    "placeholder": true
+  },
+  {
+    "id": "filtering-fields",
+    "type": "video",
+    "title": "Filtering fields, start to finish",
+    "note": "",
+    "project": "Conservis",
+    "industry": "Agriculture",
+    "platform": "Web",
+    "shared": "2026-09",
+    "caseStudy": {
+      "slug": "conservis"
+    },
+    "media": {
+      "duration": "2:02"
+    },
+    "placeholder": true
+  },
+  {
+    "id": "family-week",
+    "type": "reel",
+    "title": "A family week, planned on one phone",
+    "note": "",
+    "project": "Activity Central",
+    "industry": "Productivity",
+    "platform": "Mobile",
+    "shared": "2026-09",
+    "media": {
+      "duration": "2:01"
+    },
+    "related": [
+      "activity-central"
+    ],
+    "placeholder": true
+  },
+  {
+    "id": "markdown-to-rich-text",
+    "type": "video",
+    "title": "Markdown ↔ rich text, in 44 seconds",
+    "note": "",
+    "project": "Atomic Tools",
+    "industry": "Writing",
+    "platform": "Web",
+    "shared": "2026-09",
+    "media": {
+      "duration": "0:44"
+    },
+    "related": [
+      "text-diff"
+    ],
+    "placeholder": true
+  },
+  {
+    "id": "patient-enrollment-form",
+    "type": "screen",
+    "title": "Patient enrollment form",
+    "note": "",
+    "alt": "Mobile patient enrollment form with introduction, progress steps, and a date question",
+    "project": "Vidscrip",
+    "industry": "Healthcare",
+    "platform": "Mobile",
+    "shared": "2026-09",
+    "caseStudy": {
+      "slug": "vidscrip"
+    },
+    "media": {
+      "src": "assets/feed/patient-enrollment-form.webp",
+      "width": 758,
+      "height": 2332
+    }
+  },
+  {
+    "id": "population-forecast-matrix",
+    "type": "screen",
+    "title": "Population forecast matrix",
+    "note": "",
+    "alt": "Livestock population forecast matrix organized by week and age in a dense planning grid",
+    "project": "Ever.Ag",
+    "industry": "Agriculture",
+    "platform": "Web",
+    "shared": "2026-09",
+    "caseStudy": {
+      "slug": "everag"
+    },
+    "media": {
+      "src": "assets/feed/population-forecast-matrix.webp",
+      "width": 1250,
+      "height": 1150
+    }
+  },
+  {
+    "id": "scouting-sentiment-search",
+    "type": "screen",
+    "title": "Scouting sentiment search",
+    "note": "Search puts an explicitly labeled, auto-generated summary above the discussions that support it. Outputs still require independent review.",
+    "alt": "Search results with an insight summary, sentiment bar, and a feed of scouting comments",
+    "project": "Expert Insights",
+    "industry": "Sports",
+    "platform": "Web",
+    "shared": "2026-09",
+    "caseStudy": {
+      "slug": "expert-insights",
+      "figure": "expert-insights-02"
+    },
+    "media": {
+      "src": "assets/feed/scouting-sentiment-search.webp",
+      "width": 1250,
+      "height": 889
+    }
+  },
+  {
+    "id": "conservis",
+    "type": "case-study",
+    "title": "Conservis",
+    "note": "Field work and financial planning, connected acre by acre.",
+    "alt": "Field activity log showing an irrigation ticket with equipment, operator, and input details",
+    "project": "Conservis",
+    "industry": "Agriculture",
+    "shared": "2026-07",
+    "caseStudy": {
+      "slug": "conservis"
+    },
+    "theme": "conservis",
+    "media": {
+      "src": "assets/conservis-02.png",
+      "width": 2880,
+      "height": 2048
+    }
+  },
+  {
+    "id": "daily-activity-schedule",
+    "type": "screen",
+    "title": "Today’s activity schedule",
+    "note": "",
+    "alt": "Mobile daily schedule with swimming practice, fishing camp, and reminders arranged by time",
+    "project": "Activity Central",
+    "industry": "Productivity",
+    "platform": "Mobile",
+    "shared": "2026-09",
+    "media": {
+      "src": "assets/feed/daily-activity-schedule.webp",
+      "width": 750,
+      "height": 1624
+    },
+    "related": [
+      "weekly-activity-calendar",
+      "activity-central"
+    ]
+  },
+  {
+    "id": "specialist-profile",
+    "type": "screen",
+    "title": "Specialist profile and contact",
+    "note": "",
+    "alt": "Mobile specialist profile with portrait, biography, and message and call actions",
+    "project": "SophConnect",
+    "industry": "Healthcare",
+    "platform": "Mobile",
+    "shared": "2026-09",
+    "media": {
+      "src": "assets/feed/specialist-profile.webp",
+      "width": 750,
+      "height": 1624
+    }
+  },
+  {
+    "id": "campaign-sim",
+    "type": "case-study",
+    "title": "Campaign Sim",
+    "note": "Learning campaign planning within a real set of constraints.",
+    "alt": "Select Channels screen: a scout profile panel beside a grid of channel cards like international showcase, scout visit, and remote film session",
+    "project": "Campaign Sim",
+    "industry": "Sports",
+    "shared": "2026-07",
+    "caseStudy": {
+      "slug": "campaign-sim"
+    },
+    "theme": "sim",
+    "media": {
+      "src": "assets/campaign-sim-01.png",
+      "width": 2880,
+      "height": 2048
+    }
+  },
+  {
+    "id": "direct-expense-planning",
+    "type": "screen",
+    "title": "Direct expense planning",
+    "note": "",
+    "alt": "Crop-plan wizard for entering direct expenses, acres, rates, costs, and totals by seed and fertilizer",
+    "project": "Conservis",
+    "industry": "Agriculture",
+    "platform": "Web",
+    "shared": "2026-09",
+    "caseStudy": {
+      "slug": "conservis"
+    },
+    "media": {
+      "src": "assets/feed/direct-expense-planning.webp",
+      "width": 1250,
+      "height": 781
+    }
+  },
+  {
+    "id": "application-confirmation",
+    "type": "screen",
+    "title": "Application confirmation",
+    "note": "",
+    "alt": "Financial application workflow showing a confirmation message and completed section navigation",
+    "project": "Patriot",
+    "industry": "Finance",
+    "platform": "Web",
+    "shared": "2026-09",
+    "media": {
+      "src": "assets/feed/application-confirmation.webp",
+      "width": 1250,
+      "height": 1143
+    },
+    "related": [
+      "competency-video-assessment"
+    ]
+  },
+  {
+    "id": "everag",
+    "type": "case-study",
+    "title": "Ever.Ag",
+    "note": "A shared foundation for a growing product family.",
+    "alt": "Dashboard template assembled from design system parts: KPI cards with sparklines and warnings, a news feed, and stat tiles",
+    "project": "Ever.Ag",
+    "industry": "Agriculture",
+    "shared": "2026-08",
+    "caseStudy": {
+      "slug": "everag"
+    },
+    "theme": "everag",
+    "media": {
+      "src": "assets/everag-01.png",
+      "width": 1440,
+      "height": 1024
+    }
+  },
+  {
+    "id": "household-task-builder",
+    "type": "screen",
+    "title": "Household task builder",
+    "note": "",
+    "alt": "Long mobile task form with schedule, assignee, room, supplies, instructions, and notes",
+    "project": "Motivated Moms",
+    "industry": "Productivity",
+    "platform": "Mobile",
+    "shared": "2026-09",
+    "media": {
+      "src": "assets/feed/household-task-builder.webp",
+      "width": 1125,
+      "height": 3741
+    }
+  },
+  {
+    "id": "one-field-in-detail",
+    "type": "screen",
+    "title": "One field, in detail",
+    "note": "",
+    "alt": "Conservis field detail for AG Burnstton, with crop plantings and ownership sections beside a satellite map outlining the field",
+    "project": "Conservis",
+    "industry": "Agriculture",
+    "platform": "Web",
+    "shared": "2026-09",
+    "caseStudy": {
+      "slug": "conservis"
+    },
+    "media": {
+      "src": "assets/conservis-01.png",
+      "width": 2880,
+      "height": 2048
+    }
+  },
+  {
+    "id": "advisor-insights-hub",
+    "type": "screen",
+    "title": "Advisor insights hub",
+    "note": "",
+    "alt": "Long-form advisor insights website with articles, video, research, and green editorial feature panels",
+    "project": "Ascensus",
+    "industry": "Finance",
+    "platform": "Web",
+    "shared": "2026-09",
+    "media": {
+      "src": "assets/feed/advisor-insights-hub.webp",
+      "width": 1250,
+      "height": 5378
+    },
+    "related": [
+      "retirement-education-library"
+    ],
+    "placeholder": true
+  },
+  {
+    "id": "vidscrip",
+    "type": "case-study",
+    "title": "Vidscrip",
+    "note": "Your doctor’s guidance, from preparation through recovery.",
+    "alt": "Vidscrip desktop journey with three procedure phases and a physician video expanded in the preparation column",
+    "project": "Vidscrip",
+    "industry": "Healthcare",
+    "shared": "2026-07",
+    "caseStudy": {
+      "slug": "vidscrip"
+    },
+    "theme": "vidscrip",
+    "media": {
+      "src": "assets/vidscrip-desktop-journey.png",
+      "width": 2880,
+      "height": 2048
+    }
+  },
+  {
+    "id": "competency-video-assessment",
+    "type": "prototype",
+    "title": "Competency video assessment",
+    "note": "",
+    "alt": "Prototype competency step with a video player, progress timeline, and continue action",
+    "project": "Patriot",
+    "industry": "Finance",
+    "platform": "Web",
+    "shared": "2026-09",
+    "media": {
+      "src": "assets/feed/competency-video-assessment.webp",
+      "width": 1250,
+      "height": 1667
+    },
+    "related": [
+      "application-confirmation"
+    ],
+    "placeholder": true
+  },
+  {
+    "id": "feed-ingredient-defaults",
+    "type": "screen",
+    "title": "Feed ingredient defaults",
+    "note": "The ingredient table aligns price types and basis costs for comparison, with actions held in fixed columns.",
+    "alt": "Feed ingredient settings table with inclusion percentages, prices, costs, and editable defaults",
+    "project": "Ever.Ag",
+    "industry": "Agriculture",
+    "platform": "Web",
+    "shared": "2026-09",
+    "caseStudy": {
+      "slug": "everag",
+      "figure": "everag-feed-ingredients"
+    },
+    "media": {
+      "src": "assets/feed/feed-ingredient-defaults.webp",
+      "width": 1250,
+      "height": 887
+    }
+  },
+  {
+    "id": "plinth",
+    "type": "case-study",
+    "title": "Plinth",
+    "note": "A literary journal with a new design language every issue.",
+    "alt": "PLINTH issue 06 contents page: a white serif wordmark over a mirrored, inkblot-like graphic on black, with the contents listed in two flanking columns",
+    "project": "Plinth",
+    "industry": "Publishing",
+    "shared": "2026-08",
+    "caseStudy": {
+      "slug": "plinth"
+    },
+    "theme": "plinth",
+    "media": {
+      "src": "assets/plinth-06.jpg",
+      "width": 1440,
+      "height": 1000
+    }
+  },
+  {
+    "id": "field-task-setup",
+    "type": "screen",
+    "title": "Field task setup",
+    "note": "",
+    "alt": "Mobile field-task setup with crop, equipment, inputs, operators, and notes in an expandable form",
+    "project": "Conservis",
+    "industry": "Agriculture",
+    "platform": "Mobile",
+    "shared": "2026-09",
+    "caseStudy": {
+      "slug": "conservis"
+    },
+    "media": {
+      "src": "assets/feed/field-task-setup.webp",
+      "width": 1250,
+      "height": 2295
+    }
+  },
+  {
+    "id": "manufacturing-careers-story",
+    "type": "post",
+    "title": "Building 500+ manufacturing careers",
+    "note": "",
+    "alt": "Third Wave story page about developing more than five hundred next-generation manufacturing careers",
+    "project": "Third Wave",
+    "industry": "Manufacturing",
+    "shared": "2026-09",
+    "media": {
+      "src": "assets/feed/manufacturing-careers-story.webp",
+      "width": 1250,
+      "height": 1869
+    },
+    "placeholder": true
+  },
+  {
+    "id": "position-detail-transactions",
+    "type": "screen",
+    "title": "Position detail and transactions",
+    "note": "",
+    "alt": "Mobile grain position detail with profit and loss totals and an expandable transaction history",
+    "project": "Ever.Ag",
+    "industry": "Agriculture",
+    "platform": "Mobile",
+    "shared": "2026-09",
+    "caseStudy": {
+      "slug": "everag",
+      "figure": "everag-position"
+    },
+    "media": {
+      "src": "assets/feed/position-detail-transactions.webp",
+      "width": 780,
+      "height": 1688
+    }
+  },
+  {
+    "id": "campaign-investment-review",
+    "type": "prototype",
+    "title": "Campaign investment review",
+    "note": "",
+    "alt": "Campaign review prototype with player investment rows, resource totals, and channel mix breakdowns",
+    "project": "Campaign Sim",
+    "industry": "Sports",
+    "platform": "Web",
+    "shared": "2026-09",
+    "caseStudy": {
+      "slug": "campaign-sim"
+    },
+    "media": {
+      "src": "assets/feed/campaign-investment-review.webp",
+      "width": 1250,
+      "height": 889
+    },
+    "related": [
+      "channel-impact-simulator"
+    ],
+    "placeholder": true
+  },
+  {
+    "id": "conservis-dashboard",
+    "type": "prototype",
+    "title": "Conservis dashboard",
+    "note": "",
+    "alt": "Fertilizer metrics dashboard with projected yield scatter plot and planned-versus-actual input cost bars",
+    "project": "Conservis",
+    "industry": "Agriculture",
+    "platform": "Web",
+    "shared": "2026-09",
+    "caseStudy": {
+      "slug": "conservis"
+    },
+    "media": {
+      "src": "assets/feed/field-performance-explorer.webp",
+      "width": 1250,
+      "height": 889
+    },
+    "placeholder": true
+  },
+  {
+    "id": "retirement-education-library",
+    "type": "screen",
+    "title": "Retirement education library",
+    "note": "",
+    "alt": "Long retirement education website with product explanations, video, tools, and editorial resource cards",
+    "project": "Ascensus",
+    "industry": "Finance",
+    "platform": "Web",
+    "shared": "2026-09",
+    "media": {
+      "src": "assets/feed/retirement-education-library.webp",
+      "width": 1250,
+      "height": 5236
+    },
+    "related": [
+      "advisor-insights-hub"
+    ],
+    "placeholder": true
+  }
+]

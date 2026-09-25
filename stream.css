@@ -1,0 +1,717 @@
+/* spidleweb.net: Craft, the stream.
+
+   The headline and filters, the Grid of cards and the List of rows the
+   generator writes (scripts/build-stream.mjs, "Card contract" in
+   specs/redesign.md), and the pagination under the last column. style.css
+   holds the tokens and the chrome; the open-in-place panels are in panel.css.
+   Values come from Paper, row 02 for the Grid and row 09 for the List. */
+
+/* ---- Head: the headline, with the filters at its foot ---- */
+
+.craft-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 40px;
+  padding: 64px var(--gutter) 36px;
+}
+
+.craft-head__line {
+  max-width: 960px;
+  font-family: var(--display);
+  font-size: 31px;
+  font-weight: 400;
+  line-height: 38px;
+  letter-spacing: -0.015em;
+  text-wrap: pretty;
+}
+
+/* ---- Filters ----
+   Progressive enhancement over each card's data-type and data-industry, so
+   they only show when site.js runs. Each is a native select laid invisibly
+   over its label, which keeps the platform's own menu and keyboard support. */
+
+.filters {
+  display: flex;
+  flex: none;
+  gap: 22px;
+  padding-bottom: 6px;
+  line-height: 14px;
+}
+
+html:not(.js) .filters { display: none; }
+
+.filter {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  min-height: 44px;
+  margin: -15px 0;
+  white-space: nowrap;
+}
+
+.filter__select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+  /* 16px keeps iOS from zooming in when the select takes focus */
+  font-size: 16px;
+  appearance: none;
+}
+
+.filter:has(.filter__select:focus-visible) {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .filter:hover .filter__value { text-decoration: underline; text-underline-offset: 4px; }
+}
+
+/* ---- The Grid ---- */
+
+.stream-grid {
+  --columns: 5;
+  --card-gap: 10px;
+  --stack-step: 7px;
+  display: grid;
+  grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+  gap: 40px 20px;
+  padding: 0 var(--gutter);
+}
+
+/* Pagination and the filters hide cards with the hidden attribute. */
+[data-stream] > [hidden] { display: none !important; }
+
+@media (max-width: 1199px) { .stream-grid { --columns: 4; } }
+@media (max-width: 899px) { .stream-grid { --columns: 3; } }
+@media (max-width: 599px) {
+  .stream-grid {
+    --columns: 2;
+    --card-gap: 8px;
+    --stack-step: 6px;
+    gap: 28px 14px;
+  }
+}
+
+/* ---- Cards ----
+   The theme class on a case-study card resets --paper and --ink to the
+   project's, so the card puts the site's back. It keeps --case-dark and
+   --chip for the stack, the chip, and the project name. */
+
+.stream-card {
+  --paper: var(--site-paper);
+  --ink: var(--site-ink);
+  min-width: 0;
+  color: var(--ink);
+}
+
+.stream-card__link {
+  display: flex;
+  flex-direction: column;
+  color: inherit;
+  text-decoration: none;
+}
+
+.stream-card__media {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 256 / 182;
+  background: var(--frame-empty);
+}
+
+.stream-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left top;
+  background: #fff;
+  outline: 1px solid var(--line);
+  outline-offset: -1px;
+}
+
+/* A phone capture stands in its frame at phone proportions, cropped below. */
+.stream-card__media[data-shape="tall"] img {
+  width: 37.5%;
+  height: auto;
+  margin: 7% auto 0;
+  object-fit: fill;
+}
+
+.stream-card__media--empty {
+  background:
+    repeating-linear-gradient(135deg, transparent 0 10px, var(--line) 10px 11px),
+    var(--frame-empty);
+}
+
+/* A tool without a capture is an ink tile that repeats its name as cover art. */
+.stream-card__media--tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px;
+  background: var(--site-ink);
+  color: var(--site-paper);
+}
+
+.stream-card__kicker,
+.stream-row__kicker {
+  color: rgb(242 242 239 / 0.6);
+  font-family: var(--mono);
+  font-size: var(--text-micro);
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  line-height: 14px;
+  text-transform: uppercase;
+}
+
+.stream-card__tile-title {
+  max-width: 11em;
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 19px;
+  text-transform: uppercase;
+}
+
+/* A case study is a stack: its cover in front, two leaves of the project's
+   colour behind, each a step up and to the right. The Grid and the List
+   each set --stack-step. */
+:is(.stream-card, .stream-row)[data-type="case-study"] :is(.stream-card__media, .stream-row__media) {
+  overflow: visible;
+  background: none;
+}
+
+:is(.stream-card, .stream-row)[data-type="case-study"] :is(.stream-card__media, .stream-row__media)::before,
+:is(.stream-card, .stream-row)[data-type="case-study"] :is(.stream-card__media, .stream-row__media)::after {
+  content: "";
+  position: absolute;
+}
+
+:is(.stream-card, .stream-row)[data-type="case-study"] :is(.stream-card__media, .stream-row__media)::before {
+  inset: 0 0 calc(var(--stack-step) * 2) calc(var(--stack-step) * 2);
+  background: var(--case-dark);
+}
+
+/* The middle leaf keeps the project's hue, 0.16 lighter and a touch more
+   saturated, as Paper draws Expert Insights (#191E2F behind #3F475E). The
+   mix is the fallback where relative colour is not supported. */
+:is(.stream-card, .stream-row)[data-type="case-study"] :is(.stream-card__media, .stream-row__media)::after {
+  inset: var(--stack-step);
+  background: color-mix(in oklch, var(--case-dark) 78%, var(--site-paper));
+  background: oklch(from var(--case-dark) calc(l + 0.16) calc(c * 1.2) h);
+}
+
+:is(.stream-card, .stream-row)[data-type="case-study"] :is(.stream-card__media, .stream-row__media) img {
+  position: absolute;
+  z-index: 1;
+  bottom: 0;
+  left: 0;
+  width: calc(100% - var(--stack-step) * 2);
+  height: calc(100% - var(--stack-step) * 2);
+}
+
+/* Badges and running time sit on the frame. */
+.stream-card__badge,
+.stream-card__time,
+.stream-row__badge,
+.stream-row__time {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--site-ink);
+  color: var(--site-paper);
+  font-family: var(--mono);
+  font-size: var(--text-micro);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  line-height: 14px;
+  text-transform: uppercase;
+}
+
+.stream-card__badge {
+  bottom: 10px;
+  left: 10px;
+  padding: 5px 8px;
+}
+
+.stream-card__time {
+  right: 8px;
+  bottom: 8px;
+  padding: 3px 6px;
+}
+
+:is(.stream-card, .stream-row)[data-type="prototype"] :is(.stream-card__badge, .stream-row__badge)::before {
+  content: "▶";
+  content: "▶" / "";
+  color: var(--accent);
+}
+
+/* A reel is a vertical poster on an ink tile. */
+:is(.stream-card, .stream-row)[data-type="reel"] :is(.stream-card__media, .stream-row__media) { background: var(--site-ink); }
+
+:is(.stream-card, .stream-row)[data-type="reel"] :is(.stream-card__media, .stream-row__media)[data-shape="tall"] img {
+  width: auto;
+  height: 100%;
+  margin: 0 auto;
+}
+
+:is(.stream-card, .stream-row)[data-type="reel"] :is(.stream-card__media--empty, .stream-row__media--empty) {
+  background:
+    repeating-linear-gradient(135deg, transparent 0 10px, var(--ink-rule) 10px 11px),
+    var(--site-ink);
+}
+
+:is(.stream-card, .stream-row)[data-type="reel"] :is(.stream-card__badge, .stream-row__badge) {
+  top: 10px;
+  bottom: auto;
+  padding: 3px 6px;
+  border: 1px solid rgb(242 242 239 / 0.5);
+  background: transparent;
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  line-height: 12px;
+}
+
+:is(.stream-card, .stream-row)[data-type="reel"] :is(.stream-card__time, .stream-row__time) {
+  background: var(--site-paper);
+  color: var(--site-ink);
+}
+
+:is(.stream-card, .stream-row)[data-type="reel"] :is(.stream-card__time, .stream-row__time)::before {
+  content: "▶";
+  content: "▶" / "";
+}
+
+/* A video shows a play button over its poster. */
+:is(.stream-card, .stream-row)[data-type="video"] :is(.stream-card__media, .stream-row__media)::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  width: 48px;
+  height: 48px;
+  margin: -24px 0 0 -24px;
+  border-radius: 50%;
+  background: var(--site-ink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23f2f2ef' d='M18 15v18l16-9z'/%3E%3C/svg%3E") center / 48px no-repeat;
+}
+
+.stream-card__title {
+  margin-top: var(--card-gap);
+  font-size: 14px;
+  line-height: 19px;
+  text-wrap: pretty;
+}
+
+.stream-card__meta {
+  margin-top: var(--card-gap);
+  color: var(--ink-soft);
+  line-height: 14px;
+}
+
+/* The project's name and chip read as one unit, and wrap as one, with the
+   name hanging clear of the chip. */
+.stream-card__case,
+.stream-row__case {
+  display: inline-block;
+  color: var(--case-dark);
+}
+
+.stream-card__chip,
+.stream-row__chip {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin: 0 8px 0 1px;
+  background: var(--chip);
+}
+
+:is(.stream-card, .stream-row)[data-type="case-study"] :is(.stream-card__chip, .stream-row__chip) { margin-left: 0; }
+
+.stream-card__link:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 6px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .stream-card__link:hover .stream-card__title {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+}
+
+/* ---- The List ----
+   Every item with its image above its title, note, and links: two columns
+   on desktop and one on phones (Paper row 09). A row cannot be one link,
+   since its links sit beside the title's, so the title's link stretches over
+   the whole row and the other links sit above it. Like a card, a row puts
+   the site's paper and ink back inside a theme class, and its rule takes the
+   project's colour. */
+
+.stream-list {
+  --stack-step: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 56px 40px;
+  padding: 0 var(--gutter);
+}
+
+.stream-row {
+  --paper: var(--site-paper);
+  --ink: var(--site-ink);
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+  color: var(--ink);
+}
+
+.stream-row__media {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 660 / 400;
+  background: var(--frame-empty);
+}
+
+.stream-row__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #fff;
+  outline: 1px solid var(--line);
+  outline-offset: -1px;
+}
+
+.stream-row__media--empty {
+  background:
+    repeating-linear-gradient(135deg, transparent 0 10px, var(--line) 10px 11px),
+    var(--frame-empty);
+}
+
+/* A phone capture stands whole in its frame at 170 of 660px, cropped below
+   when it runs longer than a phone. */
+.stream-row__media[data-shape="tall"] img {
+  width: 25.75%;
+  height: auto;
+  margin: 32px auto 0;
+  object-fit: fill;
+}
+
+.stream-row__media--tile {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
+  background: var(--site-ink);
+  color: var(--site-paper);
+}
+
+.stream-row__tile-title {
+  max-width: 11em;
+  font-family: var(--display);
+  font-size: clamp(22px, 5.5cqi, 40px);
+  font-weight: 400;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.stream-row__badge {
+  bottom: 14px;
+  left: 14px;
+  padding: 6px 10px;
+}
+
+.stream-row__time {
+  right: 12px;
+  bottom: 12px;
+  padding: 5px 8px;
+}
+
+/* The note and its metadata, under a 3px rule in the project's colour for a
+   case study and in ink otherwise. */
+.stream-row__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 3px solid var(--case-dark, var(--ink));
+}
+
+/* The dateline sits at the right of the kind, and drops under it, still at
+   the right, when the two do not fit on one line. */
+.stream-row__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 16px;
+  color: var(--ink-soft);
+  line-height: 14px;
+}
+
+.stream-row__kind { min-width: 0; }
+.stream-row__dateline { margin-left: auto; }
+
+.stream-row__title {
+  font-size: 18px;
+  line-height: 24px;
+  text-wrap: pretty;
+}
+
+.stream-row__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Above the stack's cover and the badges, which have their own layers. */
+.stream-row__link::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+}
+
+.stream-row__note {
+  max-width: 34em;
+  font-family: "EB Garamond", Georgia, serif;
+  font-size: 22px;
+  font-weight: 400;
+  font-synthesis: none;
+  line-height: 30px;
+  text-wrap: pretty;
+}
+
+.stream-row__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 28px;
+  padding-top: 4px;
+  line-height: 14px;
+}
+
+.stream-row__hint { color: var(--case-dark, var(--ink)); }
+
+/* The other links sit above the stretched title link, each with a 44px hit
+   area that moves nothing. */
+.stream-row__action {
+  position: relative;
+  z-index: 4;
+  padding: 15px 0;
+  margin: -15px 0;
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+
+.stream-row__link:focus-visible { outline: none; }
+
+.stream-row:has(.stream-row__link:focus-visible) {
+  outline: 2px solid var(--ink);
+  outline-offset: 6px;
+}
+
+@supports not selector(:has(*)) {
+  .stream-row__link:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+}
+
+.stream-row__action:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .stream-row__link:hover,
+  .stream-row__action:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  .stream-row__action:hover { color: var(--ink); }
+}
+
+/* Two narrower columns take the phone's type, and one column below 600px
+   runs each row the full width of the screen, with a hairline between rows
+   that the open row drops, so nothing sits between it and its panel. */
+@media (max-width: 899px) {
+  .stream-list {
+    --stack-step: 8px;
+    column-gap: 24px;
+  }
+
+  .stream-row__media--tile { padding: 16px; }
+  .stream-row__media[data-shape="tall"] img { margin-top: 20px; }
+  .stream-row__body { padding-top: 12px; }
+  .stream-row__title { font-size: 17px; line-height: 22px; }
+  .stream-row__note { font-size: 21px; line-height: 27px; }
+}
+
+@media (max-width: 599px) {
+  .stream-list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px 0;
+    padding: 0;
+  }
+
+  .stream-row {
+    gap: 16px;
+    padding: 0 var(--gutter) 20px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .stream-row:has(.stream-row__link[aria-expanded="true"]) {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .stream-row:has(.stream-row__link:focus-visible) { outline-offset: -3px; }
+
+  .stream-row__media { aspect-ratio: 358 / 254; }
+  .stream-row__media[data-shape="tall"] img { width: 30.5%; }
+  .stream-row__badge { bottom: 10px; left: 10px; padding: 5px 8px; }
+
+  /* On a phone each link is its own 44px row of the actions line. */
+  .stream-row__actions { padding-top: 0; }
+  .stream-row__hint,
+  .stream-row__action {
+    padding: 15px 0;
+    margin: 0;
+  }
+
+  /* A prototype that is not Mobile is not offered live on a phone, so its
+     hint says Open rather than Try it here, as its badge drops Try it. */
+  .stream-row[data-type="prototype"]:not([data-platform="mobile"]) .stream-row__hint { font-size: 0; }
+  .stream-row[data-type="prototype"]:not([data-platform="mobile"]) .stream-row__hint::before {
+    content: "Open ↓";
+    content: "Open ↓" / "";
+    font-size: var(--text-micro);
+  }
+}
+
+/* ---- No matches ---- */
+
+.stream-empty {
+  padding: 8px var(--gutter) 0;
+  font-family: var(--display);
+  font-size: 20px;
+  line-height: 28px;
+}
+
+.stream-empty__clear {
+  min-height: 44px;
+  margin-left: 12px;
+  padding: 0 14px;
+  border: 1.5px solid var(--ink);
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+/* ---- Pagination: right-aligned under the last column ---- */
+
+.stream-foot {
+  --columns: 5;
+  display: grid;
+  grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+  column-gap: 20px;
+  padding: 52px var(--gutter) 44px;
+}
+
+@media (max-width: 1199px) { .stream-foot { --columns: 4; } }
+@media (max-width: 899px) { .stream-foot { --columns: 3; } }
+@media (max-width: 599px) { .stream-foot { --columns: 2; column-gap: 14px; padding-top: 28px; } }
+
+.pager { grid-column: -2 / -1; }
+.pager[hidden] { display: none; }
+.pager__count { line-height: 14px; }
+
+.pager__bar {
+  height: 3px;
+  margin-top: 8px;
+  background: color-mix(in srgb, var(--ink) 15%, transparent);
+}
+
+.pager__fill {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--ink);
+}
+
+.pager__more {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px 18px;
+  border: 1.5px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  line-height: 14px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.pager__more[hidden] { display: none; }
+
+.pager__more:focus-visible,
+.stream-empty__clear:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pager__more:hover,
+  .stream-empty__clear:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+}
+
+/* ---- Narrow windows and phones ----
+   Below 1000px the filters move under the headline, so it keeps its measure. */
+
+@media (max-width: 999px) {
+  .craft-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filters { gap: 24px; padding-bottom: 0; }
+  .filter { margin: 0; }
+}
+
+@media (max-width: 799px) {
+  .craft-head { padding: 56px var(--gutter) 28px; }
+}
+
+@media (max-width: 599px) {
+  .craft-head__line {
+    font-size: 18px;
+    line-height: 24px;
+  }
+
+  .stream-card__media--tile { padding: 12px; }
+  .stream-card__badge { bottom: 8px; left: 8px; padding: 4px 7px; }
+  .pager__more { padding: 15px 16px; }
+
+  /* A phone runs only a Mobile prototype live, so any other prototype drops
+     its Try it badge, by the same test stream.js applies when one opens.
+     Jason's ruling of 2026-09-24. data-platform is on the card and the List
+     row (the card contract). */
+  :is(.stream-card, .stream-row)[data-type="prototype"]:not([data-platform="mobile"]) :is(.stream-card__badge, .stream-row__badge) {
+    display: none;
+  }
+}
