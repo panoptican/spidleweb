@@ -300,6 +300,8 @@
         more.hidden = next <= 0;
         pager.querySelector('[data-pager-next]').textContent = next;
       }
+      // The rows may have moved, so an open panel re-anchors (stream.js).
+      document.dispatchEvent(new CustomEvent('stream:layout'));
     }
 
     function remember() {

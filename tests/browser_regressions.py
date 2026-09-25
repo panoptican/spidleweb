@@ -375,8 +375,11 @@ class BrowserRegressions(unittest.TestCase):
         self.assertEqual(page.locator('.stream-card:not([hidden])').count(), min(60, total))
 
         page = self.open(self.context(reduced_motion='reduce'))
+        page.evaluate("document.addEventListener('stream:layout', () => { window.layouts = (window.layouts || 0) + 1; })")
         prototypes = [card for card in cards if card['type'] == 'prototype']
         page.locator('select[data-filter="type"]').select_option('prototype')
+        # An open panel re-anchors when the filtered rows move (stream.js).
+        self.assertGreaterEqual(page.evaluate('window.layouts'), 1)
         self.assertEqual(page.locator('.stream-card:not([hidden])').count(), min(30, len(prototypes)))
         self.assertEqual(page.locator('.pager__count').text_content(), f'{len(prototypes)} of {len(prototypes)} items')
         self.assertTrue(page.url.endswith('?type=prototype'))
