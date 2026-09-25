@@ -39,6 +39,7 @@ const STREAM_FILE = 'content/stream.json';
 
 // Pages with stream regions. Add a page here when it gains one.
 const PAGES = [
+  'index.html',
   'content/fixtures/grid.html',
   'content/fixtures/list.html',
   'content/fixtures/more-from.html',

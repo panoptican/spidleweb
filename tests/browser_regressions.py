@@ -119,15 +119,6 @@ class BrowserRegressions(unittest.TestCase):
                 return
             page.locator('.featured__next').click()
 
-    def featured_state(self, page):
-        return page.evaluate("""() => {
-          const items = [...document.querySelectorAll('.featured__item')];
-          const shown = items.filter(el => getComputedStyle(el).display !== 'none' && getComputedStyle(el).visibility === 'visible');
-          return {shown: shown.map(el => el.dataset.name),
-            count: document.querySelector('.featured__position').textContent,
-            next: document.querySelector('.featured__next-name').textContent};
-        }""")
-
     def screenshot(self, page, name):
         if SCREENSHOTS:
             directory = Path(SCREENSHOTS)
@@ -153,20 +144,26 @@ class BrowserRegressions(unittest.TestCase):
                     page.close()
 
     def test_b02_fresh_malformed_unknown_and_encoded_fragments(self):
+        # Replaces the old section-nav version: a fragment on the homepage now
+        # names a card, and a malformed or unknown one is ignored quietly.
         context = self.context()
-        for fragment in ['#%', '#[', '#missing-section', '#%70rofile']:
+        for fragment in ['#%', '#[', '#missing-section', '#%72etirement-education-library']:
             with self.subTest(fragment=fragment):
                 page = self.open(context, f'index.html{fragment}')
                 self.assertEqual(page.errors, [])
-                self.assertEqual(page.locator('.archive__nav .is-active').count(), 1)
-                if fragment == '#%70rofile':
-                    self.assertEqual(page.locator('.archive__nav .is-active').get_attribute('href'), '#profile')
-                self.scroll_reveals(page)
+                cards = page.locator('.stream-card').evaluate_all('els => els.map(el => el.id)')
+                shown = page.locator('.stream-card:not([hidden])').count()
+                if fragment.startswith('#%72'):
+                    self.assertTrue(page.locator('#retirement-education-library').is_visible())
+                    self.assertEqual(shown, max(30, cards.index('retirement-education-library') + 1))
+                else:
+                    self.assertEqual(shown, min(30, len(cards)))
                 page.close()
         context = self.context()
         context.add_init_script('delete window.IntersectionObserver')
         page = self.open(context, 'index.html#%')
-        self.assert_visible(page, motionless=True)
+        self.assertEqual(page.locator('.view-dock').count(), 0)
+        self.assertEqual(page.locator('.stream-card:not([hidden])').count(), 30)
         self.assertEqual(page.errors, [])
 
     def test_b03_initial_and_live_reduced_motion(self):
@@ -175,94 +172,20 @@ class BrowserRegressions(unittest.TestCase):
             page = self.open(context, path)
             self.assert_visible(page, motionless=True)
             page.close()
-        context = self.context(reduced_motion='no-preference')
-        for path in ['index.html']:
-            page = self.open(context, path)
-            self.assertGreater(page.locator('.reveal:not(.is-in)').count(), 0)
-            page.emulate_media(reduced_motion='reduce')
-            self.assert_visible(page, motionless=True)
-            page.locator('.reveal').last.evaluate('el => el.scrollIntoView()')
-            self.assert_visible(page, motionless=True)
-            page.emulate_media(reduced_motion='no-preference')
-            self.assert_visible(page)
-            self.assertEqual(page.errors, [])
-            page.close()
-
-    def test_b04_b05_native_section_jumps_and_active_navigation(self):
-        for width, height in [(1440, 900), (1440, 400), (900, 650), (390, 844), (1440, 1800)]:
-            context = self.context(viewport={'width': width, 'height': height})
-            page = self.open(context)
-            for section in ['work', 'sites', 'profile', 'contact', 'sites']:
-                with self.subTest(viewport=(width, height), section=section):
-                    page.locator(f'.archive__nav a[href="#{section}"]').click()
-                    page.mouse.move(width - 5, height - 5)
-                    self.settle(page)
-                    self.assertEqual(page.locator('.archive__nav .is-active').count(), 1)
-                    self.assertEqual(page.locator('.archive__nav .is-active').get_attribute('href'), f'#{section}')
-                    bounds = page.evaluate('''id => {
-                      const header = document.querySelector('.archive__header');
-                      return {heading: document.querySelector(`#${id} h2`).getBoundingClientRect().top,
-                        header: getComputedStyle(header).position === 'sticky' ? header.getBoundingClientRect().bottom : 0};
-                    }''', section)
-                    self.assertGreaterEqual(bounds['heading'], bounds['header'] - 1)
-                    if (width, height, section) == (1440, 900, 'sites'):
-                        page.wait_for_function("() => [...document.querySelectorAll('#sites .reveal')].every(el => getComputedStyle(el).opacity === '1')")
-                        self.screenshot(page, 'b04-b05-sites-jump')
-            self.assertEqual(page.errors, [])
-            page.close()
-        # The CSS fallback must also offset native links when the script fails.
-        page = self.open(self.context(block_script=True))
-        for section in ['work', 'sites', 'profile']:
-            page.locator(f'a[href="#{section}"]').click()
-            heading = page.locator(f'#{section} h2').bounding_box()
-            header = page.locator('.archive__header').bounding_box()
-            self.assertGreaterEqual(heading['y'], header['y'] + header['height'] - 1)
-
-    def test_b05_manual_scroll_repeat_click_keyboard_history_and_resize(self):
-        page = self.open(self.context())
-        page.locator('a[href="#sites"]').click()
-        page.evaluate('window.scrollTo(0, document.documentElement.scrollHeight)')
-        self.settle(page)
-        self.assertEqual(page.locator('.archive__nav .is-active').get_attribute('href'), '#contact')
-        page.locator('a[href="#sites"]').click()
-        self.settle(page)
-        self.assertEqual(page.locator('.archive__nav .is-active').get_attribute('href'), '#sites')
-        page.locator('a[href="#profile"]').focus()
-        page.keyboard.press('Enter')
-        page.wait_for_url('**/index.html#profile')
-        self.settle(page)
-        self.assertEqual(page.locator('.archive__nav .is-active').get_attribute('href'), '#profile')
-        page.go_back()
-        self.settle(page)
-        self.assertEqual(page.locator('.archive__nav .is-active').get_attribute('href'), '#sites')
-        page.set_viewport_size({'width': 390, 'height': 844})
-        page.locator('a[href="#profile"]').click()
-        self.settle(page)
-        self.assertEqual(page.locator('.archive__nav .is-active').get_attribute('href'), '#profile')
-        self.assertAlmostEqual(page.locator('#profile h2').bounding_box()['y'], 0, delta=1)
-        for section in ['work', 'sites', 'profile']:
-            page.evaluate('''id => {
-              const y = document.getElementById(id).getBoundingClientRect().top + scrollY;
-              window.scrollTo(0, y + 2);
-            }''', section)
-            self.settle(page)
-            self.assertEqual(page.locator('.archive__nav .is-active').get_attribute('href'), f'#{section}')
+        # The homepage's one motion is the docked bar's slide, which reduced
+        # motion drops live, without a reload.
+        page = self.open(self.context(reduced_motion='no-preference'), 'index.html')
+        duration = "document.querySelector('.view-dock') && getComputedStyle(document.querySelector('.view-dock')).transitionDuration"
+        self.assertNotEqual(page.evaluate(duration), '0s')
+        page.emulate_media(reduced_motion='reduce')
+        self.assertEqual(page.evaluate(duration), '0s')
+        page.emulate_media(reduced_motion='no-preference')
+        self.assertNotEqual(page.evaluate(duration), '0s')
         self.assertEqual(page.errors, [])
 
-    def test_b06_short_home_panel_and_flowing_case_context(self):
+    def test_b06_flowing_case_context_on_short_screens(self):
         for width in [1440, 800]:
             context = self.context(viewport={'width': width, 'height': 400})
-            page = self.open(context)
-            panel = page.locator('.panel')
-            panel.hover(position={'x': 100, 'y': 100})
-            page.mouse.wheel(0, 1200)
-            page.wait_for_timeout(120)
-            bounds = page.evaluate("""() => ({
-              panel: document.querySelector('.panel').getBoundingClientRect().bottom,
-              footer: document.querySelector('.panel__footer').getBoundingClientRect().bottom
-            })""")
-            self.assertLessEqual(bounds['footer'], bounds['panel'] - 20)
-            page.close()
             for path in CASE_PAGES:
                 page = self.open(context, path)
                 rail = page.locator('.case-context')
@@ -300,12 +223,12 @@ class BrowserRegressions(unittest.TestCase):
         }''')
         for path in PAGES:
             page = self.open(context, path)
-            self.assertIn('© 2027 JASON SPIDLE', page.locator('.footer').inner_text())
+            self.assertIn('© 2027 JASON SPIDLE', page.locator('.footer, .footline').first.inner_text())
             page.close()
         context = self.context(java_script_enabled=False)
         for path in PAGES:
             page = self.open(context, path)
-            self.assertIn('© 2026 JASON SPIDLE', page.locator('.footer').inner_text())
+            self.assertIn('© 2026 JASON SPIDLE', page.locator('.footer, .footline').first.inner_text())
             page.close()
 
     def test_b10_external_links_use_this_tab_and_preserve_back_navigation(self):
@@ -313,11 +236,13 @@ class BrowserRegressions(unittest.TestCase):
         count = 0
         for path in PAGES:
             page = self.open(context, path)
-            links = page.locator('a[href^="https://"]').evaluate_all('els => els.map(el => ({href: el.getAttribute("href"), url: el.href}))')
+            links = page.locator('a[href^="https://"]').evaluate_all('''els => [...new Map(els
+              .filter(el => el.getClientRects().length || el.closest('.featured__item'))
+              .map(el => [el.getAttribute("href"), {href: el.getAttribute("href"), url: el.href}])).values()]''')
             for link_info in links:
                 href = link_info['href']
                 with self.subTest(path=path, href=href):
-                    link = page.locator(f'a[href="{href}"]')
+                    link = page.locator(f'a[href="{href}"]:not(.about a)').first
                     self.assertIn(link.get_attribute('target'), [None, '_self'])
                     self.show_featured_link(page, link)
                     link.click()
@@ -328,10 +253,12 @@ class BrowserRegressions(unittest.TestCase):
                     page.wait_for_url(f'{ORIGIN}/{path}')
                     count += 1
             page.close()
-        self.assertGreaterEqual(count, 15)
+        # Craft in Grid dropped the old homepage's Featured and Sites links, six
+        # of the links this counted, so the floor moved from 15 to 12.
+        self.assertGreaterEqual(count, 12)
         page = self.open(context)
         with context.expect_page() as opened:
-            page.locator('.sites__row').first.click(modifiers=['ControlOrMeta'])
+            page.locator('.footline a[href^="https://"]').click(modifiers=['ControlOrMeta'])
         destination = opened.value
         destination.wait_for_load_state()
         self.assertEqual(destination.title(), 'External destination fixture')
@@ -348,6 +275,295 @@ class BrowserRegressions(unittest.TestCase):
                     self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
                     self.assertEqual(page.errors, [])
                     page.close()
+
+    # ---- Craft in Grid and the site chrome (Phase 2A) ----
+
+    def craft_cards(self, page):
+        return page.locator('.stream-card').evaluate_all("""els => els.map(el => ({id: el.id,
+          type: el.dataset.type, industry: el.dataset.industry}))""")
+
+    def test_craft_is_complete_and_readable_without_its_script(self):
+        # With JavaScript off, or with site.js failing to load, every card shows
+        # as a real link, the places stay a row of links, and nothing dead shows.
+        for label, options in [('no javascript', {'java_script_enabled': False}), ('site.js blocked', {})]:
+            for width in [1440, 390]:
+                with self.subTest(label, width=width):
+                    context = self.context(viewport={'width': width, 'height': 900}, **options)
+                    if label == 'site.js blocked':
+                        context.route('**/site.js', lambda route: route.abort())
+                    page = self.open(context)
+                    self.assertFalse(page.evaluate("document.documentElement.classList.contains('js')"))
+                    total = page.locator('.stream-card').count()
+                    self.assertGreaterEqual(total, 30)
+                    self.assertEqual(page.locator('.stream-card__link:visible').count(), total)
+                    for selector in ['[data-filters]', '[data-pager]', '.masthead__trigger', '.view-dock', '#about']:
+                        self.assertEqual(page.locator(f'{selector}:visible').count(), 0, selector)
+                    self.assertEqual(page.locator('.masthead__places a:visible').count(), 4)
+                    self.assertEqual(page.locator('.legend__item:visible').count(), 3)
+                    self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
+                    # About opens through :target, and Close takes it away again.
+                    page.locator('.masthead__places a[href="#about"]').click()
+                    self.assertTrue(page.locator('#about').is_visible())
+                    self.assertTrue(page.locator('.about .email').get_attribute('href').startswith('mailto:'))
+                    page.locator('.about__close').click()
+                    self.assertFalse(page.locator('#about').is_visible())
+                    self.assertEqual(page.errors, [])
+                    context.close()
+
+    def test_craft_cards_keep_the_contract_links_and_outline(self):
+        page = self.open(self.context(java_script_enabled=False))
+        self.assertEqual(page.locator('h1').count(), 1)
+        self.assertEqual(page.locator('.masthead__name').evaluate('el => el.tagName'), 'H1')
+        cards = page.locator('.stream-card').evaluate_all("""els => els.map(el => {
+          const links = el.querySelectorAll('a');
+          const link = links[0];
+          return {id: el.id, type: el.dataset.type, count: links.length, href: link.getAttribute('href'),
+            open: link.dataset.open, title: el.querySelector('h2.stream-card__title') !== null,
+            caseStudy: el.dataset.caseStudy || null, industry: el.dataset.industry};
+        })""")
+        self.assertEqual(len({card['id'] for card in cards}), len(cards))
+        for card in cards:
+            with self.subTest(card=card['id']):
+                self.assertEqual(card['count'], 1)
+                self.assertEqual(card['open'], card['id'])
+                self.assertTrue(card['title'])
+                self.assertTrue(card['industry'])
+                href = card['href']
+                if card['type'] == 'case-study':
+                    self.assertEqual(href, f"/work/{card['caseStudy']}")
+                elif href.startswith('/work/'):
+                    self.assertRegex(href, rf"^/work/{card['caseStudy']}#fig-[a-z0-9-]+$")
+                elif href.startswith('/writing/'):
+                    self.assertEqual(card['type'], 'post')
+                else:
+                    self.assertEqual(href, f"/#{card['id']}")
+        # The first row loads eagerly, and every image the cards use decodes.
+        self.assertEqual(page.locator('.stream-card img[loading="eager"]').count(),
+                         page.locator('.stream-card:nth-child(-n+5) img').count())
+        page.close()
+        page = self.open(self.context(reduced_motion='reduce'))
+        self.assertTrue(page.locator('.stream-card img').evaluate_all("""async images => {
+          images.forEach(image => { image.loading = 'eager'; });
+          await Promise.all(images.map(image => image.decode()));
+          return images.every(image => image.naturalWidth > 0);
+        }"""))
+
+    def test_craft_pagination_and_filters_agree(self):
+        page = self.open(self.context(reduced_motion='reduce'))
+        cards = self.craft_cards(page)
+        total = len(cards)
+        shown = min(30, total)
+        pager = page.locator('[data-pager]')
+        self.assertEqual(page.locator('.stream-card:not([hidden])').count(), shown)
+        self.assertEqual(pager.locator('.pager__count').text_content(), f'{shown} of {total} items')
+        self.assertEqual(pager.locator('.pager__more').text_content().split('↓')[0].strip(),
+                         f'Show {min(30, total - shown)} more')
+        # Right-aligned under the last column
+        last = page.locator('.stream-card').nth(4).bounding_box()
+        box = pager.bounding_box()
+        self.assertAlmostEqual(box['x'], last['x'], delta=1)
+        self.assertAlmostEqual(box['width'], last['width'], delta=1)
+        first_new = cards[shown]['id']
+        page.locator('.pager__more').click()
+        self.assertEqual(page.locator('.stream-card:not([hidden])').count(), min(60, total))
+        self.assertEqual(page.evaluate('document.activeElement.closest("article")?.id'), first_new)
+        if total <= 60:
+            self.assertTrue(page.locator('.pager__more').is_hidden())
+        # Coming back keeps what was shown.
+        page.reload()
+        self.settle(page)
+        self.assertEqual(page.locator('.stream-card:not([hidden])').count(), min(60, total))
+
+        page = self.open(self.context(reduced_motion='reduce'))
+        prototypes = [card for card in cards if card['type'] == 'prototype']
+        page.locator('select[data-filter="type"]').select_option('prototype')
+        self.assertEqual(page.locator('.stream-card:not([hidden])').count(), min(30, len(prototypes)))
+        self.assertEqual(page.locator('.pager__count').text_content(), f'{len(prototypes)} of {len(prototypes)} items')
+        self.assertTrue(page.url.endswith('?type=prototype'))
+        self.assertEqual(page.locator('[data-filter-label="type"]').text_content(), 'Prototypes')
+        self.assertTrue(page.locator('.stream-card:not([hidden])').evaluate_all(
+            "els => els.every(el => el.dataset.type === 'prototype')"))
+        # Industry counts follow the type already chosen, and empty ones are off.
+        options = page.locator('select[data-filter="industry"] option').evaluate_all(
+            "els => els.map(el => [el.value, el.textContent, el.disabled])")
+        for value, text, disabled in options[1:]:
+            count = sum(card['industry'] == value for card in prototypes)
+            self.assertTrue(text.endswith(f'({count})'), text)
+            self.assertEqual(disabled, count == 0)
+        industry = prototypes[0]['industry']
+        page.locator('select[data-filter="industry"]').select_option(industry)
+        both = [card for card in prototypes if card['industry'] == industry]
+        self.assertEqual(page.locator('.stream-card:not([hidden])').count(), len(both))
+        self.assertIn(f'industry={industry}', page.url)
+
+        # No match shows a way out, and unknown values are ignored.
+        page.goto(f'{ORIGIN}/index.html?type=reel&industry=finance')
+        self.settle(page)
+        self.assertEqual(page.locator('.stream-card:not([hidden])').count(), 0)
+        self.assertTrue(page.locator('[data-stream-empty]').is_visible())
+        self.assertTrue(page.locator('[data-pager]').is_hidden())
+        page.locator('[data-filters-clear]').click()
+        self.assertEqual(page.locator('.stream-card:not([hidden])').count(), shown)
+        self.assertEqual(urlsplit(page.url).query, '')
+        page.goto(f'{ORIGIN}/index.html?type=nonsense')
+        self.settle(page)
+        self.assertEqual(page.locator('.stream-card:not([hidden])').count(), shown)
+        self.assertEqual(page.errors, [])
+
+    def test_craft_deep_links_reveal_everything_up_to_their_card(self):
+        context = self.context(reduced_motion='reduce')
+        page = self.open(context)
+        ids = [card['id'] for card in self.craft_cards(page)]
+        last = ids[-1]
+        page.close()
+        page = self.open(context, f'index.html#{last}')
+        self.assertTrue(page.locator(f'#{last}').is_visible())
+        self.assertEqual(page.locator('.stream-card:not([hidden])').count(), len(ids))
+        box = page.locator(f'#{last}').bounding_box()
+        self.assertLess(box['y'], 900)
+        self.assertGreaterEqual(box['y'] + box['height'], 0)
+        page.close()
+        # stream.js asks for a card with stream:reveal. A filter that hides it
+        # is cleared, since the card was asked for by name.
+        page = self.open(context)
+        page.locator('select[data-filter="type"]').select_option('tool')
+        page.evaluate("id => document.dispatchEvent(new CustomEvent('stream:reveal', {detail: {id}}))", last)
+        self.assertTrue(page.locator(f'#{last}').is_visible())
+        self.assertEqual(page.locator('select[data-filter="type"]').input_value(), '')
+        # A same-page link to a hidden card reveals it and scrolls to it.
+        page = self.open(context)
+        page.evaluate('id => { location.hash = id; }', last)
+        page.wait_for_function('id => !document.getElementById(id).hidden', arg=last)
+        self.settle(page)
+        self.assertLess(page.locator(f'#{last}').bounding_box()['y'], 900)
+        self.assertEqual(page.errors, [])
+
+    def test_masthead_matches_the_board_and_keeps_targets(self):
+        page = self.open(self.context(reduced_motion='reduce'))
+        name = page.locator('.masthead__name a').bounding_box()
+        switch = page.locator('.view-switch').bounding_box()
+        places = page.locator('.masthead__places').bounding_box()
+        self.assertAlmostEqual(name['x'], 40, delta=1)
+        self.assertAlmostEqual(switch['x'] + switch['width'] / 2, 720, delta=1)
+        self.assertAlmostEqual(switch['y'], 34.5, delta=1)
+        self.assertAlmostEqual(switch['height'], 35, delta=1)
+        self.assertAlmostEqual(places['x'] + places['width'], 1400, delta=2)
+        self.assertEqual(page.locator('.masthead__places a[aria-current="page"]').text_content(), 'Craft')
+        self.assertEqual(page.locator('.view-switch a[aria-current="page"]').get_attribute('href'), '/')
+        for link in page.locator('.masthead__places a, .masthead__name a').all():
+            self.assertGreaterEqual(link.bounding_box()['height'], 44)
+        # The switcher's 35px segments reach 44px through their hit areas.
+        for link in page.locator('.view-switch a').all():
+            box = link.bounding_box()
+            hit = page.evaluate('([x, y]) => document.elementFromPoint(x, y).closest("a")?.getAttribute("href")',
+                                [box['x'] + box['width'] / 2, box['y'] - 4])
+            self.assertEqual(hit, link.get_attribute('href'))
+        page.close()
+        page = self.open(self.context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True))
+        trigger = page.locator('.masthead__trigger')
+        self.assertTrue(trigger.is_visible())
+        self.assertGreaterEqual(trigger.bounding_box()['height'], 44)
+        self.assertEqual(trigger.text_content(), 'Menu, Craft')
+        switch = page.locator('.view-switch').bounding_box()
+        self.assertEqual((switch['x'], switch['width']), (16, 358))
+        for link in page.locator('.view-switch a').all():
+            self.assertGreaterEqual(link.bounding_box()['height'], 44)
+
+    def test_phone_menu_is_a_disclosure_that_closes_four_ways(self):
+        page = self.open(self.context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True,
+                                      reduced_motion='reduce'))
+        trigger = page.locator('.masthead__trigger')
+        places = page.locator('#site-places')
+        self.assertEqual(trigger.get_attribute('aria-controls'), 'site-places')
+        self.assertEqual(trigger.get_attribute('aria-expanded'), 'false')
+        self.assertTrue(places.is_hidden())
+        switch_y = page.locator('.view-switch').bounding_box()['y']
+
+        def open_menu():
+            trigger.tap()
+            self.assertEqual(trigger.get_attribute('aria-expanded'), 'true')
+            self.assertTrue(places.is_visible())
+
+        open_menu()
+        rows = places.locator('a')
+        self.assertEqual(rows.count(), 4)
+        for row in rows.all():
+            self.assertGreaterEqual(row.bounding_box()['height'], 48)
+        # It opens in place, pushing the switcher down.
+        self.assertGreater(page.locator('.view-switch').bounding_box()['y'], switch_y + 4 * 48)
+        self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), 390)
+        trigger.tap()
+        self.assertEqual(trigger.get_attribute('aria-expanded'), 'false')
+        open_menu()
+        page.keyboard.press('Escape')
+        self.assertTrue(places.is_hidden())
+        self.assertEqual(page.evaluate('document.activeElement.className'), trigger.get_attribute('class'))
+        open_menu()
+        page.locator('.craft-head__line').tap()
+        self.assertTrue(places.is_hidden())
+        open_menu()
+        # A picked row closes the menu and leaves focus to where it leads.
+        places.locator('a[href="#about"]').tap()
+        self.assertTrue(places.is_hidden())
+        self.assertTrue(page.locator('#about').is_visible())
+        self.assertEqual(page.errors, [])
+
+    def test_email_copies_with_desktop_and_touch_states(self):
+        for width in [1440, 390]:
+            touch = width < 600
+            context = self.context(viewport={'width': width, 'height': 844}, is_mobile=touch, has_touch=touch,
+                                   permissions=['clipboard-read', 'clipboard-write'])
+            page = self.open(context)
+            email = page.locator('.footline .email')
+            self.assertEqual(email.get_attribute('href'), 'mailto:jason@spidleweb.net')
+            email.scroll_into_view_if_needed()
+            glyph = email.locator('.email__glyph')
+            self.assertEqual(glyph.is_visible(), touch)
+            email.tap() if touch else email.click()
+            page.wait_for_function('el => el.hasAttribute("data-copied")', arg=email.element_handle())
+            self.assertEqual(page.evaluate('navigator.clipboard.readText()'), 'jason@spidleweb.net')
+            # The live region fills on the next frame, so a repeat copy is announced again.
+            page.wait_for_function("document.querySelector('[role=status]')?.textContent === 'Copied to clipboard'")
+            if touch:
+                self.assertEqual(email.locator('.email__done').text_content(), 'Copied to clipboard ✓')
+                self.assertTrue(email.locator('.email__done').is_visible())
+                self.assertTrue(email.locator('.email__address').is_hidden())
+            else:
+                tip = email.locator('.email__tip')
+                self.assertEqual(tip.text_content(), 'Copied to clipboard')
+                self.assertEqual(tip.evaluate('el => getComputedStyle(el).opacity'), '1')
+            self.assertEqual(urlsplit(page.url).path, '/index.html')
+            page.wait_for_function('el => !el.hasAttribute("data-copied")', arg=email.element_handle(), timeout=3000)
+            self.assertEqual(page.errors, [])
+            context.close()
+
+    def test_docked_bar_follows_scroll_and_steps_aside_for_the_legend(self):
+        for width, height in [(1440, 900), (390, 844)]:
+            page = self.open(self.context(viewport={'width': width, 'height': height}, reduced_motion='reduce'))
+            dock = page.locator('.view-dock')
+            hidden = 'el => el.hasAttribute("data-hidden")'
+            self.assertTrue(dock.evaluate(hidden))
+            self.assertEqual(dock.locator('a').evaluate_all('els => els.map(el => [el.getAttribute("href"), el.getAttribute("aria-current")])'),
+                             [['/', 'page'], ['/list/', None]])
+            page.mouse.move(width / 2, height / 2)
+            page.mouse.wheel(0, 1200)
+            page.wait_for_function('() => scrollY > 1000')
+            self.settle(page)
+            self.assertTrue(dock.evaluate(hidden))
+            page.mouse.wheel(0, -200)
+            page.wait_for_function('el => !el.hasAttribute("data-hidden")', arg=dock.element_handle())
+            box = dock.bounding_box()
+            self.assertGreater(box['y'] + box['height'], height - 40)
+            self.assertLess(box['y'] + box['height'], height)
+            if width < 600:
+                self.assertEqual((box['x'], box['width']), (16, 358))
+            else:
+                self.assertAlmostEqual(box['x'] + box['width'] / 2, width / 2, delta=1)
+            page.evaluate('scrollTo(0, document.documentElement.scrollHeight)')
+            page.wait_for_function('el => el.hasAttribute("data-hidden")', arg=dock.element_handle())
+            self.assertFalse(dock.is_visible())
+            self.assertEqual(page.errors, [])
+            page.close()
 
     def test_feed_monolith_layout_titles_icons_and_type_mix(self):
         page = self.open(self.context(viewport={'width': 1440, 'height': 900}), 'feed/')
@@ -769,256 +985,6 @@ class BrowserRegressions(unittest.TestCase):
             self.assertEqual(image.count(), 1)
             self.assertEqual(image.get_attribute('width'), '2880')
             self.assertEqual(image.get_attribute('height'), '2048')
-
-    # ---- Homepage variant E: Featured, mode switch, feed door ----
-
-    FEATURED = [('Expert Insights', '/work/expert-insights', 'VIEW CASE STUDY'),
-                ('Atomic Tools', 'https://tools.spidleweb.net', 'USE THE TOOLS'),
-                ('Two by Four', 'https://twobyfour.spidleweb.net', 'PLAY THE GAME')]
-    VIEWPORTS = [(1440, 900), (834, 1112), (390, 844), (320, 844), (1440, 400)]
-
-    def test_featured_never_advances_on_its_own(self):
-        page = self.open(self.context(reduced_motion='no-preference'))
-        before = self.featured_state(page)
-        self.assertEqual(before, {'shown': ['Expert Insights'], 'count': '01 / 03', 'next': 'Atomic Tools'})
-        page.wait_for_timeout(6000)
-        self.assertEqual(self.featured_state(page), before)
-        self.assertEqual(page.errors, [])
-
-    def test_featured_next_wraps_through_every_item_without_moving_the_page(self):
-        page = self.open(self.context(reduced_motion='reduce'))
-        button = page.locator('.featured__next')
-        self.assertEqual(page.locator('.featured__count').get_attribute('aria-live'), 'polite')
-        names = [name for name, _, _ in self.FEATURED]
-        geometry = []
-        for step in range(len(names) + 1):
-            index = step % len(names)
-            state = self.featured_state(page)
-            self.assertEqual(state['shown'], [names[index]])
-            self.assertEqual(state['count'], f'0{index + 1} / 03')
-            self.assertEqual(state['next'], names[(index + 1) % len(names)])
-            self.assertIn(names[index], page.locator('.featured__count').text_content())
-            item = page.locator('.featured__item.is-current')
-            self.assertEqual(item.locator('.featured__cta').get_attribute('href'), self.FEATURED[index][1])
-            self.assertIn(self.FEATURED[index][2], item.locator('.featured__cta').inner_text())
-            self.assertTrue(item.locator('.featured__cta').is_visible())
-            # Hidden items leave the tab order and the accessibility tree.
-            self.assertEqual(page.locator('.featured__cta:visible').count(), 1)
-            geometry.append(page.evaluate("""() => {
-              const top = selector => document.querySelector(selector).getBoundingClientRect().top;
-              const media = document.querySelector('.featured__item.is-current .featured__media').getBoundingClientRect();
-              return [top('#work'), top('.featured__pager'), media.top, media.height];
-            }"""))
-            button.click()
-        self.assertEqual(len(set(map(tuple, geometry))), 1, geometry)
-        self.assertEqual(geometry[0][3], 244)
-        self.assertEqual(page.errors, [])
-
-    def test_featured_next_works_from_the_keyboard_and_keeps_focus(self):
-        page = self.open(self.context(reduced_motion='reduce'))
-        page.locator('.featured__item.is-current .featured__cta').focus()
-        page.keyboard.press('Tab')
-        self.assertEqual(page.locator(':focus').get_attribute('class'), 'featured__next')
-        for key, expected in [('Enter', 'Atomic Tools'), ('Space', 'Two by Four'), ('Enter', 'Expert Insights')]:
-            page.keyboard.press(key)
-            self.assertEqual(self.featured_state(page)['shown'], [expected])
-            self.assertEqual(page.locator(':focus').get_attribute('class'), 'featured__next')
-        self.assertEqual(page.evaluate('scrollY'), 0)
-
-    def test_featured_first_item_works_without_javascript(self):
-        for options in ({'java_script_enabled': False}, {'block_script': True}):
-            page = self.open(self.context(**options))
-            with self.subTest(options=options):
-                self.assertEqual(page.locator('.featured__item:visible').count(), 1)
-                first = page.locator('.featured__item').first
-                self.assertTrue(first.locator('.featured__headline').is_visible())
-                self.assertEqual(first.locator('.featured__headline').inner_text(), 'AI-powered dashboard for soccer scouts')
-                cta = first.locator('.featured__cta')
-                self.assertTrue(cta.is_visible())
-                self.assertEqual(cta.get_attribute('href'), '/work/expert-insights')
-                self.assertFalse(page.locator('.featured__pager').is_visible())
-                self.assertFalse(page.locator('.featured__next').is_visible())
-                image = first.locator('img')
-                self.assertTrue(image.is_visible())
-                self.assertEqual(image.bounding_box()['height'], 242)
-            page.close()
-        page = self.open(self.context(java_script_enabled=False))
-        page.locator('.featured__item .featured__cta').first.click()
-        page.wait_for_url(f'{ORIGIN}/work/expert-insights')
-        self.assertEqual(page.locator('h1').text_content(), 'Expert Insights')
-
-    def test_featured_items_are_complete_and_external_links_use_the_subdomains(self):
-        page = self.open(self.context(reduced_motion='reduce'))
-        items = page.locator('.featured__item')
-        self.assertEqual(items.count(), len(self.FEATURED))
-        for index, (name, href, label) in enumerate(self.FEATURED):
-            item = items.nth(index)
-            self.assertEqual(item.get_attribute('data-name'), name)
-            self.assertTrue(item.locator('.featured__type').text_content().strip())
-            self.assertTrue(item.locator('.featured__headline').text_content().strip())
-            self.assertEqual(item.locator('.featured__media').locator('img, video').count(), 1)
-            cta = item.locator('.featured__cta')
-            self.assertEqual(cta.get_attribute('href'), href)
-            self.assertIn(cta.get_attribute('target'), [None, '_self'])
-        external = page.locator('.featured__cta[href^="https://"]').evaluate_all('els => els.map(el => el.hostname)')
-        self.assertEqual(external, ['tools.spidleweb.net', 'twobyfour.spidleweb.net'])
-        # No year is shown unless one is known.
-        self.assertEqual([text.strip() for text in page.locator('.featured__type').all_text_contents()],
-                         ['Case study · 2025', 'Tools · 2025–26', 'Game'])
-
-    def test_featured_images_decode_from_the_checkout(self):
-        for strip_avif in (False, True):
-            page = self.open(self.context(reduced_motion='reduce'))
-            if strip_avif:
-                page.locator('.featured source').evaluate_all('els => els.forEach(el => el.remove())')
-                page.locator('.featured img').evaluate_all("els => els.forEach(el => { el.src = el.getAttribute('src'); })")
-            sources = page.locator('.featured img').evaluate_all("""async images => {
-              await Promise.all(images.map(image => image.decode()));
-              return images.map(image => ({src: image.currentSrc, ok: image.complete && image.naturalWidth > 0}));
-            }""")
-            self.assertEqual(len(sources), 3)
-            for source in sources:
-                self.assertTrue(source['ok'], source)
-                self.assertTrue(source['src'].startswith(f'{ORIGIN}/assets/'), source)
-                self.assertTrue((ROOT / source['src'][len(ORIGIN) + 1:]).is_file(), source)
-            self.assertEqual(sum('/assets/placeholder-' in source['src'] for source in sources), 2)
-            page.close()
-
-    def test_featured_headlines_never_strand_a_word_and_swap_without_motion_when_reduced(self):
-        for width, height in self.VIEWPORTS:
-            page = self.open(self.context(viewport={'width': width, 'height': height}, reduced_motion='reduce'))
-            for index in range(len(self.FEATURED)):
-                lines = page.locator('.featured__item.is-current .featured__headline').evaluate("""el => {
-                  const text = el.firstChild; const lines = new Map();
-                  for (const match of text.textContent.matchAll(/\\S+/g)) {
-                    const range = document.createRange();
-                    range.setStart(text, match.index); range.setEnd(text, match.index + match[0].length);
-                    const top = Math.round(range.getBoundingClientRect().top);
-                    lines.set(top, (lines.get(top) || 0) + 1);
-                  }
-                  return [...lines.values()];
-                }""")
-                self.assertGreaterEqual(lines[-1], 2, ((width, height), index, lines))
-                self.assertEqual(page.locator('.featured__item.is-current').evaluate(
-                    'el => getComputedStyle(el).transitionDuration'), '0s')
-                page.locator('.featured__next').click()
-            self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
-            page.close()
-        page = self.open(self.context(reduced_motion='no-preference'))
-        self.assertNotEqual(page.locator('.featured__item.is-current').evaluate(
-            'el => getComputedStyle(el).transitionDuration'), '0s')
-
-    def test_featured_controls_never_overlap_with_enlarged_text_or_long_names(self):
-        # Review finding: a simulated second row let Next overlap the CTA once the text grew.
-        for width, height in [(320, 900), (390, 844), (834, 1112), (1440, 900)]:
-            page = self.open(self.context(viewport={'width': width, 'height': height}, reduced_motion='reduce'))
-            page.add_style_tag(content='html { font-size: 20px; }')
-            for step in range(len(self.FEATURED)):
-                page.locator('.featured__next-name').evaluate("el => { el.textContent = 'A considerably longer short name'; }")
-                # On phones the footer starts below the fold; the click must land inside the viewport.
-                page.locator('.featured__next').scroll_into_view_if_needed()
-                self.settle(page)
-                boxes = page.evaluate("""() => {
-                  const rect = el => { const b = el.getBoundingClientRect(); return {top: b.top, bottom: b.bottom, left: b.left, right: b.right}; };
-                  const cta = rect(document.querySelector('.featured__item.is-current .featured__cta'));
-                  const target = {top: cta.top - 5, bottom: cta.bottom + 5, left: cta.left - 1, right: cta.right + 1};
-                  const next = rect(document.querySelector('.featured__next'));
-                  const overlap = Math.min(target.right, next.right) > Math.max(target.left, next.left) &&
-                    Math.min(target.bottom, next.bottom) > Math.max(target.top, next.top);
-                  return {overlap, next, wrapped: next.bottom - next.top > 50, scrollWidth: document.documentElement.scrollWidth};
-                }""")
-                with self.subTest(viewport=(width, height), step=step):
-                    self.assertFalse(boxes['overlap'], boxes)
-                    self.assertLessEqual(boxes['scrollWidth'], width)
-                    if width == 320:
-                        self.assertTrue(boxes['wrapped'], boxes)
-                    # The corner of Next nearest the CTA must advance the pager, not follow the link.
-                    next_box = boxes['next']
-                    page.mouse.click(next_box['left'] + 2, next_box['top'] + 2)
-                    self.settle(page)
-                    self.assertEqual(page.url, f'{ORIGIN}/index.html')
-                    self.assertEqual(self.featured_state(page)['shown'], [self.FEATURED[(step + 1) % 3][0]])
-            page.close()
-
-    def test_work_list_still_lists_all_six_projects(self):
-        page = self.open(self.context(reduced_motion='reduce'))
-        self.assertEqual(page.locator('.index__row').evaluate_all('els => els.map(el => el.getAttribute("href"))'),
-                         [f'/work/{slug}' for slug in ['expert-insights', 'campaign-sim', 'everag', 'vidscrip', 'conservis', 'plinth']])
-        self.assertEqual(page.locator('.archive__nav a').first.inner_text(), 'WORK')
-        self.assertEqual(page.locator('#work-title span').first.inner_text(), 'WORK')
-        # Featured has no nav link, so it stays out of the scroll-spy's sections.
-        self.assertEqual(page.locator('.archive__nav .is-active').get_attribute('href'), '#work')
-        thumb = page.locator('.index__thumb').first.bounding_box()
-        self.assertEqual((thumb['width'], thumb['height']), (80, 50))
-
-    def test_mode_switch_marks_the_current_view_from_the_leading_side(self):
-        for width, height in [(1440, 900), (390, 844)]:
-            page = self.open(self.context(viewport={'width': width, 'height': height}))
-            switch = page.locator('nav.mode-switch')
-            self.assertEqual(switch.get_attribute('aria-label'), 'View')
-            self.assertIsNone(switch.get_attribute('role'))
-            links = switch.locator('a.mode-switch__link')
-            self.assertEqual(links.evaluate_all('els => els.map(el => [el.textContent, el.getAttribute("href"), el.getAttribute("aria-current")])'),
-                             [['Portfolio', '/', 'page'], ['Feed', 'feed/', None]])
-            marks = links.evaluate_all("""els => els.map(el => ['::before', '::after'].map(pseudo => {
-              const style = getComputedStyle(el, pseudo);
-              return style.content === 'none' ? null : [style.width, style.backgroundColor];
-            }))""")
-            self.assertEqual(marks, [[['6px', 'rgb(250, 25, 0)'], None], [None, None]])
-            boxes = [link.bounding_box() for link in links.all()]
-            for box in boxes:
-                self.assertGreaterEqual(box['width'], 44)
-                self.assertGreaterEqual(box['height'], 44)
-            # The labels keep their order and their hit areas do not overlap.
-            self.assertLessEqual(boxes[0]['x'] + boxes[0]['width'], boxes[1]['x'])
-            # The padded hit areas leave the switch one text line tall.
-            self.assertAlmostEqual(switch.bounding_box()['height'], links.first.evaluate(
-                'el => parseFloat(getComputedStyle(el).lineHeight)'), delta=0.5)
-            page.close()
-
-    def test_feed_door_is_one_decorated_link_that_clears_the_seam(self):
-        for width, height in self.VIEWPORTS:
-            page = self.open(self.context(viewport={'width': width, 'height': height}, reduced_motion='reduce'))
-            door = page.locator('a.feed-door')
-            self.assertEqual(door.count(), 1)
-            # The href is asserted, not followed: feed/ arrives with the Feed page.
-            self.assertEqual(door.get_attribute('href'), 'feed/')
-            self.assertEqual(page.locator('a[href="feed/"]').count(), 2)
-            self.assertIn('FEED', door.inner_text())
-            self.assertEqual(door.locator('img').evaluate_all('els => els.map(el => el.getAttribute("alt"))'), [''] * 5)
-            page.locator('.panel').evaluate('el => { el.scrollTop = el.scrollHeight; }')
-            clearance = page.evaluate("""() => {
-              const panel = document.querySelector('.panel').getBoundingClientRect();
-              const door = document.querySelector('.feed-door').getBoundingClientRect();
-              const about = document.querySelector('.panel__about').getBoundingClientRect();
-              const right = door.right - panel.left, bottom = door.bottom - panel.top;
-              // Desktop seam: (100%, 4%) to (93.5%, 100%). Phone seam: (0, 100%) to (100%, 93%).
-              const split = getComputedStyle(document.querySelector('.panel')).position === 'sticky';
-              const seamX = panel.width * (1 - 0.065 * (bottom - 0.04 * panel.height) / (0.96 * panel.height));
-              const seamY = panel.height * (1 - 0.07 * right / panel.width);
-              return {gap: split ? seamX - right : seamY - bottom, inside: door.left >= panel.left && door.bottom <= panel.bottom,
-                bottoms: Math.abs(door.bottom - about.bottom), beside: door.left >= about.right, split};
-            }""")
-            with self.subTest(viewport=(width, height)):
-                self.assertGreaterEqual(clearance['gap'], 16, clearance)
-                self.assertTrue(clearance['inside'], clearance)
-                thumbs = door.locator('.feed-door__thumbs')
-                if (width, height) == (1440, 900):
-                    self.assertLess(clearance['bottoms'], 1, clearance)
-                    self.assertTrue(clearance['beside'], clearance)
-                    box = thumbs.bounding_box()
-                    self.assertEqual((box['width'], box['height']), (188, 76))
-                    sizes = thumbs.locator('img').evaluate_all('els => els.map(el => [el.offsetWidth, el.offsetHeight])')
-                    self.assertEqual(sizes, [[60, 76], [60, 34], [60, 38], [60, 48], [60, 24]])
-                    self.assertTrue(thumbs.locator('img').evaluate_all("""async images => {
-                      images.forEach(image => { image.loading = 'eager'; });
-                      await Promise.all(images.map(image => image.decode()));
-                      return images.every(image => image.naturalWidth > 0);
-                    }"""))
-                # The thumbnails fold away on phones and short panels; the link itself never does.
-                self.assertEqual(thumbs.is_visible(), width > 768 and height > 560)
-                self.assertTrue(door.is_visible())
-            page.close()
 
 
 if __name__ == '__main__':

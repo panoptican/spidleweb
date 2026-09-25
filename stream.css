@@ -1,0 +1,448 @@
+/* spidleweb.net: Craft, the stream.
+
+   The headline and filters, the Grid of cards the generator writes
+   (scripts/build-stream.mjs, "Card contract" in specs/redesign.md), and the
+   pagination under the last column. style.css holds the tokens and the chrome;
+   the open-in-place panels are in panel.css. Values come from Paper, row 02. */
+
+/* ---- Head: the headline, with the filters at its foot ---- */
+
+.craft-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 40px;
+  padding: 64px var(--gutter) 36px;
+}
+
+.craft-head__line {
+  max-width: 960px;
+  font-family: var(--display);
+  font-size: 31px;
+  font-weight: 400;
+  line-height: 38px;
+  letter-spacing: -0.015em;
+  text-wrap: pretty;
+}
+
+/* ---- Filters ----
+   Progressive enhancement over each card's data-type and data-industry, so
+   they only show when site.js runs. Each is a native select laid invisibly
+   over its label, which keeps the platform's own menu and keyboard support. */
+
+.filters {
+  display: flex;
+  flex: none;
+  gap: 22px;
+  padding-bottom: 6px;
+  line-height: 14px;
+}
+
+html:not(.js) .filters { display: none; }
+
+.filter {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  min-height: 44px;
+  margin: -15px 0;
+  white-space: nowrap;
+}
+
+.filter__select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+  /* 16px keeps iOS from zooming in when the select takes focus */
+  font-size: 16px;
+  appearance: none;
+}
+
+.filter:has(.filter__select:focus-visible) {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .filter:hover .filter__value { text-decoration: underline; text-underline-offset: 4px; }
+}
+
+/* ---- The Grid ---- */
+
+.stream-grid {
+  --columns: 5;
+  --card-gap: 10px;
+  --stack-step: 7px;
+  display: grid;
+  grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+  gap: 40px 20px;
+  padding: 0 var(--gutter);
+}
+
+/* Pagination and the filters hide cards with the hidden attribute. */
+[data-stream] > [hidden] { display: none !important; }
+
+@media (max-width: 1199px) { .stream-grid { --columns: 4; } }
+@media (max-width: 899px) { .stream-grid { --columns: 3; } }
+@media (max-width: 599px) {
+  .stream-grid {
+    --columns: 2;
+    --card-gap: 8px;
+    --stack-step: 6px;
+    gap: 28px 14px;
+  }
+}
+
+/* ---- Cards ----
+   The theme class on a case-study card resets --paper and --ink to the
+   project's, so the card puts the site's back. It keeps --case-dark and
+   --chip for the stack, the chip, and the project name. */
+
+.stream-card {
+  --paper: var(--site-paper);
+  --ink: var(--site-ink);
+  min-width: 0;
+  color: var(--ink);
+}
+
+.stream-card__link {
+  display: flex;
+  flex-direction: column;
+  color: inherit;
+  text-decoration: none;
+}
+
+.stream-card__media {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 256 / 182;
+  background: var(--frame-empty);
+}
+
+.stream-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left top;
+  background: #fff;
+  outline: 1px solid var(--line);
+  outline-offset: -1px;
+}
+
+/* A phone capture stands in its frame at phone proportions, cropped below. */
+.stream-card__media[data-shape="tall"] img {
+  width: 37.5%;
+  height: auto;
+  margin: 7% auto 0;
+  object-fit: fill;
+}
+
+.stream-card__media--empty {
+  background:
+    repeating-linear-gradient(135deg, transparent 0 10px, var(--line) 10px 11px),
+    var(--frame-empty);
+}
+
+/* A tool without a capture is an ink tile that repeats its name as cover art. */
+.stream-card__media--tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px;
+  background: var(--site-ink);
+  color: var(--site-paper);
+}
+
+.stream-card__kicker {
+  color: rgb(242 242 239 / 0.6);
+  font-family: var(--mono);
+  font-size: var(--text-micro);
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  line-height: 14px;
+  text-transform: uppercase;
+}
+
+.stream-card__tile-title {
+  max-width: 11em;
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 19px;
+  text-transform: uppercase;
+}
+
+/* A case study is a stack: its cover in front, two leaves of the project's
+   colour behind, each a step up and to the right. */
+.stream-card[data-type="case-study"] .stream-card__media {
+  overflow: visible;
+  background: none;
+}
+
+.stream-card[data-type="case-study"] .stream-card__media::before,
+.stream-card[data-type="case-study"] .stream-card__media::after {
+  content: "";
+  position: absolute;
+}
+
+.stream-card[data-type="case-study"] .stream-card__media::before {
+  inset: 0 0 calc(var(--stack-step) * 2) calc(var(--stack-step) * 2);
+  background: var(--case-dark);
+}
+
+.stream-card[data-type="case-study"] .stream-card__media::after {
+  inset: var(--stack-step);
+  background: color-mix(in oklch, var(--case-dark) 78%, var(--site-paper));
+}
+
+.stream-card[data-type="case-study"] .stream-card__media img {
+  position: absolute;
+  z-index: 1;
+  bottom: 0;
+  left: 0;
+  width: calc(100% - var(--stack-step) * 2);
+  height: calc(100% - var(--stack-step) * 2);
+}
+
+/* Badges and running time sit on the frame. */
+.stream-card__badge,
+.stream-card__time {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--site-ink);
+  color: var(--site-paper);
+  font-family: var(--mono);
+  font-size: var(--text-micro);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  line-height: 14px;
+  text-transform: uppercase;
+}
+
+.stream-card__badge {
+  bottom: 10px;
+  left: 10px;
+  padding: 5px 8px;
+}
+
+.stream-card__time {
+  right: 8px;
+  bottom: 8px;
+  padding: 3px 6px;
+}
+
+.stream-card[data-type="prototype"] .stream-card__badge::before {
+  content: "▶";
+  content: "▶" / "";
+  color: var(--accent);
+}
+
+/* A reel is a vertical poster on an ink tile. */
+.stream-card[data-type="reel"] .stream-card__media { background: var(--site-ink); }
+
+.stream-card[data-type="reel"] .stream-card__media[data-shape="tall"] img {
+  width: auto;
+  height: 100%;
+  margin: 0 auto;
+}
+
+.stream-card[data-type="reel"] .stream-card__media--empty {
+  background:
+    repeating-linear-gradient(135deg, transparent 0 10px, var(--ink-rule) 10px 11px),
+    var(--site-ink);
+}
+
+.stream-card[data-type="reel"] .stream-card__badge {
+  top: 10px;
+  bottom: auto;
+  padding: 3px 6px;
+  border: 1px solid rgb(242 242 239 / 0.5);
+  background: transparent;
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  line-height: 12px;
+}
+
+.stream-card[data-type="reel"] .stream-card__time {
+  background: var(--site-paper);
+  color: var(--site-ink);
+}
+
+.stream-card[data-type="reel"] .stream-card__time::before {
+  content: "▶";
+  content: "▶" / "";
+}
+
+/* A video shows a play button over its poster. */
+.stream-card[data-type="video"] .stream-card__media::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  width: 48px;
+  height: 48px;
+  margin: -24px 0 0 -24px;
+  border-radius: 50%;
+  background: var(--site-ink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23f2f2ef' d='M18 15v18l16-9z'/%3E%3C/svg%3E") center / 48px no-repeat;
+}
+
+.stream-card__title {
+  margin-top: var(--card-gap);
+  font-size: 14px;
+  line-height: 19px;
+  text-wrap: pretty;
+}
+
+.stream-card__meta {
+  margin-top: var(--card-gap);
+  color: var(--ink-soft);
+  line-height: 14px;
+}
+
+/* The project's name and chip read as one unit, and wrap as one, with the
+   name hanging clear of the chip. */
+.stream-card__case {
+  display: inline-block;
+  color: var(--case-dark);
+}
+
+.stream-card__chip {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin: 0 8px 0 1px;
+  background: var(--chip);
+}
+
+.stream-card[data-type="case-study"] .stream-card__chip { margin-left: 0; }
+
+.stream-card__link:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 6px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .stream-card__link:hover .stream-card__title {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+}
+
+/* ---- No matches ---- */
+
+.stream-empty {
+  padding: 8px var(--gutter) 0;
+  font-family: var(--display);
+  font-size: 20px;
+  line-height: 28px;
+}
+
+.stream-empty__clear {
+  min-height: 44px;
+  margin-left: 12px;
+  padding: 0 14px;
+  border: 1.5px solid var(--ink);
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+/* ---- Pagination: right-aligned under the last column ---- */
+
+.stream-foot {
+  --columns: 5;
+  display: grid;
+  grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+  column-gap: 20px;
+  padding: 52px var(--gutter) 44px;
+}
+
+@media (max-width: 1199px) { .stream-foot { --columns: 4; } }
+@media (max-width: 899px) { .stream-foot { --columns: 3; } }
+@media (max-width: 599px) { .stream-foot { --columns: 2; column-gap: 14px; padding-top: 28px; } }
+
+.pager { grid-column: -2 / -1; }
+.pager[hidden] { display: none; }
+.pager__count { line-height: 14px; }
+
+.pager__bar {
+  height: 3px;
+  margin-top: 8px;
+  background: color-mix(in srgb, var(--ink) 15%, transparent);
+}
+
+.pager__fill {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--ink);
+}
+
+.pager__more {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px 18px;
+  border: 1.5px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  line-height: 14px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.pager__more[hidden] { display: none; }
+
+.pager__more:focus-visible,
+.stream-empty__clear:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pager__more:hover,
+  .stream-empty__clear:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+}
+
+/* ---- Narrow windows and phones ----
+   Below 1000px the filters move under the headline, so it keeps its measure. */
+
+@media (max-width: 999px) {
+  .craft-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filters { gap: 24px; padding-bottom: 0; }
+  .filter { margin: 0; }
+}
+
+@media (max-width: 799px) {
+  .craft-head { padding: 56px var(--gutter) 28px; }
+}
+
+@media (max-width: 599px) {
+  .craft-head__line {
+    font-size: 18px;
+    line-height: 24px;
+  }
+
+  .stream-card__media--tile { padding: 12px; }
+  .stream-card__badge { bottom: 8px; left: 8px; padding: 4px 7px; }
+  .pager__more { padding: 15px 16px; }
+}
