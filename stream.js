@@ -593,6 +593,12 @@
   // beside the story, and "solo" is the story alone. The markup order is the
   // phone's reading order.
 
+  /** Read the full case study →, unless this is already that page. */
+  function studyLink(study) {
+    const here = location.pathname.replace(/\.html$/, '').replace(/\/$/, '');
+    return study.href === here ? '' : cta(study.href, 'Read the full case study', '→');
+  }
+
   function bandFacts(study) {
     return facts([['Role', study.facts[0]], ['Scope', study.facts[2]]]);
   }
@@ -622,7 +628,7 @@
         strip(frames, start, `${study.title} screens`),
         lede(study.note, 'intro'),
         bandFacts(study),
-        cta(study.href, 'Read the full case study', '→'),
+        studyLink(study),
         closer(),
       ].join(''),
     };
@@ -692,7 +698,7 @@
         lede(item.note),
         `<div class="stream-panel__media">${stage}</div>`,
         facts([['Industry', item.industry], ['Platform', item.platform], ...(item.facts || []).map((f) => [f.label, f.value]), ['Shared', monthYear(item.shared)]]),
-        band ? cta(study.href, 'Read the full case study', '→') : '',
+        band ? studyLink(study) : '',
         `<div class="stream-panel__aside">${steps(item, ctx.level)}${relatedBlock(ctx.related, ctx.level)}</div>`,
         closer(open),
       ].join(''),
@@ -782,7 +788,7 @@
         lede(item.note),
         `<div class="stream-panel__media">${player(item, { eager: true, vertical: true })}</div>`,
         facts([['Project', item.project], ['Running time', item.media?.duration], ['Shared', monthYear(item.shared)]]),
-        study ? cta(study.href, 'Read the full case study', '→') : '',
+        study ? studyLink(study) : '',
         `<div class="stream-panel__aside">${relatedBlock(ctx.related, ctx.level)}</div>`,
         closer(),
       ].join(''),
