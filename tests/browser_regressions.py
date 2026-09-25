@@ -1021,5 +1021,330 @@ class BrowserRegressions(unittest.TestCase):
             page.close()
 
 
+    # ---- Open in place (Phase 2B): stream.js and panel.css on the fixtures ----
+
+    GRID = 'content/fixtures/grid.html'
+    LIST = 'content/fixtures/list.html'
+
+    def open_item(self, page, item_id):
+        """Click a stream card and wait for its panel to settle."""
+        link = page.locator(f'.stream-card [data-open="{item_id}"], .stream-row [data-open="{item_id}"]').first
+        link.scroll_into_view_if_needed()
+        link.click()
+        self.wait_for_panel(page, item_id)
+        return link
+
+    def wait_for_panel(self, page, item_id):
+        page.wait_for_function("""id => {
+          const panel = document.getElementById('stream-panel');
+          return panel && !panel.classList.contains('is-moving') && location.hash === `#${id}`;
+        }""", arg=item_id)
+        self.settle(page)
+
+    def panel_state(self, page):
+        """Where the panel sits, what it follows, and where its rise peaks."""
+        return page.evaluate("""() => {
+          const panel = document.getElementById('stream-panel');
+          if (!panel) return null;
+          const rect = panel.getBoundingClientRect();
+          const d = panel.querySelector('.stream-panel__rise path').getAttribute('d');
+          const peak = d.split('C')[1].trim().split(/\\s+/).map(Number)[4];
+          const opener = document.querySelector('[data-open][aria-expanded="true"]');
+          const card = opener && opener.closest('.stream-card, .stream-row');
+          const box = card && card.getBoundingClientRect();
+          return {
+            prev: panel.previousElementSibling && panel.previousElementSibling.id,
+            next: panel.nextElementSibling && panel.nextElementSibling.id,
+            top: rect.top + scrollY, bottom: rect.bottom + scrollY,
+            left: rect.left, width: rect.width, viewport: document.documentElement.clientWidth,
+            peak, opener: card && card.id, openerCentre: box && box.left + box.width / 2,
+            title: panel.querySelector('#stream-panel-title').textContent.trim(),
+            tone: panel.dataset.tone,
+          };
+        }""")
+
+    def item_ids(self, page, selector):
+        return page.eval_on_selector_all(selector, 'els => els.map(el => el.id)')
+
+    def row_end(self, page, selector, item_id):
+        """The last item sharing the given item's top edge, read from layout without a panel."""
+        return page.evaluate("""([selector, id]) => {
+          const items = [...document.querySelectorAll(selector)];
+          const top = document.getElementById(id).getBoundingClientRect().top;
+          return items.filter(el => Math.abs(el.getBoundingClientRect().top - top) < 2).pop().id;
+        }""", [selector, item_id])
+
+    def test_open_in_place_opens_under_the_row_of_the_clicked_card(self):
+        cases = [
+            (self.GRID, '.stream-grid > .stream-card', 1440, 6, 9),   # five columns: 7th card, row ends at the 10th
+            (self.GRID, '.stream-grid > .stream-card', 390, 2, 3),    # two columns on phones
+            (self.LIST, '.stream-list > .stream-row', 1440, 2, 3),    # List opens under the pair
+            (self.LIST, '.stream-list > .stream-row', 390, 2, 2),     # one column on phones
+        ]
+        for path, selector, width, index, end in cases:
+            with self.subTest(path=path, width=width):
+                page = self.open(self.context(viewport={'width': width, 'height': 900}), path)
+                ids = self.item_ids(page, selector)
+                self.assertEqual(self.row_end(page, selector, ids[index]), ids[end])
+                self.open_item(page, ids[index])
+                state = self.panel_state(page)
+                self.assertEqual(state['prev'], ids[end])
+                self.assertEqual(state['next'], ids[end + 1])
+                self.assertEqual(state['opener'], ids[index])
+                # Full bleed, below the row, and the rise under the opener's centre.
+                self.assertEqual((state['left'], state['width']), (0, state['viewport']))
+                opener_bottom = page.locator(f'#{ids[index]}').evaluate('el => el.getBoundingClientRect().bottom + scrollY')
+                self.assertGreater(state['top'], opener_bottom)
+                self.assertAlmostEqual(state['peak'], state['openerCentre'], delta=0.6)
+                next_top = page.locator(f'#{ids[end + 1]}').evaluate('el => el.getBoundingClientRect().top + scrollY')
+                self.assertGreaterEqual(next_top, state['bottom'])
+                self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
+                self.assertEqual(page.errors, [])
+                page.close()
+
+    def test_open_in_place_follows_its_card_when_the_layout_reflows(self):
+        page = self.open(self.context(), self.GRID)
+        selector = '.stream-grid > .stream-card'
+        ids = self.item_ids(page, selector)
+        self.open_item(page, ids[6])
+        self.assertEqual(self.panel_state(page)['prev'], ids[9])
+        # Three columns below 1100px: the 7th card's row now ends at the 9th.
+        page.set_viewport_size({'width': 900, 'height': 900})
+        page.wait_for_function("id => document.getElementById('stream-panel').previousElementSibling.id === id", arg=ids[8])
+        self.settle(page)
+        state = self.panel_state(page)
+        self.assertEqual(state['opener'], ids[6])
+        self.assertEqual((state['left'], state['width']), (0, 900))
+        self.assertAlmostEqual(state['peak'], state['openerCentre'], delta=0.6)
+        # Every row above the panel is whole.
+        tops = page.eval_on_selector_all(selector, 'els => els.slice(0, 9).map(el => Math.round(el.getBoundingClientRect().top))')
+        self.assertEqual(len(set(tops)), 3)
+        self.assertEqual(page.errors, [])
+
+    def test_open_in_place_escape_or_close_closes_and_returns_focus(self):
+        page = self.open(self.context(), self.GRID)
+        link = page.locator('.stream-card [data-open="fields-on-the-map"]')
+        self.assertEqual(link.get_attribute('aria-expanded'), 'false')
+        link.focus()
+        page.keyboard.press('Enter')
+        self.wait_for_panel(page, 'fields-on-the-map')
+        self.assertEqual(link.get_attribute('aria-expanded'), 'true')
+        self.assertEqual(link.get_attribute('aria-controls'), 'stream-panel')
+        self.assertEqual(page.evaluate('document.activeElement.id'), 'stream-panel-title')
+        self.assertEqual(page.locator('#stream-panel').get_attribute('aria-labelledby'), 'stream-panel-title')
+        page.keyboard.press('Escape')
+        page.wait_for_function("() => !document.querySelector('.stream-panel')")
+        self.assertEqual(link.get_attribute('aria-expanded'), 'false')
+        self.assertTrue(link.evaluate('el => el === document.activeElement'))
+        # The visible Close button does the same, and so does the open card.
+        self.open_item(page, 'fields-on-the-map')
+        page.locator('#stream-panel [data-panel-close]:visible').click()
+        page.wait_for_function("() => !document.querySelector('.stream-panel')")
+        self.assertTrue(link.evaluate('el => el === document.activeElement'))
+        self.open_item(page, 'fields-on-the-map')
+        link.click()
+        page.wait_for_function("() => !document.querySelector('.stream-panel')")
+        self.assertEqual(page.errors, [])
+
+    def test_open_in_place_sets_and_clears_the_hash_without_history_steps(self):
+        page = self.open(self.context(), self.GRID)
+        steps = page.evaluate('history.length')
+        self.open_item(page, 'fields-on-the-map')
+        self.assertEqual(urlsplit(page.url).fragment, 'fields-on-the-map')
+        # Another card moves the panel and the address with it.
+        self.open_item(page, 'weekly-activity-calendar')
+        self.assertEqual(urlsplit(page.url).fragment, 'weekly-activity-calendar')
+        self.assertEqual(page.locator('.stream-panel').count(), 1)
+        page.keyboard.press('Escape')
+        page.wait_for_function("() => !document.querySelector('.stream-panel')")
+        self.assertEqual(urlsplit(page.url).fragment, '')
+        self.assertEqual(page.evaluate('history.length'), steps)
+        self.assertEqual(page.errors, [])
+
+    def test_open_in_place_deep_link_reveals_the_item_and_opens_it(self):
+        context = self.context()
+        context.add_init_script("""window.__reveals = [];
+          document.addEventListener('stream:reveal', event => window.__reveals.push(event.detail.id));""")
+        page = self.open(context, f'{self.GRID}#population-forecast-matrix')
+        self.wait_for_panel(page, 'population-forecast-matrix')
+        self.assertEqual(page.evaluate('window.__reveals'), ['population-forecast-matrix'])
+        state = self.panel_state(page)
+        ids = self.item_ids(page, '.stream-grid > .stream-card')
+        self.assertEqual(state['opener'], 'population-forecast-matrix')
+        self.assertEqual(state['prev'], self.row_end(page, '.stream-grid > .stream-card', 'population-forecast-matrix'))
+        self.assertIn(state['prev'], ids)
+        # A case-study item opens in its project's band.
+        self.assertEqual(state['tone'], 'band')
+        self.assertIn('theme-everag', page.locator('#stream-panel').get_attribute('class'))
+        self.assertEqual(page.evaluate('document.activeElement.id'), 'stream-panel-title')
+        top = page.locator('#population-forecast-matrix').evaluate('el => el.getBoundingClientRect().top')
+        self.assertTrue(0 <= top < 900)
+        self.assertEqual(page.errors, [])
+        # On a fresh load, an unknown fragment opens nothing and throws nothing.
+        page = self.open(self.context(), f'{self.GRID}#not-an-item')
+        page.wait_for_load_state('load')
+        self.settle(page)
+        self.assertEqual(page.locator('.stream-panel').count(), 0)
+        self.assertEqual(page.errors, [])
+
+    def test_open_in_place_arrow_keys_change_what_shows_but_not_where(self):
+        page = self.open(self.context(), self.GRID)
+        # A case study's strip: the count and caption step, the panel stays.
+        self.open_item(page, 'expert-insights')
+        panel = page.locator('#stream-panel')
+        count = panel.locator('[data-strip-count] [aria-hidden="true"]')
+        caption = panel.locator('[data-strip-caption]')
+        before = self.panel_state(page)
+        self.assertEqual(count.text_content(), '01 / 07')
+        first_caption = caption.text_content()
+        page.keyboard.press('ArrowRight')
+        page.wait_for_function("() => document.querySelector('[data-strip-count] [aria-hidden]').textContent === '02 / 07'")
+        page.wait_for_timeout(700)
+        self.assertNotEqual(caption.text_content(), first_caption)
+        track_left = panel.locator('[data-strip-track]').evaluate('el => el.scrollLeft')
+        frame_left = panel.locator('.stream-strip__frame[data-index="1"]').evaluate('el => el.offsetLeft')
+        self.assertAlmostEqual(track_left, frame_left, delta=1)
+        after = self.panel_state(page)
+        self.assertEqual((after['top'], after['prev']), (before['top'], before['prev']))
+        self.assertEqual(urlsplit(page.url).fragment, 'expert-insights')
+        page.keyboard.press('ArrowLeft')
+        page.wait_for_function("() => document.querySelector('[data-strip-count] [aria-hidden]').textContent === '01 / 07'")
+        # A neutral screen steps through its related items in the same place.
+        self.open_item(page, 'weekly-activity-calendar')
+        before = self.panel_state(page)
+        self.assertEqual(panel.locator('.stream-related__count').text_content(), '1 of 4')
+        page.keyboard.press('ArrowRight')
+        page.wait_for_function("() => location.hash === '#daily-activity-schedule'")
+        self.settle(page)
+        after = self.panel_state(page)
+        expected = page.evaluate("JSON.parse(document.getElementById('stream-data').textContent).items['daily-activity-schedule'].title")
+        self.assertEqual(after['title'], expected)
+        self.assertNotEqual(after['title'], before['title'])
+        self.assertEqual(panel.locator('.stream-related__count').text_content(), '2 of 4')
+        self.assertEqual((after['top'], after['prev'], after['opener']), (before['top'], before['prev'], before['opener']))
+        self.assertAlmostEqual(after['peak'], before['peak'], delta=0.1)
+        # Keys with a modifier belong to the browser.
+        page.keyboard.press('Alt+ArrowLeft')
+        self.settle(page)
+        self.assertEqual(urlsplit(page.url).fragment, 'daily-activity-schedule')
+        self.assertEqual(page.errors, [])
+
+    def test_open_in_place_about_opens_under_the_masthead_with_the_rise(self):
+        for width in (1440, 390):
+            with self.subTest(width=width):
+                page = self.open(self.context(viewport={'width': width, 'height': 900}), self.GRID)
+                self.assertTrue(page.evaluate("document.documentElement.classList.contains('panels')"))
+                about = page.locator('#about')
+                self.assertFalse(about.is_visible())
+                if width < 800:
+                    page.locator('.masthead__trigger').click()
+                link = page.locator('.masthead__places a[href="#about"]')
+                link.click()
+                page.wait_for_function("() => !document.getElementById('about').hidden && location.hash === '#about'")
+                self.settle(page)
+                self.assertEqual(page.evaluate('document.activeElement.id'), 'about-title')
+                rise = page.locator('#about').evaluate("""el => {
+                  const svg = el.previousElementSibling;
+                  const d = svg.querySelector('path').getAttribute('d');
+                  return {cls: svg.getAttribute('class'), width: svg.getBoundingClientRect().width,
+                          peak: d.split('C')[1].trim().split(/\\s+/).map(Number)[4]};
+                }""")
+                self.assertIn('stream-about-rise', rise['cls'])
+                self.assertEqual(rise['width'], page.evaluate('document.documentElement.clientWidth'))
+                # Under About on desktop, and under the menu trigger on a phone.
+                anchor = page.locator('.masthead__trigger' if width < 800 else '.masthead__places a[href="#about"]')
+                box = anchor.bounding_box()
+                self.assertAlmostEqual(rise['peak'], box['x'] + box['width'] / 2, delta=0.6)
+                page.keyboard.press('Escape')
+                page.wait_for_function("() => document.getElementById('about').hidden")
+                self.assertEqual(urlsplit(page.url).fragment, '')
+                self.assertEqual(page.evaluate("document.activeElement.getAttribute('href') === '#about' || document.activeElement.classList.contains('masthead__trigger')"), True)
+                self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
+                self.assertEqual(page.errors, [])
+                page.close()
+
+    def test_open_in_place_reduced_motion_shows_the_final_state_at_once(self):
+        page = self.open(self.context(reduced_motion='reduce'), self.GRID)
+        page.locator('.stream-card [data-open="fields-on-the-map"]').click()
+        # No animation runs, so the panel is at full height on the next frame.
+        state = page.evaluate("""() => new Promise(resolve => requestAnimationFrame(() => {
+          const panel = document.getElementById('stream-panel');
+          resolve({animations: document.getAnimations().length, moving: panel.classList.contains('is-moving'),
+                   height: panel.getBoundingClientRect().height});
+        }))""")
+        self.assertEqual(state['animations'], 0)
+        self.assertFalse(state['moving'])
+        self.assertGreater(state['height'], 400)
+        page.keyboard.press('Escape')
+        self.assertEqual(page.locator('.stream-panel').count(), 0)
+        self.assertEqual(page.errors, [])
+
+    def test_open_in_place_every_kind_fits_a_phone_without_sideways_scroll(self):
+        page = self.open(self.context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True), self.GRID)
+        kinds = ['expert-insights', 'fields-on-the-map', 'weekly-activity-calendar', 'channel-impact-simulator',
+                 'description-generator', 'how-i-built-description-generator', 'filtering-fields',
+                 'markdown-to-rich-text', 'family-week', 'plinth']
+        for item_id in kinds:
+            with self.subTest(item=item_id):
+                self.open_item(page, item_id)
+                self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), 390)
+                # Close is a 44px target at the top of the panel on a phone.
+                close = page.locator('#stream-panel .stream-panel__close--head').bounding_box()
+                self.assertGreaterEqual(close['height'], 44)
+        self.assertEqual(page.errors, [])
+
+    def test_open_in_place_prototypes_on_a_phone_follow_their_platform(self):
+        context = self.context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True)
+        page = self.open(context, self.GRID)
+        # A web prototype is not offered live on a phone.
+        self.open_item(page, 'channel-impact-simulator')
+        self.assertIn('Runs on a larger screen', page.locator('#stream-panel .stream-proto__note').text_content())
+        self.assertEqual(page.locator('#stream-panel iframe').count(), 0)
+        page.keyboard.press('Escape')
+        # A mobile prototype whose demo is missing opens inline and says so.
+        self.open_item(page, 'activity-central')
+        self.assertIn('not published yet', page.locator('#stream-panel .stream-proto__note').text_content())
+        page.keyboard.press('Escape')
+        page.close()
+        # With its demo published, it goes full screen and the back gesture closes it.
+        page = context.new_page()
+        page.errors = []
+        page.on('pageerror', lambda error: page.errors.append(str(error)))
+        page.route('**/demos/activity-central/**', lambda route: route.fulfill(
+            content_type='text/html', body='<title>Activity Central demo</title>Demo'))
+        page.goto(f'{ORIGIN}/{self.GRID}')
+        self.settle(page)
+        link = page.locator('.stream-card [data-open="activity-central"]')
+        link.click()
+        dialog = page.locator('dialog.stream-fullscreen')
+        dialog.wait_for(state='visible')
+        # Its own history entry, so that going back closes it.
+        self.assertEqual(page.evaluate('history.state.streamFullscreen'), 'activity-central')
+        self.assertEqual(urlsplit(page.url).fragment, 'activity-central')
+        self.assertTrue(page.locator('.stream-fullscreen__close').evaluate('el => el === document.activeElement'))
+        self.assertGreaterEqual(page.locator('.stream-fullscreen__close').bounding_box()['height'], 44)
+        self.assertEqual(dialog.bounding_box()['width'], 390)
+        page.go_back()
+        page.wait_for_function("() => !document.querySelector('dialog.stream-fullscreen')")
+        self.assertEqual(urlsplit(page.url).path, f'/{self.GRID}')
+        self.assertEqual(urlsplit(page.url).fragment, '')
+        self.assertTrue(link.evaluate('el => el === document.activeElement'))
+        # Close does the same.
+        link.click()
+        dialog.wait_for(state='visible')
+        page.locator('.stream-fullscreen__close').click()
+        page.wait_for_function("() => !document.querySelector('dialog.stream-fullscreen')")
+        self.assertEqual(urlsplit(page.url).fragment, '')
+        self.assertFalse(page.evaluate('Boolean(history.state && history.state.streamFullscreen)'))
+        self.assertEqual(page.errors, [])
+
+    def test_open_in_place_cards_stay_links_without_javascript(self):
+        page = self.open(self.context(java_script_enabled=False), self.GRID)
+        link = page.locator('.stream-card [data-open="fields-on-the-map"]')
+        self.assertIsNone(link.get_attribute('aria-expanded'))
+        link.click()
+        page.wait_for_url(f'{ORIGIN}/work/conservis#fig-conservis-03')
+        self.assertEqual(page.locator('.stream-panel').count(), 0)
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
