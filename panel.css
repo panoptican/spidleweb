@@ -304,6 +304,17 @@ html.panels .about {
   text-decoration: none;
 }
 
+/* A mono line is 13px tall, so the link's hit area grows to 44px, over the
+   whole value, without moving the fact rows or the focus ring. It hangs off
+   the value rather than the link, since a link that wraps would give it the
+   width of its last line only. */
+.stream-panel__facts dd { position: relative; }
+.stream-panel__jump::before {
+  content: "";
+  position: absolute;
+  inset: -15.5px 0;
+}
+
 .stream-panel__cta {
   display: flex;
   align-items: center;

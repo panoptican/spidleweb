@@ -227,7 +227,11 @@ a { color: inherit; }
   text-wrap: pretty;
 }
 .case-context__links { margin-top: 18px; font-size: 19px; }
-.case-context__links a { display: inline-block; padding: 8px 0; }
+.case-context__links a { position: relative; display: inline-block; padding: 8px 0; }
+/* The padded link is 42.6px tall; the hit area adds the rest of 44px
+   without moving the line. It grows upward only, since the link ends the
+   rail and anything below it would overflow the rail. */
+.case-context__links a::before { content: ""; position: absolute; inset: -2px 0 0; }
 .case-context a,
 .proof a {
   color: var(--case-dark);
