@@ -19,15 +19,54 @@
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="../assets/fonts/eb-garamond/eb-garamond-latin-400-v33.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../fonts/GT-America-Expanded-Regular.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../style.css">
+  <script>document.documentElement.classList.add('js')</script>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/site.js" defer onerror="document.documentElement.classList.remove('js')"></script>
+  <link rel="stylesheet" href="/pages.css">
   <script defer src="https://analytics.spidleweb.net/script.js" data-website-id="49720a36-6280-4d69-9531-c1d0c36b8f11"></script>
 </head>
 <body class="case-study theme-plinth">
   <a class="skip-link micro" href="#project">Skip to project</a>
-  <header class="case-masthead micro">
-    <a class="case-masthead__identity" href="/">Jason Spidle <span>/ Work</span></a>
-    <a class="case-masthead__index" href="/">← Index</a>
+  <header class="masthead" id="top">
+    <div class="masthead__id">
+      <p class="masthead__name"><a href="/">Jason Spidle</a></p>
+      <p class="masthead__role micro">Product designer · Minneapolis</p>
+    </div>
+    <nav class="masthead__nav" aria-label="Site">
+      <button class="masthead__trigger micro" type="button" aria-expanded="false" aria-controls="site-places"><span class="visually-hidden">Menu, </span>Work</button>
+      <ul class="masthead__places micro" id="site-places">
+        <li><a href="/">Craft</a></li>
+        <li><a href="/work/" aria-current="page">Work</a></li>
+        <li><a href="/writing/">Writing</a></li>
+        <li><a href="#about">About</a></li>
+      </ul>
+    </nav>
   </header>
+
+  <section class="about" id="about" aria-labelledby="about-title" hidden>
+    <div class="about__inner">
+      <p class="about__kicker micro"><span>About</span><span class="about__place">Minneapolis</span></p>
+      <h2 class="about__title" id="about-title">Comfortable in dense data.</h2>
+      <p class="about__status micro">Open to contract and full&#8209;time roles</p>
+      <div class="about__body">
+        <p>I'm a product designer in Minneapolis. I've spent ten years shipping enterprise software in financial services, agtech, and healthcare. Most of it has been dashboards and complex workflows, where the job is turning dense operational data into clear decisions. I organize screens around the tasks people are actually there to do, and I keep them approachable for newer users without taking depth away from the experienced ones.</p>
+        <p>I work in Figma every day, from discovery and user flows through high-fidelity UI and developer handoff. I build the design systems that keep a product coherent as it grows. To test a workflow before committing to it, I build working browser prototypes with coding agents. A live build shows how the interface feels with realistic data before anything goes to production.</p>
+        <p>Before design, I spent a decade programming and analyzing market research studies. That's where the comfort with dense data started.</p>
+        <p>Almost everything I know, I've learned from experience. I've lived in over fifty homes across ten states and two countries. I've worn just about every collar they've fitted for the working class. In the company of countless people, some who matter to me and some just passing through, I've found beauty and felt understood. It's a whole wide world out there.</p>
+      </div>
+      <ul class="about__roles micro" aria-label="Roles">
+        <li><span>Blueshift</span><span>Partner / Design lead · <span class="nobreak">2024–</span></span></li>
+        <li><span>Vault AI Systems</span><span>Fractional CDO · <span class="nobreak">2025–</span></span></li>
+        <li><span>Foundry</span><span>Designer, then director · <span class="nobreak">2015–24</span></span></li>
+      </ul>
+      <div class="about__contact">
+        <p class="micro">Contact</p>
+        <a class="email email--large" href="mailto:jason@spidleweb.net">jason@spidleweb.net</a>
+        <a class="about__linkedin micro" href="https://www.linkedin.com/in/jspidle">LinkedIn&nbsp;<span aria-hidden="true">↗</span></a>
+      </div>
+      <a class="about__close micro" href="#top">Close <span aria-hidden="true">×</span><kbd aria-hidden="true">esc</kbd></a>
+    </div>
+  </section>
 
   <main id="project" class="case-layout">
     <div class="case-context">
@@ -47,62 +86,85 @@
     </div>
 
     <section class="case-proofs" aria-label="PLINTH project imagery">
-        <figure class="proof">
+        <figure class="proof" id="fig-plinth-06">
           <div class="proof__frame"><picture><source srcset="../assets/plinth-06-850.avif 850w, ../assets/plinth-06-1250.avif 1250w, ../assets/plinth-06-1440.avif 1440w" sizes="(max-width: 599px) calc(100vw - 40px), (max-width: 999px) calc(100vw - 64px), (max-width: 1440px) calc(100vw - 412px), calc(78.8344vw - 107.2147px)" type="image/avif"><img src="../assets/plinth-06.jpg" width="1440" height="1000" alt="PLINTH issue 06 contents page: a white serif wordmark over a mirrored, inkblot-like graphic on black, with the contents listed in two flanking columns" loading="eager" fetchpriority="high" decoding="async"></picture></div>
           <figcaption>Issue 06 puts the entire journal on one scrolling black page. Utopia’s caption cut becomes the wordmark. <a href="https://plinth.us/issue06/">Read it <span aria-hidden="true">↗</span></a>.</figcaption>
         </figure>
 
-        <figure class="proof">
+        <figure class="proof" id="fig-plinth-03">
           <div class="proof__frame"><picture><source srcset="../assets/plinth-03-850.avif 850w, ../assets/plinth-03-1250.avif 1250w, ../assets/plinth-03-1440.avif 1440w" sizes="(max-width: 599px) calc(100vw - 40px), (max-width: 999px) calc(100vw - 64px), (max-width: 1440px) calc(100vw - 412px), calc(78.8344vw - 107.2147px)" type="image/avif"><img src="../assets/plinth-03.jpg" width="1440" height="1000" alt="PLINTH issue 03 contents page set like a printed broadside: an oversized black display letter, justified text columns, solid black bars, over a photograph of an ice face" loading="lazy" decoding="async"></picture></div>
           <figcaption>Issue 03 makes its contents a broadside image, with polygon hotspots turning the large letterforms into links. <a href="https://plinth.us/issue03/">Read it <span aria-hidden="true">↗</span></a>.</figcaption>
         </figure>
 
-        <figure class="proof">
+        <figure class="proof" id="fig-plinth-04">
           <div class="proof__frame"><picture><source srcset="../assets/plinth-04-850.avif 850w, ../assets/plinth-04-1250.avif 1250w, ../assets/plinth-04-1440.avif 1440w" sizes="(max-width: 599px) calc(100vw - 40px), (max-width: 999px) calc(100vw - 64px), (max-width: 1440px) calc(100vw - 412px), calc(78.8344vw - 107.2147px)" type="image/avif"><img src="../assets/plinth-04.jpg" width="1440" height="1000" alt="PLINTH issue 04 contents page: the wordmark set in wide-spaced condensed capitals on white, ruled by a mint hairline grid inside a navy border, with a vertical photographic panel at right" loading="lazy" decoding="async"></picture></div>
           <figcaption>Issue 04 pairs condensed capitals with a mint hairline grid and a navy border. <a href="https://plinth.us/issue04/">Read it <span aria-hidden="true">↗</span></a>.</figcaption>
         </figure>
 
-        <figure class="proof">
+        <figure class="proof" id="fig-plinth-05">
           <div class="proof__frame"><picture><source srcset="../assets/plinth-05-850.avif 850w, ../assets/plinth-05-1250.avif 1250w, ../assets/plinth-05-1440.avif 1440w" sizes="(max-width: 599px) calc(100vw - 40px), (max-width: 999px) calc(100vw - 64px), (max-width: 1440px) calc(100vw - 412px), calc(78.8344vw - 107.2147px)" type="image/avif"><img src="../assets/plinth-05.jpg" width="1440" height="1000" alt="PLINTH issue 05 contents page: a full-bleed rust-and-rose photographic ground with a white triangular sigil built out of letterforms" loading="lazy" decoding="async"></picture></div>
           <figcaption>Issue 05 sets a letterform sigil against Tyann Prentice’s photographic ground. <a href="https://plinth.us/issue05/">Read it <span aria-hidden="true">↗</span></a>.</figcaption>
         </figure>
 
-        <figure class="proof">
+        <figure class="proof" id="fig-plinth-07">
           <div class="proof__frame"><picture><source srcset="../assets/plinth-07-850.avif 850w, ../assets/plinth-07-1250.avif 1250w, ../assets/plinth-07-1440.avif 1440w" sizes="(max-width: 599px) calc(100vw - 40px), (max-width: 999px) calc(100vw - 64px), (max-width: 1440px) calc(100vw - 412px), calc(78.8344vw - 107.2147px)" type="image/avif"><img src="../assets/plinth-07.jpg" width="1440" height="1000" alt="PLINTH issue 07 contents page: piece titles and author names on bracket rules, beside a photograph of black volcanic rock lit from within by red" loading="lazy" decoding="async"></picture></div>
           <figcaption>Issue 07 returns to the first issue’s bracket rules, closing a run of seven distinct designs. <a href="https://plinth.us/issue07/">Read it <span aria-hidden="true">↗</span></a>.</figcaption>
         </figure>
 
-        <figure class="proof">
+        <figure class="proof" id="fig-plinth-evenson">
           <div class="proof__frame"><picture><source srcset="../assets/plinth-evenson-850.avif 850w, ../assets/plinth-evenson-1250.avif 1250w, ../assets/plinth-evenson-1440.avif 1440w" sizes="(max-width: 599px) calc(100vw - 40px), (max-width: 999px) calc(100vw - 64px), (max-width: 1440px) calc(100vw - 412px), calc(78.8344vw - 107.2147px)" type="image/avif"><img src="../assets/plinth-evenson.jpg" width="1440" height="1000" alt="Reading page for Brian Evenson&#x27;s The Tower: justified prose in a single measured column, with issue 07&#x27;s bracket-rule navigation at the left and a large multicolour wordmark below" loading="lazy" decoding="async"></picture></div>
           <figcaption>Brian Evenson’s “The Tower”: justified prose in a measured column, with issue navigation held to the margin. <a href="https://plinth.us/issue07/evenson">Read it <span aria-hidden="true">↗</span></a>.</figcaption>
         </figure>
 
-        <figure class="proof">
+        <figure class="proof" id="fig-plinth-attar">
           <div class="proof__frame"><picture><source srcset="../assets/plinth-attar-850.avif 850w, ../assets/plinth-attar-1250.avif 1250w, ../assets/plinth-attar-1440.avif 1440w" sizes="(max-width: 599px) calc(100vw - 40px), (max-width: 999px) calc(100vw - 64px), (max-width: 1440px) calc(100vw - 412px), calc(78.8344vw - 107.2147px)" type="image/avif"><img src="../assets/plinth-attar.jpg" width="1440" height="1000" alt="Reading page for Tipu Attar&#x27;s Lines: the poem&#x27;s words positioned at varying indents and alignments across the full width of the page, inside a salmon ruled frame" loading="lazy" decoding="async"></picture></div>
           <figcaption>Tipu Attar’s “Lines”: words keep their positions across the page instead of reflowing into one column. <a href="https://plinth.us/issue05/attar">Read it <span aria-hidden="true">↗</span></a>.</figcaption>
         </figure>
 
-        <figure class="proof">
+        <figure class="proof" id="fig-plinth-kreiden">
           <div class="proof__frame"><picture><source srcset="../assets/plinth-kreiden-850.avif 850w, ../assets/plinth-kreiden-1250.avif 1250w, ../assets/plinth-kreiden-1440.avif 1440w" sizes="(max-width: 599px) calc(100vw - 40px), (max-width: 999px) calc(100vw - 64px), (max-width: 1440px) calc(100vw - 412px), calc(78.8344vw - 107.2147px)" type="image/avif"><img src="../assets/plinth-kreiden.jpg" width="1440" height="1000" alt="Reading page for Purdey Lord Kreiden&#x27;s from Paradise City: a narrow left-aligned poem column on issue 04&#x27;s mint hairline grid inside a navy border, with the title block set in condensed capitals" loading="lazy" decoding="async"></picture></div>
           <figcaption>Purdey Lord Kreiden’s “from Paradise City”: a narrow, ragged poem column within the issue’s grid. <a href="https://plinth.us/issue04/kreiden">Read it <span aria-hidden="true">↗</span></a>.</figcaption>
         </figure>
 
-        <figure class="proof">
+        <figure class="proof" id="fig-plinth-conn">
           <div class="proof__frame"><picture><source srcset="../assets/plinth-conn-850.avif 850w, ../assets/plinth-conn-1250.avif 1250w, ../assets/plinth-conn-1440.avif 1440w" sizes="(max-width: 599px) calc(100vw - 40px), (max-width: 999px) calc(100vw - 64px), (max-width: 1440px) calc(100vw - 412px), calc(78.8344vw - 107.2147px)" type="image/avif"><img src="../assets/plinth-conn.jpg" width="1440" height="1000" alt="Reading page for Brian Conn&#x27;s The Hub: justified prose flanked by solid black vertical rules, which are the page&#x27;s custom inverted scrollbars, with slab-serif navigation at the left" loading="lazy" decoding="async"></picture></div>
           <figcaption>Brian Conn’s “The Hub”: the black rule beside the prose is the custom scrollbar, with a white thumb. <a href="https://plinth.us/issue03/conn">Read it <span aria-hidden="true">↗</span></a>.</figcaption>
         </figure>
     </section>
   </main>
 
-  <footer class="case-endpaper" data-next="insights">
-    <nav class="case-endpaper__nav" aria-label="More work">
-      <a class="case-endpaper__index" href="/">Back to all work</a>
-      <a class="case-endpaper__next" href="/work/expert-insights" aria-label="Next project: Expert Insights">
-        <span>Expert Insights</span><span class="case-endpaper__arrow" aria-hidden="true">→</span>
-      </a>
-    </nav>
-    <div class="footer micro"><span>© <span id="year">2026</span> Jason Spidle</span></div>
+  <section class="more-from" aria-labelledby="more-from-title">
+    <h2 class="more-from__title" id="more-from-title">More from PLINTH</h2>
+    <div class="more-from__grid">
+      <!-- stream:start case-study="plinth" heading="3" -->
+      <!-- stream:end -->
+    </div>
+  </section>
+
+  <!-- next-story:start case-study="plinth" -->
+  <nav class="next-story theme-insights" aria-label="Next case study">
+    <a class="next-story__link" href="/work/expert-insights">
+      <span class="next-story__name">Expert Insights</span>
+      <span class="next-story__arrow" aria-hidden="true">→</span>
+    </a>
+  </nav>
+  <!-- next-story:end -->
+
+  <footer class="site-footer">
+    <div class="footline micro">
+      <a class="email" href="mailto:jason@spidleweb.net">jason@spidleweb.net</a>
+      <a class="footline__link" href="https://www.linkedin.com/in/jspidle">LinkedIn&nbsp;<span aria-hidden="true">↗</span></a>
+      <p class="footline__copy">© <span id="year">2026</span> Jason Spidle</p>
+    </div>
   </footer>
+
+  <!-- stream-data:start -->
+  <script type="application/json" id="stream-data">
+  {"items":{
+  },"caseStudies":{
+  }}
+  </script>
+  <!-- stream-data:end -->
   <script src="../script.js"></script>
 </body>
 </html>

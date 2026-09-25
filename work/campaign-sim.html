@@ -19,15 +19,54 @@
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="../assets/fonts/eb-garamond/eb-garamond-latin-400-v33.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../fonts/GT-America-Expanded-Regular.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="../style.css">
+  <script>document.documentElement.classList.add('js')</script>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/site.js" defer onerror="document.documentElement.classList.remove('js')"></script>
+  <link rel="stylesheet" href="/pages.css">
   <script defer src="https://analytics.spidleweb.net/script.js" data-website-id="49720a36-6280-4d69-9531-c1d0c36b8f11"></script>
 </head>
 <body class="case-study theme-sim">
   <a class="skip-link micro" href="#project">Skip to project</a>
-  <header class="case-masthead micro">
-    <a class="case-masthead__identity" href="/">Jason Spidle <span>/ Work</span></a>
-    <a class="case-masthead__index" href="/">← Index</a>
+  <header class="masthead" id="top">
+    <div class="masthead__id">
+      <p class="masthead__name"><a href="/">Jason Spidle</a></p>
+      <p class="masthead__role micro">Product designer · Minneapolis</p>
+    </div>
+    <nav class="masthead__nav" aria-label="Site">
+      <button class="masthead__trigger micro" type="button" aria-expanded="false" aria-controls="site-places"><span class="visually-hidden">Menu, </span>Work</button>
+      <ul class="masthead__places micro" id="site-places">
+        <li><a href="/">Craft</a></li>
+        <li><a href="/work/" aria-current="page">Work</a></li>
+        <li><a href="/writing/">Writing</a></li>
+        <li><a href="#about">About</a></li>
+      </ul>
+    </nav>
   </header>
+
+  <section class="about" id="about" aria-labelledby="about-title" hidden>
+    <div class="about__inner">
+      <p class="about__kicker micro"><span>About</span><span class="about__place">Minneapolis</span></p>
+      <h2 class="about__title" id="about-title">Comfortable in dense data.</h2>
+      <p class="about__status micro">Open to contract and full&#8209;time roles</p>
+      <div class="about__body">
+        <p>I'm a product designer in Minneapolis. I've spent ten years shipping enterprise software in financial services, agtech, and healthcare. Most of it has been dashboards and complex workflows, where the job is turning dense operational data into clear decisions. I organize screens around the tasks people are actually there to do, and I keep them approachable for newer users without taking depth away from the experienced ones.</p>
+        <p>I work in Figma every day, from discovery and user flows through high-fidelity UI and developer handoff. I build the design systems that keep a product coherent as it grows. To test a workflow before committing to it, I build working browser prototypes with coding agents. A live build shows how the interface feels with realistic data before anything goes to production.</p>
+        <p>Before design, I spent a decade programming and analyzing market research studies. That's where the comfort with dense data started.</p>
+        <p>Almost everything I know, I've learned from experience. I've lived in over fifty homes across ten states and two countries. I've worn just about every collar they've fitted for the working class. In the company of countless people, some who matter to me and some just passing through, I've found beauty and felt understood. It's a whole wide world out there.</p>
+      </div>
+      <ul class="about__roles micro" aria-label="Roles">
+        <li><span>Blueshift</span><span>Partner / Design lead · <span class="nobreak">2024–</span></span></li>
+        <li><span>Vault AI Systems</span><span>Fractional CDO · <span class="nobreak">2025–</span></span></li>
+        <li><span>Foundry</span><span>Designer, then director · <span class="nobreak">2015–24</span></span></li>
+      </ul>
+      <div class="about__contact">
+        <p class="micro">Contact</p>
+        <a class="email email--large" href="mailto:jason@spidleweb.net">jason@spidleweb.net</a>
+        <a class="about__linkedin micro" href="https://www.linkedin.com/in/jspidle">LinkedIn&nbsp;<span aria-hidden="true">↗</span></a>
+      </div>
+      <a class="about__close micro" href="#top">Close <span aria-hidden="true">×</span><kbd aria-hidden="true">esc</kbd></a>
+    </div>
+  </section>
 
   <main id="project" class="case-layout">
     <div class="case-context">
@@ -47,22 +86,22 @@
     </div>
 
     <section class="case-proofs" aria-label="Campaign Sim project imagery">
-        <figure class="proof">
+        <figure class="proof" id="fig-campaign-sim-03">
           <div class="proof__frame"><picture><source srcset="../assets/campaign-sim-03-850.avif 850w, ../assets/campaign-sim-03-1250.avif 1250w, ../assets/campaign-sim-03-1700.avif 1700w" sizes="(max-width: 599px) calc(100vw - 40px), (max-width: 999px) calc(100vw - 64px), (max-width: 1440px) calc(100vw - 412px), calc(78.8344vw - 107.2147px)" type="image/avif"><img src="../assets/campaign-sim-03.png" width="2880" height="2048" alt="Channel Insights table listing every channel with expected exposure, reach, impact, and variable and fixed cost, grouped into deep engagement and enablement channels, beside a welcome video" loading="eager" fetchpriority="high" decoding="async"></picture></div>
           <figcaption>Before a team spends anything, channel exposure and reach can be weighed against cost. An onboarding video sits alongside the reference.</figcaption>
         </figure>
 
-        <figure class="proof">
+        <figure class="proof" id="fig-campaign-sim-01">
           <div class="proof__frame"><picture><source srcset="../assets/campaign-sim-01-850.avif 850w, ../assets/campaign-sim-01-1250.avif 1250w, ../assets/campaign-sim-01-1700.avif 1700w" sizes="(max-width: 599px) calc(100vw - 40px), (max-width: 999px) calc(100vw - 64px), (max-width: 1440px) calc(100vw - 412px), calc(78.8344vw - 107.2147px)" type="image/avif"><img src="../assets/campaign-sim-01.png" width="2880" height="2048" alt="Select Channels screen: a scout profile panel beside a grid of channel cards like international showcase, scout visit, and remote film session" loading="lazy" decoding="async"></picture></div>
           <figcaption>Channel descriptions sit beside the scout’s preferences and running plan totals. Every choice is made against both the person and the budget.</figcaption>
         </figure>
 
-        <figure class="proof">
+        <figure class="proof" id="fig-campaign-sim-02">
           <div class="proof__frame"><picture><source srcset="../assets/campaign-sim-02-850.avif 850w, ../assets/campaign-sim-02-1250.avif 1250w, ../assets/campaign-sim-02-1700.avif 1700w" sizes="(max-width: 599px) calc(100vw - 40px), (max-width: 999px) calc(100vw - 64px), (max-width: 1440px) calc(100vw - 412px), calc(78.8344vw - 107.2147px)" type="image/avif"><img src="../assets/campaign-sim-02.png" width="2880" height="2048" alt="Select Content screen: content types from player news to event information listed with descriptions inside the advertisement channel" loading="lazy" decoding="async"></picture></div>
           <figcaption>Within a channel, teams choose the content mix and frequency while keeping their current plan in view.</figcaption>
         </figure>
 
-        <figure class="proof">
+        <figure class="proof" id="fig-campaign-sim-04">
           <div class="proof__frame"><picture><source srcset="../assets/campaign-sim-04-850.avif 850w, ../assets/campaign-sim-04-1250.avif 1250w, ../assets/campaign-sim-04-1700.avif 1700w" sizes="(max-width: 599px) calc(100vw - 40px), (max-width: 999px) calc(100vw - 64px), (max-width: 1440px) calc(100vw - 412px), calc(78.8344vw - 107.2147px)" type="image/avif"><img src="../assets/campaign-sim-04.png" width="2880" height="2048" alt="Review Campaign screen: per-scout investment table with round-over-round deltas beside mix breakdowns by type and content" loading="lazy" decoding="async"></picture></div>
           <figcaption>The review brings investment, expected exposure, resources, and mix together before submission.</figcaption>
         </figure>
@@ -70,15 +109,68 @@
     </section>
   </main>
 
-  <footer class="case-endpaper" data-next="everag">
-    <nav class="case-endpaper__nav" aria-label="More work">
-      <a class="case-endpaper__index" href="/">Back to all work</a>
-      <a class="case-endpaper__next" href="/work/everag" aria-label="Next project: Ever.Ag">
-        <span>Ever.Ag</span><span class="case-endpaper__arrow" aria-hidden="true">→</span>
-      </a>
-    </nav>
-    <div class="footer micro"><span>© <span id="year">2026</span> Jason Spidle</span></div>
+  <section class="more-from" aria-labelledby="more-from-title">
+    <h2 class="more-from__title" id="more-from-title">More from Campaign Sim</h2>
+    <div class="more-from__grid">
+      <!-- stream:start case-study="campaign-sim" heading="3" -->
+      <article class="stream-card theme-sim" id="channel-impact-simulator" data-type="prototype" data-project="campaign-sim" data-industry="sports" data-case-study="campaign-sim" data-placeholder>
+        <a class="stream-card__link" href="/#channel-impact-simulator" data-open="channel-impact-simulator" aria-labelledby="channel-impact-simulator-title channel-impact-simulator-meta">
+          <div class="stream-card__media" data-shape="wide">
+            <picture>
+              <source type="image/avif" srcset="/assets/feed/responsive/channel-impact-simulator-480.avif 480w, /assets/feed/responsive/channel-impact-simulator-850.avif 850w, /assets/feed/responsive/channel-impact-simulator-1250.avif 1250w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 1099px) calc((100vw - 120px) / 3), calc((100vw - 160px) / 5)">
+              <img src="/assets/feed/channel-impact-simulator.webp" width="1250" height="889" alt="Campaign simulation table comparing channels by reach, expected impact, waste, and cost" loading="lazy" decoding="async">
+            </picture>
+            <span class="stream-card__badge" aria-hidden="true">Try it</span>
+          </div>
+          <h3 class="stream-card__title" id="channel-impact-simulator-title">Channel impact simulator</h3>
+          <p class="stream-card__meta micro" id="channel-impact-simulator-meta"><span class="stream-card__type">Prototype</span> <span class="stream-card__case"><span class="stream-card__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Campaign Sim<span class="visually-hidden"> case study</span></span></p>
+        </a>
+      </article>
+
+      <article class="stream-card theme-sim" id="campaign-investment-review" data-type="prototype" data-project="campaign-sim" data-industry="sports" data-case-study="campaign-sim" data-placeholder>
+        <a class="stream-card__link" href="/#campaign-investment-review" data-open="campaign-investment-review" aria-labelledby="campaign-investment-review-title campaign-investment-review-meta">
+          <div class="stream-card__media" data-shape="wide">
+            <picture>
+              <source type="image/avif" srcset="/assets/feed/responsive/campaign-investment-review-480.avif 480w, /assets/feed/responsive/campaign-investment-review-850.avif 850w, /assets/feed/responsive/campaign-investment-review-1250.avif 1250w" sizes="(max-width: 599px) calc(100vw - 32px), (max-width: 1099px) calc((100vw - 120px) / 3), calc((100vw - 160px) / 5)">
+              <img src="/assets/feed/campaign-investment-review.webp" width="1250" height="889" alt="Campaign review prototype with player investment rows, resource totals, and channel mix breakdowns" loading="lazy" decoding="async">
+            </picture>
+            <span class="stream-card__badge" aria-hidden="true">Try it</span>
+          </div>
+          <h3 class="stream-card__title" id="campaign-investment-review-title">Campaign investment review</h3>
+          <p class="stream-card__meta micro" id="campaign-investment-review-meta"><span class="stream-card__type">Prototype</span> <span class="stream-card__case"><span class="stream-card__chip" aria-hidden="true"></span><span class="visually-hidden">from the </span>Campaign Sim<span class="visually-hidden"> case study</span></span></p>
+        </a>
+      </article>
+      <!-- stream:end -->
+    </div>
+  </section>
+
+  <!-- next-story:start case-study="campaign-sim" -->
+  <nav class="next-story theme-everag" aria-label="Next case study">
+    <a class="next-story__link" href="/work/everag">
+      <span class="next-story__name">Ever.Ag</span>
+      <span class="next-story__arrow" aria-hidden="true">→</span>
+    </a>
+  </nav>
+  <!-- next-story:end -->
+
+  <footer class="site-footer">
+    <div class="footline micro">
+      <a class="email" href="mailto:jason@spidleweb.net">jason@spidleweb.net</a>
+      <a class="footline__link" href="https://www.linkedin.com/in/jspidle">LinkedIn&nbsp;<span aria-hidden="true">↗</span></a>
+      <p class="footline__copy">© <span id="year">2026</span> Jason Spidle</p>
+    </div>
   </footer>
+
+  <!-- stream-data:start -->
+  <script type="application/json" id="stream-data">
+  {"items":{
+  "channel-impact-simulator":{"type":"prototype","title":"Channel impact simulator","href":"/#channel-impact-simulator","project":"Campaign Sim","industry":"Sports","platform":"Web","shared":"2026-09","caseStudy":{"slug":"campaign-sim","total":4},"media":{"src":"/assets/feed/channel-impact-simulator.webp","width":1250,"height":889,"alt":"Campaign simulation table comparing channels by reach, expected impact, waste, and cost","avif":"/assets/feed/responsive/channel-impact-simulator-480.avif 480w, /assets/feed/responsive/channel-impact-simulator-850.avif 850w, /assets/feed/responsive/channel-impact-simulator-1250.avif 1250w"},"links":{"full":"/work/campaign-sim"},"related":["campaign-investment-review"],"placeholder":true},
+  "campaign-investment-review":{"type":"prototype","title":"Campaign investment review","href":"/#campaign-investment-review","project":"Campaign Sim","industry":"Sports","platform":"Web","shared":"2026-09","caseStudy":{"slug":"campaign-sim","total":4},"media":{"src":"/assets/feed/campaign-investment-review.webp","width":1250,"height":889,"alt":"Campaign review prototype with player investment rows, resource totals, and channel mix breakdowns","avif":"/assets/feed/responsive/campaign-investment-review-480.avif 480w, /assets/feed/responsive/campaign-investment-review-850.avif 850w, /assets/feed/responsive/campaign-investment-review-1250.avif 1250w"},"links":{"full":"/work/campaign-sim"},"related":["channel-impact-simulator"],"placeholder":true}
+  },"caseStudies":{
+  "campaign-sim":{"title":"Campaign Sim","theme":"sim","href":"/work/campaign-sim","premise":"Learning campaign planning within a real set of constraints.","facts":["Design lead","Blueshift · 2025","Planning tool · Simulation UX"],"note":"I led design of the planning and simulation experience. Channel choices stay beside the scout’s preferences and the team’s budget, then come together in a review that connects each round’s expected results to the decisions behind them.","figures":[{"id":"campaign-sim-03","anchor":"fig-campaign-sim-03","src":"/assets/campaign-sim-03.png","width":2880,"height":2048,"alt":"Channel Insights table listing every channel with expected exposure, reach, impact, and variable and fixed cost, grouped into deep engagement and enablement channels, beside a welcome video","avif":"/assets/campaign-sim-03-850.avif 850w, /assets/campaign-sim-03-1250.avif 1250w, /assets/campaign-sim-03-1700.avif 1700w","caption":"Before a team spends anything, channel exposure and reach can be weighed against cost. An onboarding video sits alongside the reference."},{"id":"campaign-sim-01","anchor":"fig-campaign-sim-01","src":"/assets/campaign-sim-01.png","width":2880,"height":2048,"alt":"Select Channels screen: a scout profile panel beside a grid of channel cards like international showcase, scout visit, and remote film session","avif":"/assets/campaign-sim-01-850.avif 850w, /assets/campaign-sim-01-1250.avif 1250w, /assets/campaign-sim-01-1700.avif 1700w","caption":"Channel descriptions sit beside the scout’s preferences and running plan totals. Every choice is made against both the person and the budget."},{"id":"campaign-sim-02","anchor":"fig-campaign-sim-02","src":"/assets/campaign-sim-02.png","width":2880,"height":2048,"alt":"Select Content screen: content types from player news to event information listed with descriptions inside the advertisement channel","avif":"/assets/campaign-sim-02-850.avif 850w, /assets/campaign-sim-02-1250.avif 1250w, /assets/campaign-sim-02-1700.avif 1700w","caption":"Within a channel, teams choose the content mix and frequency while keeping their current plan in view."},{"id":"campaign-sim-04","anchor":"fig-campaign-sim-04","src":"/assets/campaign-sim-04.png","width":2880,"height":2048,"alt":"Review Campaign screen: per-scout investment table with round-over-round deltas beside mix breakdowns by type and content","avif":"/assets/campaign-sim-04-850.avif 850w, /assets/campaign-sim-04-1250.avif 1250w, /assets/campaign-sim-04-1700.avif 1700w","caption":"The review brings investment, expected exposure, resources, and mix together before submission."}]}
+  }}
+  </script>
+  <!-- stream-data:end -->
   <script src="../script.js"></script>
 </body>
 </html>

@@ -1,0 +1,380 @@
+/* spidleweb.net: the Work and Writing pages (Phase 2C)
+   The /work/ and /writing/ indexes, the endings of a case-study page (More
+   from and the next-story band), and the post page. The case-study layout
+   and the tokens stay in style.css, the site chrome is its "Site chrome"
+   block, and the stream cards inside More from take their styles from
+   stream.css. Values come from rows 11 to 14 of "current · redesign" in
+   Paper, read through its JSX. */
+
+:root {
+  /* The site's red, kept under its own name because a case study's theme
+     turns --accent into the project colour. */
+  --site-accent: var(--accent);
+  /* Grey bars that stand in for text still to be written. */
+  --placeholder-fill: rgb(10 10 10 / 0.08);
+}
+
+/* A cross-fade between Work and Writing pages, with no script. Both pages
+   of a navigation must opt in, so leaving for Craft never fades. Reduced
+   motion keeps the plain page change. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+}
+
+/* Paper places each page's first line a fixed distance below the top of
+   the window. The masthead is --mast-h tall on desktop, so each page's own
+   top padding is that distance less the masthead. */
+
+/* ---- Case-study pages ---------------------------------------------------- */
+
+/* The case study sits on the site's gutter, so it lines up with the
+   masthead and the footer line, and starts where row 13 starts it. */
+.case-study { --case-gutter: var(--gutter); }
+.case-study .case-layout { padding-top: calc(124px - var(--mast-h)); }
+
+/* Inside a case study, the chrome keeps the site's red for its markers. */
+.case-study :is(.masthead, .about) { --accent: var(--site-accent); }
+
+/* A figure named in a link, such as /work/conservis#fig-conservis-03, lands
+   with a little room above it. */
+.case-proofs [id^="fig-"] { scroll-margin-top: 24px; }
+
+/* More from: what the project shares in Craft, on the case study's grid.
+   An empty region hides the whole section, heading included. */
+.more-from {
+  display: grid;
+  grid-template-columns: minmax(0, 276px) minmax(0, 1fr);
+  align-items: start;
+  gap: 20px 56px;
+  margin: 0 var(--case-gutter);
+  border-top: 1px solid var(--line);
+  padding: 32px 0 96px;
+}
+@media (min-width: 1441px) {
+  .more-from { grid-template-columns: minmax(276px, 276fr) minmax(0, 1028fr); }
+}
+.more-from:not(:has(.stream-card)) { display: none; }
+
+.more-from__title {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 27px;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--case-dark);
+}
+
+/* Cards keep the Grid's width, a fifth of the stream, three to a row. */
+.more-from__grid {
+  display: grid;
+  grid-template-columns: repeat(3, calc((100vw - 160px) / 5));
+  gap: 40px 20px;
+}
+
+/* The next-story band: forward only, in the next case study's colours,
+   which its theme class sets. The slope sits on a pseudo-element, so the
+   focus ring is never clipped. */
+.next-story {
+  position: relative;
+  isolation: isolate;
+  padding: 112px var(--case-gutter) 68px;
+  color: var(--paper);
+}
+.next-story::before {
+  content: "";
+  position: absolute;
+  /* One pixel past the bottom, under the footer, so a fractional edge
+     never shows a hairline of paper between the two. */
+  inset: 0 0 -1px;
+  z-index: -1;
+  background: var(--case-dark);
+  clip-path: polygon(0 48px, 100% 0, 100% 100%, 0 100%);
+}
+.next-story__link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  min-height: 44px;
+  padding: 12px 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(36px, 4.72vw, 68px);
+  line-height: 1.176;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.next-story__name { min-width: 0; text-wrap: balance; overflow-wrap: anywhere; }
+.next-story__arrow { flex-shrink: 0; }
+@media (hover: hover) and (pointer: fine) {
+  .next-story__link:hover { color: var(--case-hover); }
+}
+
+/* ---- The /work/ and /writing/ indexes -------------------------------------- */
+
+/* Short pages keep the footer line at the bottom of the window. */
+body.page { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
+body.page > main { flex: 1 0 auto; }
+
+.page-main { padding: 0 var(--gutter) 96px; }
+
+.page-head {
+  padding-top: calc(132px - var(--mast-h));
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--ink);
+}
+.page-head__title {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 42px;
+  line-height: 44px;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+/* A row per entry. The whole row is one link; a case study's row takes its
+   project's theme class for the stack and the title, while the text keeps
+   the site's ink. */
+.entry-list { list-style: none; }
+.entry { border-bottom: 1px solid var(--line); }
+.entry-list[data-placeholders="hide"] > .entry[data-placeholder] { display: none; }
+
+.entry__link {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr) 220px;
+  grid-template-areas: "cover body cta";
+  align-items: start;
+  column-gap: 40px;
+  padding: 32px 0;
+  color: var(--site-ink);
+  text-decoration: none;
+}
+.entry__link:focus-visible { outline: 2px solid var(--site-ink); outline-offset: 4px; }
+
+/* A case study's cover is its first figure, stacked on a slab of the
+   project's colour that sits 14px up and to the right. */
+.entry__cover { grid-area: cover; position: relative; isolation: isolate; }
+.entry__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left top;
+  background: #fff;
+  outline: 1px solid var(--line);
+  outline-offset: -1px;
+}
+.entry--case .entry__cover { --stack: 14px; padding: var(--stack) var(--stack) 0 0; }
+.entry--case .entry__cover img { aspect-ratio: 306 / 196; height: auto; }
+.entry--case .entry__cover::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 var(--stack) var(--stack);
+  z-index: -1;
+  background: var(--case-dark);
+}
+/* Paper centres these two covers; the rest hang from the top left. */
+.entry--case:is(.theme-conservis, .theme-plinth) .entry__cover img { object-position: 50% 50%; }
+
+/* A post's cover sits whole on white, the colour of its own ground. */
+.entry__cover--plain,
+.entry__cover--empty { aspect-ratio: 320 / 210; }
+.entry__cover--plain img { object-fit: contain; object-position: 50% 50%; }
+.entry__cover--empty {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  background: var(--frame-empty);
+  color: var(--ink-soft);
+}
+
+.entry__body { grid-area: body; min-width: 0; padding-top: 2px; }
+.entry__title {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 26px;
+  line-height: 30px;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+.entry--case .entry__title { color: var(--case-dark); }
+.entry__dek {
+  max-width: 520px;
+  margin-top: 14px;
+  font-family: "EB Garamond", Georgia, serif;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 30px;
+  font-synthesis: none;
+  text-wrap: pretty;
+}
+/* Paper sets a post's dek on a longer measure than a case study's premise. */
+.entry:not(.entry--case) .entry__dek { max-width: 600px; }
+.entry__bars { display: grid; gap: 12px; margin-top: 23px; margin-bottom: 9px; }
+.entry__bars span { display: block; height: 12px; background: var(--placeholder-fill); }
+.entry__bars span:first-child { width: min(560px, 100%); }
+.entry__bars span:last-child { width: min(340px, 60%); }
+.entry__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 24px;
+  margin-top: 16px;
+}
+.entry__dateline { color: var(--ink-soft); white-space: nowrap; }
+.entry__detail { white-space: nowrap; }
+.entry__cta { grid-area: cta; justify-self: end; margin-top: 8px; white-space: nowrap; }
+@media (hover: hover) and (pointer: fine) {
+  .entry__link:hover .entry__cta { text-decoration: underline; text-underline-offset: 4px; }
+}
+
+/* ---- The post page -------------------------------------------------------- */
+
+/* The post reads in the case study's wide column, so both kinds of page
+   share one measure. */
+.post {
+  display: grid;
+  grid-template-columns: minmax(0, 276px) minmax(0, 1fr);
+  column-gap: 56px;
+  padding: calc(163px - var(--mast-h)) var(--gutter) 96px;
+}
+@media (min-width: 1441px) {
+  .post { grid-template-columns: minmax(276px, 276fr) minmax(0, 1028fr); }
+}
+.post__article { grid-column: 2; min-width: 0; }
+
+.post__head { display: grid; gap: 20px; }
+.post__kicker { color: var(--ink-soft); }
+.post__title {
+  max-width: 900px;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 42px;
+  line-height: 46px;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+.post__dek {
+  max-width: 700px;
+  font-family: "EB Garamond", Georgia, serif;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 32px;
+  font-synthesis: none;
+  text-wrap: pretty;
+}
+/* The site's mono line is 15.6px to Paper's 14px, so the spacing around it
+   gives back the difference. */
+.post__facts { display: flex; flex-wrap: wrap; gap: 4px 32px; padding-top: 6px; }
+.post__facts div { display: flex; gap: 10px; }
+.post__facts dt { color: var(--ink-soft); }
+
+.post__cover {
+  margin-top: 40px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--frame-empty);
+}
+.post__cover img { width: 100%; }
+/* Wider screens trim the cover's empty top and bottom, as Paper frames it. */
+@media (min-width: 600px) {
+  .post__cover img { aspect-ratio: 1026 / 538; object-fit: cover; }
+}
+
+.post__body { margin-top: 55px; }
+.post__placeholder { color: var(--ink-soft); }
+.post__bars { display: grid; gap: 28px; margin-top: 24px; }
+.post__bars p { display: grid; gap: 14px; }
+/* Tracks that never grow past the column, so a bar's width is a ceiling. */
+.post__bars,
+.post__bars p { grid-template-columns: minmax(0, 1fr); }
+.post__bars span { display: block; max-width: 100%; height: 12px; background: var(--placeholder-fill); }
+.post__bars p:first-child span:nth-child(1) { width: 680px; }
+.post__bars p:first-child span:nth-child(2) { width: 660px; }
+.post__bars p:first-child span:nth-child(3) { width: 672px; }
+.post__bars p:first-child span:nth-child(4) { width: 420px; }
+.post__bars p:last-child span:nth-child(1) { width: 676px; }
+.post__bars p:last-child span:nth-child(2) { width: 650px; }
+.post__bars p:last-child span:nth-child(3) { width: 540px; }
+
+/* ---- Tablet and phone ------------------------------------------------------ */
+
+@media (max-width: 999px) {
+  .more-from { grid-template-columns: minmax(0, 1fr); }
+  .more-from__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .next-story { padding-top: 96px; padding-bottom: 56px; }
+  .next-story__link { font-size: clamp(32px, 6vw, 60px); }
+  .entry__link {
+    grid-template-columns: 280px minmax(0, 1fr);
+    grid-template-areas: "cover body" "cover cta";
+    column-gap: 32px;
+  }
+  .entry__cta { justify-self: start; margin-top: 20px; }
+  .post { grid-template-columns: minmax(0, 1fr); }
+  .post__article { grid-column: 1; }
+}
+
+/* Below 800px the masthead folds into its menu and sizes to its content,
+   66.6px tall, where Paper's phone masthead block runs to 86px. */
+@media (max-width: 799px) {
+  .case-study .case-layout { padding-top: 43px; }
+  .page-head { padding-top: 59px; }
+  .post { padding-top: 58px; }
+}
+
+@media (max-width: 599px) {
+  .more-from { padding: 28px 0 64px; }
+  .more-from__title { font-size: 20px; line-height: 25px; }
+  .more-from__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 14px; }
+
+  .next-story { padding-top: 64px; padding-bottom: 28px; }
+  .next-story::before { clip-path: polygon(0 20px, 100% 0, 100% 100%, 0 100%); }
+  .next-story__link { font-size: clamp(28px, 7.5vw, 42px); gap: 16px; }
+
+  .page-main { padding-bottom: 64px; }
+  .page-head { padding-bottom: 24px; }
+  .page-head__title { font-size: 30px; line-height: 32px; }
+
+  .entry__link {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "cover" "body" "cta";
+    padding: 20px 0 8px;
+  }
+  .entry--case .entry__cover { --stack: 12px; }
+  .entry--case .entry__cover img { aspect-ratio: 346 / 220; }
+  .entry__cover--plain,
+  .entry__cover--empty { aspect-ratio: 358 / 224; }
+  .entry__cover--plain img { object-fit: cover; }
+  .entry__body { margin-top: 20px; padding-top: 0; }
+  .entry__title { font-size: 22px; line-height: 26px; }
+  .entry__dek { margin-top: 10px; font-size: 20px; line-height: 26px; }
+  .entry__meta { margin-top: 12px; gap: 6px 16px; }
+  .entry__bars { gap: 10px; margin-top: 17px; margin-bottom: 7px; }
+  .entry__bars span { height: 11px; }
+  .entry__bars span:first-child { width: min(340px, 95%); }
+  .entry__bars span:last-child { width: min(220px, 60%); }
+  /* The whole row is the link; the call to action still gets a 44px row. */
+  .entry__cta { display: flex; align-items: center; min-height: 44px; margin-top: 14px; }
+
+  .post { padding-bottom: 64px; }
+  .post__head { gap: 16px; }
+  .post__title { font-size: 28px; line-height: 32px; }
+  .post__dek { font-size: 20px; line-height: 26px; }
+  .post__facts { display: grid; gap: 6px; padding-top: 3px; }
+  .post__facts div { display: grid; grid-template-columns: 64px 1fr; gap: 10px; }
+  .post__cover { margin-top: 28px; }
+  .post__cover img { aspect-ratio: 356 / 198; object-fit: cover; }
+  .post__body { margin-top: 32px; }
+  .post__bars { gap: 36px; margin-top: 20px; }
+  .post__bars p { gap: 12px; }
+  .post__bars span { height: 11px; }
+  .post__bars p:first-child span:nth-child(1) { width: 358px; }
+  .post__bars p:first-child span:nth-child(2) { width: 340px; }
+  .post__bars p:first-child span:nth-child(3) { width: 352px; }
+  .post__bars p:first-child span:nth-child(4) { width: 200px; }
+  .post__bars p:last-child span:nth-child(1) { width: 356px; }
+  .post__bars p:last-child span:nth-child(2) { width: 330px; }
+  .post__bars p:last-child span:nth-child(3) { width: 250px; }
+}
