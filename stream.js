@@ -24,6 +24,12 @@
 (() => {
   'use strict';
 
+  // If site.js fails to load, the onerror on its tag drops the page back to
+  // its no-JS form by removing the js class, before this deferred script
+  // runs. Stay out of the way then, so About keeps its :target fallback and
+  // cards stay plain links rather than half-enhanced.
+  if (!document.documentElement.classList.contains('js')) return;
+
   // ---- Settings ------------------------------------------------------------
 
   /** Phones get the single-column panel, 16px gutters, and full-screen prototypes. */
