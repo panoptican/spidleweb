@@ -26,7 +26,7 @@ CASE_PAGES = [str(p.relative_to(ROOT)) for p in sorted((ROOT / 'work').glob('*.h
 # The Work and Writing indexes and the posts (Phase 2C).
 READING_PAGES = ['work/index.html', 'writing/index.html',
                  *[str(p.relative_to(ROOT)) for p in sorted((ROOT / 'writing').glob('*.html')) if p.name != 'index.html']]
-PAGES = ['index.html', 'list/index.html', *CASE_PAGES, *READING_PAGES]
+PAGES = ['index.html', 'list/index.html', *CASE_PAGES, *READING_PAGES, '404.html']
 # /work/ lists the case studies newest first, and the next-story band follows it.
 WORK_ORDER = ['expert-insights', 'campaign-sim', 'everag', 'vidscrip', 'conservis', 'plinth']
 SCREENSHOTS = os.environ.get('SPIDLEWEB_TEST_SCREENSHOTS')
@@ -798,6 +798,36 @@ class BrowserRegressions(unittest.TestCase):
                 response = page.goto(loc.replace('https://spidleweb.net', ORIGIN))
                 self.assertEqual(response.status, 200)
                 self.assertEqual(page.locator('link[rel="canonical"]').get_attribute('href'), loc)
+                page.close()
+
+    def test_not_found_page_carries_the_chrome_with_no_place_current(self):
+        # Pages serves 404.html at whatever address was missing, so every link
+        # and asset must be root-relative.
+        for target in re.findall(r'(?:href|src)="([^"]+)"', (ROOT / '404.html').read_text()):
+            self.assertRegex(target, r'^(/|#|https://|mailto:)', target)
+        # About and the thin footer line are the site's, word for word.
+        for pattern in [r'<section class="about".*?</section>', r'<footer class="site-footer">.*?</footer>']:
+            self.assertEqual(self.page_part('404.html', pattern), self.page_part('work/index.html', pattern))
+        for width in [1440, 390]:
+            with self.subTest(width=width):
+                phone = width < 600
+                page = self.open(self.context(viewport={'width': width, 'height': 900}, is_mobile=phone,
+                                              has_touch=phone, reduced_motion='reduce'), '404.html')
+                self.assertEqual(page.locator('h1').inner_text().lower(), 'page not found')
+                self.assertIn('That page is not here.', page.locator('main').inner_text())
+                self.assertEqual(page.locator('[aria-current]').count(), 0)
+                self.assertEqual(page.locator('.legend, .view-switch').count(), 0)
+                self.assertTrue(page.locator('.footline .email').is_visible())
+                if phone:
+                    self.assertEqual(page.locator('.masthead__trigger').text_content(), 'Menu')
+                    page.locator('.masthead__trigger').tap()
+                    self.assertEqual(page.locator('#site-places a:visible').count(), 4)
+                # About opens in place, as on every page.
+                page.locator('.masthead__places a[href="#about"]').click()
+                page.wait_for_function("() => !document.getElementById('about').hidden")
+                self.assertTrue(page.locator('#about').is_visible())
+                self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), width)
+                self.assertEqual(page.errors, [])
                 page.close()
 
     def test_next_story_band_moves_forward_and_wraps_in_work_order(self):

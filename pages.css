@@ -136,6 +136,18 @@ body.page > main { flex: 1 0 auto; }
   text-transform: uppercase;
 }
 
+/* The 404 page's message under its head, set like an entry's dek. */
+.page-note {
+  max-width: 520px;
+  margin-top: 32px;
+  font-family: "EB Garamond", Georgia, serif;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 30px;
+  font-synthesis: none;
+  text-wrap: pretty;
+}
+
 /* A row per entry. The whole row is one link; a case study's row takes its
    project's theme class for the stack and the title, while the text keeps
    the site's ink. */
