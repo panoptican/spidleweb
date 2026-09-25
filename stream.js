@@ -89,8 +89,13 @@
   /** Hidden cards (a later page of the stream, or filtered out) have no box. */
   const isRendered = (el) => el.getClientRects().length > 0;
 
-  function shapeOf(m) {
-    if (!m || !m.width || !m.height) return 'wide';
+  /**
+   * "phone" for a phone capture, which shows at phone width, and "wide" for
+   * the rest. A long web page is narrow for its height too, so an item's
+   * platform settles it.
+   */
+  function shapeOf(m, platform) {
+    if (!m || !m.width || !m.height || platform === 'Web') return 'wide';
     return m.width / m.height < PHONE_RATIO ? 'phone' : 'wide';
   }
 
@@ -358,7 +363,7 @@
   function relatedThumb(id, current) {
     const item = itemById(id);
     const m = item.media;
-    const shape = shapeOf(m);
+    const shape = shapeOf(m, item.platform);
     const image = m?.src
       ? picture(m, { sizes: '120px', alt: '' })
       : m?.tile
@@ -410,7 +415,7 @@
   /** A case-study item that is not a figure on its page leads its own strip. */
   function leadFrame(item) {
     if (item.type === 'video') return { video: item, shape: 'wide', caption: esc(item.note || item.title) };
-    return { media: item.media, shape: shapeOf(item.media), caption: esc(item.note || item.title) };
+    return { media: item.media, shape: shapeOf(item.media, item.platform), caption: esc(item.note || item.title) };
   }
 
   function frameMarkup(frame, index, start) {
@@ -612,7 +617,7 @@
 
   /** A screen with no case study: neutral, with its related screens. */
   function screenView(item, ctx) {
-    const shape = shapeOf(item.media);
+    const shape = shapeOf(item.media, item.platform);
     const image = item.media?.src
       ? picture(item.media, { eager: true, sizes: shape === 'phone' ? '(max-width: 599px) 240px, 300px' : '(max-width: 599px) 100vw, 900px' })
       : '<span class="stream-shot__empty"></span>';
@@ -718,7 +723,7 @@
   function postView(item, study, ctx) {
     const tool = (item.related || []).map(itemById).find((r) => r && r.type !== 'post');
     const cover = item.media?.src;
-    const shape = shapeOf(item.media);
+    const shape = shapeOf(item.media, item.platform);
     const full = item.links?.full || (item.href && !item.href.startsWith('/#') ? item.href : '');
     return {
       tone: study ? 'band' : 'neutral',

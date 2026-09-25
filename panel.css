@@ -552,12 +552,16 @@ html.panels .about {
   height: auto;
 }
 
-/* A phone capture shows whole at 300 by 650, and a longer one scrolls. */
-.stream-shot[data-shape="phone"] {
-  width: 300px;
+/* A phone capture shows whole at 300 by 650, and a longer one scrolls. A
+   wide screen stops at the same height, so a long web page scrolls too. */
+.stream-shot {
   max-height: 650px;
   overflow-y: auto;
   scrollbar-width: thin;
+}
+
+.stream-shot[data-shape="phone"] {
+  width: 300px;
 }
 
 .stream-shot--cover[data-shape="phone"] {
