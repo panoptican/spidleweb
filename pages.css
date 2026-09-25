@@ -1,0 +1,294 @@
+/* spidleweb.net: the Work and Writing pages (Phase 2C)
+   The /work/ and /writing/ indexes, the endings of a case-study page (More
+   from and the next-story band), and the post page. The case-study layout
+   and the tokens stay in style.css, the site chrome is Phase 2A's, and the
+   stream cards inside More from take their styles from stream.css.
+   Values come from rows 11 to 14 of "current · redesign" in Paper. */
+
+:root {
+  --page-gutter: 40px;
+  /* The site's own ink and paper, for surfaces that must not take a
+     case study's tinted theme, such as the footer line. */
+  --site-ink: #0a0a0a;
+  --site-paper: #f2f2ef;
+  --placeholder-fill: #e0e0dd;
+}
+
+/* A cross-fade between Work and Writing pages, with no script. Both pages
+   of a navigation must opt in, so leaving for Craft never fades. Reduced
+   motion keeps the plain page change. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+}
+
+/* ---- Case-study pages ---------------------------------------------------- */
+
+/* A figure named in a link, such as /work/conservis#fig-conservis-03, lands
+   with a little room above it. */
+.case-proofs [id^="fig-"] { scroll-margin-top: 24px; }
+
+/* More from: what the project shares in Craft, on the case study's grid.
+   An empty region hides the whole section, heading included. */
+.more-from {
+  display: grid;
+  grid-template-columns: minmax(0, 276px) minmax(0, 1fr);
+  align-items: start;
+  gap: 32px 56px;
+  margin: 32px var(--case-gutter) 0;
+  border-top: 1px solid var(--line);
+  padding: 32px 0 96px;
+}
+@media (min-width: 1441px) {
+  .more-from { grid-template-columns: minmax(276px, 276fr) minmax(0, 1028fr); }
+}
+.more-from:not(:has(.stream-card)) { display: none; }
+
+.more-from__title {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 27px;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  color: var(--case-dark);
+}
+
+/* Cards keep the Grid's width, a fifth of the stream, three to a row. */
+.more-from__grid {
+  display: grid;
+  grid-template-columns: repeat(3, calc((100vw - 160px) / 5));
+  gap: 40px 20px;
+}
+
+/* The next-story band: forward only, in the next case study's colours,
+   which its theme class sets. The slope sits on a pseudo-element, so the
+   focus ring is never clipped. */
+.next-story {
+  position: relative;
+  isolation: isolate;
+  padding: 112px var(--case-gutter) 68px;
+  color: var(--paper);
+}
+.next-story::before {
+  content: "";
+  position: absolute;
+  /* One pixel past the bottom, under the footer, so a fractional edge
+     never shows a hairline of paper between the two. */
+  inset: 0 0 -1px;
+  z-index: -1;
+  background: var(--case-dark);
+  clip-path: polygon(0 48px, 100% 0, 100% 100%, 0 100%);
+}
+.next-story__link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  min-height: 44px;
+  padding: 12px 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(36px, 4.72vw, 68px);
+  line-height: 1.17;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.next-story__name { min-width: 0; text-wrap: balance; overflow-wrap: anywhere; }
+.next-story__arrow { flex-shrink: 0; }
+@media (hover: hover) and (pointer: fine) {
+  .next-story__link:hover { color: var(--case-hover); }
+}
+
+/* ---- The /work/ and /writing/ indexes -------------------------------------- */
+
+/* Short pages keep the footer line at the bottom of the window. */
+body.page { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
+body.page > main { flex: 1 0 auto; }
+
+.page-main { padding: 0 var(--page-gutter) 96px; }
+
+.page-head {
+  padding-top: 72px;
+  padding-bottom: 29px;
+  border-bottom: 1px solid var(--ink);
+}
+.page-head__title {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 42px;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+}
+
+/* A row per entry. The whole row is one link; a case study's row takes its
+   project's theme class for the stack and the title, while the text keeps
+   the site's ink. */
+.entry-list { --entry-ink: var(--ink); list-style: none; }
+.entry { border-bottom: 1px solid var(--line); }
+.entry-list[data-placeholders="hide"] > .entry[data-placeholder] { display: none; }
+
+.entry__link {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr) auto;
+  grid-template-areas: "cover body cta";
+  align-items: start;
+  column-gap: 40px;
+  padding: 32px 0;
+  color: var(--entry-ink);
+  text-decoration: none;
+}
+.entry__link:focus-visible { outline: 2px solid var(--entry-ink); outline-offset: 4px; }
+
+/* A case study's cover is its first figure, stacked on a slab of the
+   project's colour that sits 14px up and to the right. */
+.entry__cover { grid-area: cover; position: relative; isolation: isolate; }
+.entry__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left top;
+  outline: 1px solid var(--line);
+  outline-offset: -1px;
+}
+.entry--case .entry__cover { --stack: 14px; padding: var(--stack) var(--stack) 0 0; }
+.entry--case .entry__cover img { aspect-ratio: 306 / 196; height: auto; }
+.entry--case .entry__cover::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 var(--stack) var(--stack);
+  z-index: -1;
+  background: var(--case-dark);
+}
+
+/* A post's cover sits whole on white, the colour of its own ground. */
+.entry__cover--plain,
+.entry__cover--empty { aspect-ratio: 320 / 210; }
+.entry__cover--plain { background: #fff; }
+.entry__cover--plain img { object-fit: contain; object-position: center; }
+.entry__cover--empty {
+  display: grid;
+  place-items: center;
+  border: 1px solid #bdbdb9;
+  background: #e4e4df;
+  color: var(--ink-muted);
+}
+
+.entry__body { grid-area: body; min-width: 0; padding-top: 2px; }
+.entry__title {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 26px;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+.entry--case .entry__title { color: var(--case-dark); }
+.entry__dek {
+  max-width: 520px;
+  margin-top: 14px;
+  font-family: "EB Garamond", Georgia, serif;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 30px;
+  font-synthesis: none;
+  text-wrap: pretty;
+}
+/* Paper sets the post deks on a slightly longer measure than the premises. */
+.entry:not(.entry--case) .entry__dek { max-width: 580px; }
+.entry__bars { display: grid; gap: 12px; margin-top: 28px; }
+.entry__bars span { display: block; height: 12px; background: var(--placeholder-fill); }
+.entry__bars span:first-child { width: min(560px, 100%); }
+.entry__bars span:last-child { width: min(340px, 60%); }
+.entry__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 24px;
+  margin-top: 16px;
+}
+.entry__dateline { color: var(--ink-muted); white-space: nowrap; }
+.entry__detail { white-space: nowrap; }
+.entry__cta { grid-area: cta; margin-top: 7px; white-space: nowrap; }
+.entry__cta span { display: inline-block; }
+@media (hover: hover) and (pointer: fine) {
+  .entry__link:hover .entry__cta { text-decoration: underline; text-underline-offset: 4px; }
+}
+
+/* ---- Footer line, provisional ---------------------------------------------
+   Stands in for Phase 2A's thin footer line until its chrome contract lands,
+   then goes. It keeps .footer so the shared year test still finds it. */
+
+.footer.footer-line {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0 32px;
+  min-height: 58px;
+  padding: 7px var(--page-gutter);
+  background: var(--site-ink);
+  color: #9a9a96;
+  opacity: 1;
+}
+.footer-line__contact { display: flex; flex-wrap: wrap; gap: 0 32px; }
+.footer-line a { display: inline-flex; align-items: center; gap: 0.4em; min-height: 44px; }
+.footer-line a[href^="mailto:"] { color: var(--site-paper); }
+@media (hover: hover) and (pointer: fine) {
+  .footer.footer-line a:hover { color: var(--site-paper); text-decoration: underline; text-underline-offset: 4px; }
+}
+.footer-line a:focus-visible { outline: 2px solid var(--site-paper); outline-offset: 2px; }
+
+/* ---- Tablet and phone ------------------------------------------------------ */
+
+@media (max-width: 999px) {
+  :root { --page-gutter: 32px; }
+  .more-from { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .more-from__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .next-story { padding-top: 96px; padding-bottom: 56px; }
+  .next-story__link { font-size: clamp(32px, 6vw, 60px); }
+  .entry__link {
+    grid-template-columns: 280px minmax(0, 1fr);
+    grid-template-areas: "cover body" "cover cta";
+    column-gap: 32px;
+  }
+  .entry__cta { margin-top: 20px; }
+}
+
+@media (max-width: 599px) {
+  :root { --page-gutter: 16px; }
+  /* The case study's own gutter narrows to the site's 16px, so it lines up
+     with the masthead and the footer line. */
+  .case-study { --case-gutter: 16px; }
+
+  .more-from { margin-top: 24px; padding: 30px 0 64px; }
+  .more-from__title { font-size: 20px; line-height: 24px; }
+  .more-from__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 14px; }
+
+  .next-story { padding-top: 64px; padding-bottom: 28px; }
+  .next-story::before { clip-path: polygon(0 20px, 100% 0, 100% 100%, 0 100%); }
+  .next-story__link { font-size: clamp(28px, 7.5vw, 42px); gap: 16px; }
+
+  .page-main { padding-bottom: 64px; }
+  .page-head { padding-top: 40px; padding-bottom: 25px; }
+  .page-head__title { font-size: 30px; }
+
+  .entry__link {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "cover" "body" "cta";
+    padding: 20px 0 24px;
+  }
+  .entry--case .entry__cover { --stack: 12px; }
+  .entry__cover--plain,
+  .entry__cover--empty { aspect-ratio: 16 / 10; }
+  .entry__body { margin-top: 20px; padding-top: 0; }
+  .entry__title { font-size: 22px; line-height: 26px; }
+  .entry__dek { margin-top: 10px; font-size: 20px; line-height: 26px; }
+  .entry__meta { margin-top: 10px; gap: 0 16px; }
+  .entry__bars { margin-top: 16px; }
+  .entry__cta { margin-top: 26px; }
+
+
+  .footer.footer-line { display: grid; justify-content: start; gap: 0; padding: 10px var(--page-gutter) 16px; }
+}

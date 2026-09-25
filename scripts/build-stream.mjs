@@ -28,6 +28,15 @@
  *   case-study="<slug>"  only what that case study shares, for "More from"
  *   heading="2..6"       heading level for titles, 2 by default
  *   eager="<n>"          load the first n images eagerly, 0 by default
+ *
+ * Two more markers serve the Work pages. Both follow the case studies
+ * newest first, so the index and the bands always agree:
+ *
+ *   <!-- work-index:start -->        a row per case study, for /work/
+ *   <!-- work-index:end -->
+ *   <!-- next-story:start case-study="<slug>" -->
+ *   <!-- next-story:end -->          the band that ends a case-study page,
+ *                                    naming the next one in /work/ order
  */
 
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -37,11 +46,18 @@ import { fileURLToPath } from 'node:url';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const STREAM_FILE = 'content/stream.json';
 
-// Pages with stream regions. Add a page here when it gains one.
+// Pages with generated regions. Add a page here when it gains one.
 const PAGES = [
   'content/fixtures/grid.html',
   'content/fixtures/list.html',
   'content/fixtures/more-from.html',
+  'work/index.html',
+  'work/campaign-sim.html',
+  'work/conservis.html',
+  'work/everag.html',
+  'work/expert-insights.html',
+  'work/plinth.html',
+  'work/vidscrip.html',
 ];
 
 // ---- Vocabulary ----------------------------------------------------------
@@ -77,6 +93,10 @@ const SIZES = {
   grid: '(max-width: 599px) calc(100vw - 32px), (max-width: 1099px) calc((100vw - 120px) / 3), calc((100vw - 160px) / 5)',
   list: '(max-width: 767px) calc(100vw - 32px), min(560px, 40vw)',
 };
+
+// A /work/ cover is 306px wide beside its text, and runs the width of the
+// screen, less the gutters and the stack's offset, on a phone (pages.css).
+const COVER_SIZES = '(max-width: 599px) calc(100vw - 44px), 306px';
 
 // Items in the first Grid row at 1440. The spec puts a case study among
 // them, so the colour chip is explained early.
@@ -250,6 +270,34 @@ function readCaseStudyPage(slug) {
   };
 }
 
+/**
+ * The start and end years in a dateline such as "Foundry · 2016–21" or
+ * "Blueshift · 2025", or null when it ends with neither.
+ */
+function yearSpan(dates) {
+  const match = dates.match(/(\d{4})(?:–(\d{2}|\d{4}))?$/);
+  if (!match) return null;
+  const start = Number(match[1]);
+  if (!match[2]) return { start, end: start };
+  // A two-digit end shares the start's century, unless that would run backwards.
+  let end = match[2].length === 4 ? Number(match[2]) : Math.floor(start / 100) * 100 + Number(match[2]);
+  if (end < start) end += 100;
+  return { start, end };
+}
+
+/**
+ * The case studies newest first: the order of the /work/ index, and of the
+ * next-story band, which wraps from the last back to the first. Newest means
+ * the latest end year, then the latest start year. A tie keeps stream order.
+ */
+function workOrder(items, pages) {
+  return items
+    .filter((item) => item.type === 'case-study')
+    .map((item, i) => ({ item, i, ...yearSpan(pages.get(item.caseStudy.slug).facts[1]) }))
+    .sort((a, b) => b.end - a.end || b.start - a.start || a.i - b.i)
+    .map(({ item }) => item);
+}
+
 // ---- Checking the content ------------------------------------------------
 
 /**
@@ -409,6 +457,13 @@ function check(items, pages) {
       warnings.push(`${at}: sits beside ${next.id}, from the same case study`);
     }
   });
+
+  // The Work pages order case studies by the years on each page.
+  for (const [slug, page] of pages) {
+    if (!yearSpan(page.facts[1])) {
+      errors.push(`work/${slug}.html: its second fact, "${page.facts[1]}", needs to end with a year or a range such as 2016–21`);
+    }
+  }
 
   if (!items.slice(0, FIRST_ROW).some((item) => item.type === 'case-study')) {
     errors.push(`${STREAM_FILE}: the first ${FIRST_ROW} items must include a case study, so the colour chip is explained early`);
@@ -712,10 +767,70 @@ function renderIsland(shown, all, pages) {
   ];
 }
 
+// ---- The Work pages ------------------------------------------------------
+
+/**
+ * The /work/ index: one row per case study, newest first. The whole row is
+ * one link, named by its title and described by its premise. The cover is
+ * the page's first figure, drawn as a stack in the project's colour, and it
+ * stays out of the reading order since the title already names it.
+ */
+function renderWorkIndex(order, pages) {
+  return order.flatMap((stack, i) => {
+    const slug = stack.caseStudy.slug;
+    const page = pages.get(slug);
+    const cover = page.figures[0];
+    const id = `work-${slug}`;
+    const priority = i === 0 ? ' fetchpriority="high"' : '';
+    const img = `<img src="${esc(cover.src)}" width="${cover.width}" height="${cover.height}" alt="" loading="${i < 2 ? 'eager' : 'lazy'}"${priority} decoding="async">`;
+    const picture = cover.avif
+      ? ['<picture>', `  <source type="image/avif" srcset="${esc(cover.avif)}" sizes="${COVER_SIZES}">`, `  ${img}`, '</picture>']
+      : [img];
+    const [role, dates] = page.facts;
+    return [
+      ...(i ? [''] : []),
+      `<li class="entry entry--case theme-${stack.theme}">`,
+      `  <a class="entry__link" href="/work/${slug}" aria-labelledby="${id}-title" aria-describedby="${id}-premise">`,
+      '    <div class="entry__cover" aria-hidden="true">',
+      ...indent(picture, 6),
+      '    </div>',
+      '    <div class="entry__body">',
+      `      <h2 class="entry__title" id="${id}-title">${esc(stack.title)}</h2>`,
+      `      <p class="entry__dek" id="${id}-premise">${esc(page.premise)}</p>`,
+      `      <p class="entry__meta micro"><span class="entry__dateline">${esc(dates)}</span> <span class="entry__detail">${esc(role)}</span></p>`,
+      '    </div>',
+      '    <p class="entry__cta micro">Read the case study <span aria-hidden="true">→</span></p>',
+      '  </a>',
+      '</li>',
+    ];
+  });
+}
+
+/**
+ * The band that ends a case-study page. It only moves forward: it names the
+ * next case study in /work/ order, wrapping from the last to the first, and
+ * carries no other link. The theme class gives it the destination's colours.
+ */
+function renderNextStory(slug, order, file) {
+  const at = order.findIndex((stack) => stack.caseStudy.slug === slug);
+  if (at < 0) throw new Error(`${file}: next-story case-study="${slug}" matches no case study in the stream`);
+  const next = order[(at + 1) % order.length];
+  return [
+    `<nav class="next-story theme-${next.theme}" aria-label="Next case study">`,
+    `  <a class="next-story__link" href="/work/${next.caseStudy.slug}">`,
+    `    <span class="next-story__name">${esc(next.title)}</span>`,
+    '    <span class="next-story__arrow" aria-hidden="true">→</span>',
+    '  </a>',
+    '</nav>',
+  ];
+}
+
 // ---- Filling pages -------------------------------------------------------
 
 const REGION = /^([ \t]*)<!-- stream:start((?:\s+[a-z-]+="[^"]*")*)\s*-->[\s\S]*?^[ \t]*<!-- stream:end -->/gm;
 const ISLAND = /^([ \t]*)<!-- stream-data:start -->[\s\S]*?^[ \t]*<!-- stream-data:end -->/m;
+const WORK_INDEX = /^([ \t]*)<!-- work-index:start -->[\s\S]*?^[ \t]*<!-- work-index:end -->/gm;
+const NEXT_STORY = /^([ \t]*)<!-- next-story:start case-study="([a-z0-9-]+)" -->[\s\S]*?^[ \t]*<!-- next-story:end -->/gm;
 
 function regionOptions(text, file) {
   const options = { view: 'grid', caseStudy: null, heading: 2, eager: 0 };
@@ -742,13 +857,19 @@ function regionItems(items, options, file) {
 }
 
 /** Returns the page with every region and the island regenerated. */
-function buildPage(file, items, pages) {
+function buildPage(file, items, pages, order) {
   const html = read(file);
-  const starts = (html.match(/<!-- stream:start/g) ?? []).length;
-  const ends = (html.match(/<!-- stream:end -->/g) ?? []).length;
-  if (starts !== ends) throw new Error(`${file}: has ${starts} stream:start and ${ends} stream:end markers`);
-  if (!starts) throw new Error(`${file}: has no stream regions; remove it from PAGES or add one`);
-  if (!ISLAND.test(html)) throw new Error(`${file}: has stream regions but no stream-data markers for the island`);
+  const count = (marker) => (html.match(new RegExp(`<!-- ${marker}`, 'g')) ?? []).length;
+  for (const kind of ['stream', 'work-index', 'next-story']) {
+    if (count(`${kind}:start`) !== count(`${kind}:end -->`)) {
+      throw new Error(`${file}: has ${count(`${kind}:start`)} ${kind}:start and ${count(`${kind}:end -->`)} ${kind}:end markers`);
+    }
+  }
+  const starts = count('stream:start');
+  if (!starts && !count('work-index:start') && !count('next-story:start')) {
+    throw new Error(`${file}: has no generated regions; remove it from PAGES or add one`);
+  }
+  if (starts && !ISLAND.test(html)) throw new Error(`${file}: has stream regions but no stream-data markers for the island`);
 
   const shown = [];
   let regions = 0;
@@ -771,10 +892,23 @@ function buildPage(file, items, pages) {
   const repeated = ids.find((id, i) => ids.indexOf(id) !== i);
   if (repeated) throw new Error(`${file}: ${repeated} appears in more than one region, which would repeat its id`);
 
-  out = out.replace(ISLAND, (match, space) => [
-    `${space}<!-- stream-data:start -->`,
-    ...indent(renderIsland(shown, items, pages), space.length),
-    `${space}<!-- stream-data:end -->`,
+  if (starts) {
+    out = out.replace(ISLAND, (match, space) => [
+      `${space}<!-- stream-data:start -->`,
+      ...indent(renderIsland(shown, items, pages), space.length),
+      `${space}<!-- stream-data:end -->`,
+    ].join('\n'));
+  }
+
+  out = out.replace(WORK_INDEX, (match, space) => [
+    `${space}<!-- work-index:start -->`,
+    ...indent(renderWorkIndex(order, pages), space.length),
+    `${space}<!-- work-index:end -->`,
+  ].join('\n'));
+  out = out.replace(NEXT_STORY, (match, space, slug) => [
+    `${space}<!-- next-story:start case-study="${slug}" -->`,
+    ...indent(renderNextStory(slug, order, file), space.length),
+    `${space}<!-- next-story:end -->`,
   ].join('\n'));
   return out;
 }
@@ -844,6 +978,7 @@ function main() {
   }
 
   const resolved = resolve(items, pages);
+  const order = workOrder(items, pages);
   const placeholders = resolved.filter((item) => item.placeholder).length;
   console.log(`${resolved.length} items: ${resolved.length - placeholders} ready, ${placeholders} placeholders.`);
 
@@ -851,7 +986,7 @@ function main() {
   for (const file of PAGES) {
     let next;
     try {
-      next = buildPage(file, resolved, pages);
+      next = buildPage(file, resolved, pages, order);
     } catch (error) {
       console.error(`error: ${error.message}`);
       return 1;

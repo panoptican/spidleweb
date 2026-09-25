@@ -20,6 +20,7 @@
   <link rel="preload" href="../assets/fonts/eb-garamond/eb-garamond-latin-400-v33.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../fonts/GT-America-Expanded-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../pages.css">
   <script defer src="https://analytics.spidleweb.net/script.js" data-website-id="49720a36-6280-4d69-9531-c1d0c36b8f11"></script>
 </head>
 <body class="case-study theme-insights">
@@ -84,15 +85,35 @@
     </section>
   </main>
 
-  <footer class="case-endpaper" data-next="sim">
-    <nav class="case-endpaper__nav" aria-label="More work">
-      <a class="case-endpaper__index" href="/">Back to all work</a>
-      <a class="case-endpaper__next" href="/work/campaign-sim" aria-label="Next project: Campaign Sim">
-        <span>Campaign Sim</span><span class="case-endpaper__arrow" aria-hidden="true">→</span>
-      </a>
-    </nav>
-    <div class="footer micro"><span>© <span id="year">2026</span> Jason Spidle</span></div>
+  <section class="more-from" aria-labelledby="more-from-title">
+    <h2 class="more-from__title" id="more-from-title">More from Expert Insights</h2>
+    <div class="more-from__grid">
+      <!-- stream:start case-study="expert-insights" heading="3" -->
+      <!-- stream:end -->
+    </div>
+  </section>
+
+  <!-- next-story:start case-study="expert-insights" -->
+  <nav class="next-story theme-sim" aria-label="Next case study">
+    <a class="next-story__link" href="/work/campaign-sim">
+      <span class="next-story__name">Campaign Sim</span>
+      <span class="next-story__arrow" aria-hidden="true">→</span>
+    </a>
+  </nav>
+  <!-- next-story:end -->
+
+  <footer class="footer footer-line micro">
+    <p class="footer-line__contact"><a href="mailto:jason@spidleweb.net">jason@spidleweb.net</a> <a href="https://www.linkedin.com/in/jspidle">LinkedIn <span aria-hidden="true">↗</span></a></p>
+    <p class="footer-line__copyright">© <span id="year">2026</span> Jason Spidle</p>
   </footer>
+
+  <!-- stream-data:start -->
+  <script type="application/json" id="stream-data">
+  {"items":{
+  },"caseStudies":{
+  }}
+  </script>
+  <!-- stream-data:end -->
   <script src="../script.js"></script>
 </body>
 </html>
