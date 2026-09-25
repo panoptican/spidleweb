@@ -1804,6 +1804,24 @@ class BrowserRegressions(unittest.TestCase):
             self.assertEqual(page.errors, [])
             page.close()
 
+    def test_qa_more_from_badges_keep_the_red_marker_of_the_grid(self):
+        # A case study turns --accent into the project colour, which on the
+        # badge's ink hid the Try it ▶. More from matches the Grid instead.
+        marker = "el => getComputedStyle(el, '::before').color"
+        context = self.context()
+        page = self.open(context, 'index.html')
+        red = page.locator('#activity-central .stream-card__badge').evaluate(marker)
+        self.assertEqual(red, 'rgb(250, 25, 0)')
+        page.close()
+        for path, card_id in [('work/conservis', 'conservis-dashboard'), ('work/campaign-sim', 'channel-impact-simulator')]:
+            with self.subTest(path=path):
+                page = self.open(context, path)
+                self.assertEqual(page.locator(f'.more-from #{card_id} .stream-card__badge').evaluate(marker), red)
+                # The case study's own markers keep the project colour.
+                self.assertNotEqual(page.locator('.case-study').evaluate("el => getComputedStyle(el).getPropertyValue('--accent')"),
+                                    page.locator('.more-from').evaluate("el => getComputedStyle(el).getPropertyValue('--accent')"))
+                page.close()
+
     def test_qa_list_marks_its_first_image_as_the_high_priority_lcp(self):
         # The List's first image is its largest paint, where the Grid's is its
         # headline, so only the List asks for fetchpriority.
