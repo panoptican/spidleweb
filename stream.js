@@ -1309,6 +1309,9 @@
     if (id === 'about') {
       if (aboutSection() && open.kind !== 'about') {
         openAbout(document.querySelector(ABOUT_LINKS), { animate });
+        afterLoad(() => {
+          if (open.kind === 'about') focusIfLost(open.section.querySelector('[tabindex="-1"]'));
+        });
       }
       return;
     }
@@ -1318,16 +1321,35 @@
     const link = cardLinkFor(id);
     const card = link?.closest(CARD);
     if (!link || !card) return;
+    const settle = () => {
+      if (open.kind !== 'item' || open.id !== id || animate) return;
+      scrollByY(card.getBoundingClientRect().top - (isPhone() ? 16 : 24), false);
+      focusIfLost(open.panel.querySelector('#stream-panel-title'));
+    };
     const run = () => {
       if (!isRendered(card)) return;
       openItem(link, { animate }).then(() => {
-        if (open.kind === 'item' && open.id === id && !animate) {
-          scrollByY(card.getBoundingClientRect().top - (isPhone() ? 16 : 24), false);
-        }
+        settle();
+        afterLoad(settle);
       });
     };
     if (isRendered(card)) run();
     else requestAnimationFrame(run);
+  }
+
+  /**
+   * On a page loaded with a fragment, the browser scrolls to its target after
+   * the load event, and clears focus when the target, a card, cannot take it.
+   * Opening happens earlier, so the offset and the focus are applied again.
+   */
+  function afterLoad(callback) {
+    if (document.readyState === 'complete') return;
+    window.addEventListener('load', () => requestAnimationFrame(() => requestAnimationFrame(callback)), { once: true });
+  }
+
+  function focusIfLost(target) {
+    const active = document.activeElement;
+    if (target && (!active || active === document.body)) target.focus({ preventScroll: true });
   }
 
   // ---- Start ---------------------------------------------------------------
