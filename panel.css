@@ -18,11 +18,11 @@
   /* Row bottom to the top of the rise's box, and panel bottom to the next row. */
   --sp-lead: 20px;
   --sp-trail: 48px;
-  --sp-gutter: 40px;
+  --sp-gutter: var(--gutter, 40px);
   --sp-gap: 22px;
   --sp-serif: "EB Garamond", Georgia, serif;
   --sp-text: var(--ink);
-  --sp-muted: #5c5c58;
+  --sp-muted: var(--ink-soft, #5c5c58);
   --sp-rule: color-mix(in oklch, var(--ink) 18%, transparent);
   --sp-key: color-mix(in oklch, var(--ink) 50%, transparent);
   --sp-frame: #fbfbf9;
