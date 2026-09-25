@@ -113,8 +113,15 @@
   function setHash(id) {
     history.replaceState(history.state, '', `${location.pathname}${location.search}#${encodeURIComponent(id)}`);
   }
-  function clearHash() {
-    if (location.hash) history.replaceState(history.state, '', `${location.pathname}${location.search}`);
+  /**
+   * Clears the fragment. Given an id, it clears it only while the fragment
+   * is still that id, so an anchor followed while a panel was open, such as
+   * a figure on a case-study page, stays in the address.
+   */
+  function clearHash(owner) {
+    if (!location.hash) return;
+    if (owner && location.hash !== `#${encodeURIComponent(owner)}`) return;
+    history.replaceState(history.state, '', `${location.pathname}${location.search}`);
   }
 
   function setExpanded(control, open, controls) {
@@ -188,19 +195,19 @@
   }
 
   /**
-   * Stretches `el` from its parent's content box to both edges of the
-   * viewport. The insets are custom properties, so the width still follows
-   * the parent when a scrollbar comes or goes.
+   * Stretches `el` from the box its container gives it to both edges of the
+   * viewport. The box is measured with the stretch taken off, since a grid's
+   * tracks need not fill the container, as on a case page's More from. The
+   * insets are custom properties, so the width still follows the container
+   * when a scrollbar comes or goes.
    */
   function bleed(el) {
-    const parent = el.parentElement;
-    if (!parent) return;
-    const style = getComputedStyle(parent);
-    const rect = parent.getBoundingClientRect();
-    const left = rect.left + parseFloat(style.borderLeftWidth) + parseFloat(style.paddingLeft);
-    const right = document.documentElement.clientWidth -
-      (rect.right - parseFloat(style.borderRightWidth) - parseFloat(style.paddingRight));
-    el.style.setProperty('--stream-bleed-start', `${Math.max(0, left)}px`);
+    if (!el.parentElement) return;
+    el.style.setProperty('--stream-bleed-start', '0px');
+    el.style.setProperty('--stream-bleed-end', '0px');
+    const rect = el.getBoundingClientRect();
+    const right = document.documentElement.clientWidth - rect.right;
+    el.style.setProperty('--stream-bleed-start', `${Math.max(0, rect.left)}px`);
     el.style.setProperty('--stream-bleed-end', `${Math.max(0, Math.floor(right))}px`);
   }
 
@@ -586,6 +593,12 @@
   // beside the story, and "solo" is the story alone. The markup order is the
   // phone's reading order.
 
+  /** Read the full case study →, unless this is already that page. */
+  function studyLink(study) {
+    const here = location.pathname.replace(/\.html$/, '').replace(/\/$/, '');
+    return study.href === here ? '' : cta(study.href, 'Read the full case study', '→');
+  }
+
   function bandFacts(study) {
     return facts([['Role', study.facts[0]], ['Scope', study.facts[2]]]);
   }
@@ -615,7 +628,7 @@
         strip(frames, start, `${study.title} screens`),
         lede(study.note, 'intro'),
         bandFacts(study),
-        cta(study.href, 'Read the full case study', '→'),
+        studyLink(study),
         closer(),
       ].join(''),
     };
@@ -685,7 +698,7 @@
         lede(item.note),
         `<div class="stream-panel__media">${stage}</div>`,
         facts([['Industry', item.industry], ['Platform', item.platform], ...(item.facts || []).map((f) => [f.label, f.value]), ['Shared', monthYear(item.shared)]]),
-        band ? cta(study.href, 'Read the full case study', '→') : '',
+        band ? studyLink(study) : '',
         `<div class="stream-panel__aside">${steps(item, ctx.level)}${relatedBlock(ctx.related, ctx.level)}</div>`,
         closer(open),
       ].join(''),
@@ -775,7 +788,7 @@
         lede(item.note),
         `<div class="stream-panel__media">${player(item, { eager: true, vertical: true })}</div>`,
         facts([['Project', item.project], ['Running time', item.media?.duration], ['Shared', monthYear(item.shared)]]),
-        study ? cta(study.href, 'Read the full case study', '→') : '',
+        study ? studyLink(study) : '',
         `<div class="stream-panel__aside">${relatedBlock(ctx.related, ctx.level)}</div>`,
         closer(),
       ].join(''),
@@ -1002,14 +1015,14 @@
 
   function closeItem({ animate = true, focus = true } = {}) {
     if (open.kind !== 'item') return;
-    const { panel, link } = open;
+    const { panel, link, id } = open;
     token++;
     open.strip?.destroy();
     unwatchContainer();
     for (const key of Object.keys(open)) delete open[key];
     open.kind = null;
     setExpanded(link, false);
-    clearHash();
+    clearHash(id);
     stopMedia(panel);
     retire(panel);
     if (focus) link.focus();
@@ -1191,7 +1204,7 @@
     open.kind = null;
     riseWatcher.unobserve(rise);
     document.querySelectorAll(ABOUT_LINKS).forEach((link) => setExpanded(link, false));
-    clearHash();
+    clearHash('about');
     stopMedia(section);
     const done = () => {
       section.hidden = true;
