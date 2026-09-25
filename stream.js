@@ -364,7 +364,9 @@
       : m?.tile
         ? `<span class="stream-related__tile" aria-hidden="true">${esc(item.title)}</span>`
         : '<span class="stream-related__empty"></span>';
-    const badge = item.type === 'prototype' ? '<span class="stream-related__badge micro" aria-hidden="true"><span>▶</span> Try it</span>' : '';
+    // Phones drop Try it from a web prototype, which they do not run.
+    const tryable = item.type === 'prototype' && (item.platform === 'Mobile' || !isPhone());
+    const badge = tryable ? '<span class="stream-related__badge micro" aria-hidden="true"><span>▶</span> Try it</span>' : '';
     return `<li><button type="button" class="stream-related__item" data-show="${esc(id)}" data-focus-key="show-${esc(id)}"${current ? ' aria-current="true"' : ''}>
       <span class="stream-related__thumb" data-shape="${shape}">${image}${badge}</span>
       <span class="stream-related__name">${esc(item.title)}</span>
